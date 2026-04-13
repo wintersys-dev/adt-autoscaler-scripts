@@ -213,7 +213,7 @@ count1="1"
 while ( [ "${application_configuration_installed}" = "" ] && [ "${count1}" -lt "10" ] )
 do
 	/bin/echo "${0} `/bin/date`: testing for application configuration installation on new webserver, this is attempt ${count}"
-	/usr/bin/ssh -q -p ${SSH_PORT} -i ${BUILD_KEY} ${OPTIONS} ${SERVER_USER}@${private_ip}  "${SUDO} /home/${SERVER_USER}/application/configuration/InitialiseConfigurationByApplication.sh"
+	/usr/bin/ssh -q -p ${SSH_PORT} -i ${BUILD_KEY} ${OPTIONS} ${SERVER_USER}@${private_ip}  "${SUDO} /home/${SERVER_USER}/application/configuration/InitialiseApplicationConfiguration.sh"
 	application_configuration_installed="`/usr/bin/ssh -q -p ${SSH_PORT} -i ${BUILD_KEY} ${OPTIONS} ${SERVER_USER}@${private_ip} "/usr/bin/test -f /home/${SERVER_USER}/runtime/INITIAL_CONFIG_SET && /bin/echo 'INITIAL_CONFIG_SET'"`"
 	/bin/sleep 5
 	count1="`/usr/bin/expr ${count1} + 1`"
