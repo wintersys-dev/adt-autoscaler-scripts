@@ -64,7 +64,7 @@ AddressFamily inet
 LoginGraceTime 60
 StrictModes yes
 MaxAuthTries 3
-MaxSessions10
+MaxSessions 10
 PubkeyAuthentication yes
 PermitEmptyPasswords no
 KerberosAuthentication no
