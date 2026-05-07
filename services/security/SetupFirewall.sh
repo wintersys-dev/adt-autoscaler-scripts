@@ -188,7 +188,7 @@ fi
 
 if ( [ -f ${HOME}/runtime/firewall.dat ] )
 then
-	ports="`/bin/grep "^AUTOSCALERPORTS" ${HOME}/runtime/firewall.dat | /usr/bin/awk -F':' '{print $NF}'`"
+	ports="`/bin/grep "^AUTOSCALERPORTS" ${HOME}/runtime/firewall.dat | /bin/sed 's/AUTOSCALERPORTS://g'`"
 
 	for port_token in ${ports}
 	do
