@@ -47,7 +47,7 @@ then
 fi
 
 #These scripts are set to run every 5 minutes
-/bin/echo "*/5 * * * * export HOME="${HOME}" && /bin/sleep 23 && ${HOME}/services/security/MonitorFirewall.sh" >> /var/spool/cron/crontabs/root
+/bin/echo "*/5 * * * * export HOME="${HOME}" && /bin/sleep 23 && ${HOME}/services/security/firewall/MonitorFirewall.sh" >> /var/spool/cron/crontabs/root
 /bin/echo "*/5 * * * * export HOME="${HOME}" && ${HOME}/autoscaler/RecordNumberOfWebserversRunning.sh" >> /var/spool/cron/crontabs/root
 
 #This script will run every 10 minutes
