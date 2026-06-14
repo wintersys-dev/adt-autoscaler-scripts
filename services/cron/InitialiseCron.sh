@@ -77,15 +77,8 @@ then
 	/bin/echo "@reboot export HOME="${HOME}" && ${HOME}/services/datastore/config/ActivateConfigDatastoreHeavyweight.sh" >> /var/spool/cron/crontabs/root
 fi
 
-#If we are building for production, then these scripts are also installed in the crontab. If it's for development then they are not
-#installed.
-if ( [ "`${HOME}/utilities/config/CheckConfigValue.sh PRODUCTION:1`" = "1" ] )
-then
-	/bin/echo "*/2 * * * * export HOME="${HOME}" && ${HOME}/services/cron/PerformScalingFromCron.sh" >> /var/spool/cron/crontabs/root
-	/bin/echo "*/3 * * * * export HOME="${HOME}" && ${HOME}/services/cron/DeadOrAliveFromCron.sh" >> /var/spool/cron/crontabs/root
-	#/bin/echo "30 8 * * *  export HOME="${HOME}" && ${HOME}/utilities/processing/ScalingUpdateEvent.sh 5" >> /var/spool/cron/crontabs/root
-	#/bin/echo "30 17 * * *  export HOME="${HOME}" && ${HOME}/utilities/processing/ScalingUpdateEvent.sh 3" >> /var/spool/cron/crontabs/root
-fi
+/bin/echo "*/2 * * * * export HOME="${HOME}" && ${HOME}/services/cron/PerformScalingFromCron.sh" >> /var/spool/cron/crontabs/root
+/bin/echo "*/3 * * * * export HOME="${HOME}" && ${HOME}/services/cron/DeadOrAliveFromCron.sh" >> /var/spool/cron/crontabs/root
 
 /bin/echo "30 3 * * *  export HOME="${HOME}" && ${HOME}/utilities/housekeeping/RemoveExpiredLogs.sh" >> /var/spool/cron/crontabs/root
 
