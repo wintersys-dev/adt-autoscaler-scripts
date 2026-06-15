@@ -162,7 +162,7 @@ fi
 ${HOME}/services/cloudhost/InitialiseCloudhostConfig.sh
 
 /bin/echo "${0} Setting up firewall"
-${HOME}/security/firewall/SetupFirewall.sh
+${HOME}/services/security/firewall/SetupFirewall.sh
 
 cd ${HOME}
 
