@@ -262,7 +262,7 @@ fi
 
 if ( [ "${failedonlinecheck}" = "0" ] )
 then
-	if ( [ "${NO_REVERSE_PROXY}" = "0" ] )
+	if ( [ "${NO_REVERSE_PROXIES}" = "0" ] )
 	then
 		${HOME}/autoscaler/AddIPToDNS.sh ${ip}
 	fi
