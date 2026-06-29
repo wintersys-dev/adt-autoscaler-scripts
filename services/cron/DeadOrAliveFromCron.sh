@@ -43,13 +43,13 @@ cleanup()
 
 lockfile=${HOME}/runtime/deadoralivelock.file
 
-NO_REVERSE_PROXY="`${HOME}/utilities/config/ExtractConfigValue.sh 'NOREVERSEPROXY'`"
+NO_REVERSE_PROXIES="`${HOME}/utilities/config/ExtractConfigValue.sh 'NOREVERSEPROXIES'`"
 
 if ( [ ! -f ${lockfile} ] )
 then
         /usr/bin/touch ${lockfile}
 
-        if ( [ "${NO_REVERSE_PROXY}" != "0" ] )
+        if ( [ "${NO_REVERSE_PROXIES}" != "0" ] )
         then
                 ${HOME}/autoscaler/DeadOrAliveReverseProxies.sh
         fi
