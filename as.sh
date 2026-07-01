@@ -183,8 +183,8 @@ ${HOME}/services/email/SendEmail.sh "A NEW AUTOSCALER HAS BEEN SUCCESSFULLY BUIL
 /bin/touch ${HOME}/runtime/AUTOSCALER_READY
 /bin/touch ${HOME}/runtime/AUTHORISED_TO_SCALE
 
-/bin/echo "${0} Enforcing permissions"
-${HOME}/utilities/security/EnforcePermissions.sh &
+#/bin/echo "${0} Enforcing permissions"
+#${HOME}/utilities/security/EnforcePermissions.sh &
 
 
 
