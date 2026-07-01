@@ -171,8 +171,6 @@ ${HOME}/services/cloudhost/InitialiseCloudhostConfig.sh
 /bin/echo "${0} Setting up firewall"
 ${HOME}/services/security/firewall/SetupFirewall.sh
 
-cd ${HOME}
-
 /bin/echo "${0} Initialising cron"
 ${HOME}/services/cron/InitialiseCron.sh
 
