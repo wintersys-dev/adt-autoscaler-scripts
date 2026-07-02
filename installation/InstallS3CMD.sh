@@ -63,10 +63,10 @@ do
 		then
 			if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'DATASTORETOOL:s3cmd:repo'`" = "1" ] )
 			then
-				eval ${install_command} s3cmd	
+				eval ${install_command} s3cmd ${tail_options}
 			elif ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'DATASTORETOOL:s3cmd:source'`" = "1" ] )
 			then
-				eval ${install_command} python3 python3-dateutil
+				eval ${install_command} python3 python3-dateutil ${tail_options}
 				/usr/bin/ln -s /usr/bin/python3 /usr/bin/python
 				cd /opt
 				${HOME}/services/git/GitClone.sh "github" "" "s3tools" "s3cmd" ""
@@ -80,10 +80,10 @@ do
 		then
 			if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'DATASTORETOOL:s3cmd:repo'`" = "1" ] )
 			then
-				eval ${install_command} s3cmd
+				eval ${install_command} s3cmd ${tail_options}
 			elif ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'DATASTORETOOL:s3cmd:source'`" = "1" ] )
 			then
-				eval ${install_command} python3 python3-dateutil
+				eval ${install_command} python3 python3-dateutil ${tail_options}
 				/usr/bin/ln -s /usr/bin/python3 /usr/bin/python
 				cd /opt
 				${HOME}/services/git/GitClone.sh "github" "" "s3tools" "s3cmd" ""
