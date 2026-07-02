@@ -64,4 +64,17 @@ then
 	fi
 fi
 
+if ( [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "PACKAGEMANAGER" | /usr/bin/awk -F':' '{print $NF}'`" = "nala" ] )
+then
+	if ( [ "${BUILDOS}" = "ubuntu" ] )
+	then
+		${HOME}/installation/InstallNala.sh ${buildos}
+	fi
+
+	if ( [ "${BUILDOS}" = "debian" ] )
+	then
+		${HOME}/installation/InstallNala.sh ${buildos}
+	fi
+fi
+
 
