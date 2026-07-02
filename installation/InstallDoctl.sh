@@ -58,7 +58,7 @@ do
 	then
 	    if ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${HOME}/runtime/software.dat | /bin/grep CLOUDCLITOOL:doctl:snap`" != "" ] )
         then
-			eval ${install_command} snapd	
+			eval ${install_command} snapd ${tail_options}
 			snap="`/usr/bin/whereis snap | /usr/bin/awk -F':' '{print $NF}' | /usr/bin/awk '{print $1}'`"		
 			${snap} install doctl											
 			/usr/bin/ln -s /snap/bin/doctl /usr/local/bin/doctl							
@@ -75,9 +75,9 @@ do
 	then
 	    if ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${HOME}/runtime/software.dat | /bin/grep CLOUDCLITOOL:doctl:snap`" != "" ] )
         then
-			eval ${install_command} snapd	
+			eval ${install_command} snapd ${tail_options}	
 			snap="`/usr/bin/whereis snap | /usr/bin/awk -F':' '{print $NF}' | /usr/bin/awk '{print $1}'`"		
-			${snap} install doctl											
+			${snap} install doctl 										
 			/usr/bin/ln -s /snap/bin/doctl /usr/local/bin/doctl							
 			/bin/mkdir -p /root/.config/doctl 									
 			/bin/cp ${HOME}/.config/doctl/config.yaml /root/.config/doctl						
