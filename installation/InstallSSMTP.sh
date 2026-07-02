@@ -59,14 +59,14 @@ do
 	then
 		if ( [ "${BUILDOS}" = "ubuntu" ] )
 		then
-			eval ${install_command} ssmtp	
-			eval ${install_command} mailutils		
+			eval ${install_command} ssmtp ${tail_options}	
+			eval ${install_command} mailutils ${tail_options}		
 		fi
 
 		if ( [ "${BUILDOS}" = "debian" ] )
 		then
-			eval ${install_command} ssmtp	
-			eval ${install_command} mailutils		
+			eval ${install_command} ssmtp ${tail_options}
+			eval ${install_command} mailutils ${tail_options}		
 		fi	
 	fi
 	count="`/usr/bin/expr ${count} + 1`"
