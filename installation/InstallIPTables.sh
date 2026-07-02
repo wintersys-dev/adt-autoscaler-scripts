@@ -66,11 +66,11 @@ do
 				/usr/sbin/ufw disable                                                                          
 			fi      
 
-			eval ${install_command} iptables
+			eval ${install_command} iptables ${tail_options}
 			/bin/echo iptables-persistent iptables-persistent/autosave_v4 boolean true | /usr/bin/sudo debconf-set-selections
 			/bin/echo iptables-persistent iptables-persistent/autosave_v4 boolean true | /usr/bin/sudo debconf-set-selections 
-			eval ${install_command}  netfilter-persistent     
-			eval ${install_command}  iptables-persistent     
+			eval ${install_command}  netfilter-persistent  ${tail_options}    
+			eval ${install_command}  iptables-persistent  ${tail_options}    
 		fi
 
 		if ( [ "${BUILDOS}" = "debian" ] )
@@ -80,11 +80,11 @@ do
 				/usr/sbin/ufw disable                                                                           
 			fi        
 
-			eval ${install_command} iptables
+			eval ${install_command} iptables ${tail_options}
 			/bin/echo iptables-persistent iptables-persistent/autosave_v4 boolean true | /usr/bin/sudo debconf-set-selections
 			/bin/echo iptables-persistent iptables-persistent/autosave_v4 boolean true | /usr/bin/sudo debconf-set-selections 
-			eval ${install_command}  netfilter-persistent     
-			eval ${install_command}  iptables-persistent     
+			eval ${install_command}  netfilter-persistent ${tail_options}     
+			eval ${install_command}  iptables-persistent  ${tail_options}    
 		fi
 	fi
 	count="`/usr/bin/expr ${count} + 1`"
