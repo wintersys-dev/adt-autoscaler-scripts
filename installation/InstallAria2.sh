@@ -59,14 +59,14 @@ do
 	then
 		if ( [ "${BUILDOS}" = "ubuntu" ] )
 		then
-			${install_command} snapd
+			${install_command} snapd ${tail_options}
 			/usr/bin/snap install aria2c 
 			/bin/ln -s /snap/bin/aria2c /usr/sbin/aria2c 
 		fi
 
 		if ( [ "${BUILDOS}" = "debian" ] )
 		then
-			${install_command} snapd
+			${install_command} snapd ${tail_options}
 			/usr/bin/snap install aria2c 
 			/bin/ln -s /snap/bin/aria2c /usr/sbin/aria2c 
 		fi
