@@ -60,12 +60,12 @@ do
         then
                 if ( [ "${BUILDOS}" = "ubuntu" ] )
                 then
-                        eval ${install_command} clamav clamav-daemon clamav-freshclam clamdscan
+                        eval ${install_command} clamav clamav-daemon clamav-freshclam clamdscan ${tail_options}
                 fi
 
                 if ( [ "${BUILDOS}" = "debian" ] )
                 then
-                        eval ${install_command} clamav clamav-daemon clamav-freshclam clamdscan
+                        eval ${install_command} clamav clamav-daemon clamav-freshclam clamdscan ${tail_options}
                 fi
         fi
         count="`/usr/bin/expr ${count} + 1`"
