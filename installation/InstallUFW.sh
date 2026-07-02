@@ -59,12 +59,12 @@ do
 	then
 		if ( [ "${BUILDOS}" = "ubuntu" ] )
 		then
-			eval ${install_command} ufw	
+			eval ${install_command} ufw ${tail_options}
 		fi
 
 		if ( [ "${BUILDOS}" = "debian" ] )
 		then
-			eval ${install_command} ufw	
+			eval ${install_command} ufw ${tail_options}
 		fi
 	fi
 	count="`/usr/bin/expr ${count} + 1`"
