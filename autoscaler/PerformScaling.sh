@@ -77,7 +77,7 @@ SERVER_USER="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERUSER'`"
 SERVER_USER_PASSWORD="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERUSERPASSWORD'`"
 MAX_WEBSERVERS="`${HOME}/utilities/config/ExtractConfigValue.sh 'MAXWEBSERVERS'`"
 
-SUDO=" DEBIAN_FRONTEND=noninteractive /bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S -E "
+SUDO=" DEBIAN_FRONTEND=noninteractive /bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S "
 
 #Report up what we are doing
 autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
