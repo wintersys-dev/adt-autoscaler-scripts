@@ -76,16 +76,11 @@ then
 
         if ( [ "${domain_id}" != "" ] )
         then
-                while ( [ "${count}" -lt "5" ] && [ "`/usr/bin/exo dns show ${domain_id} --config /root/.config/exoscale/dns-exoscale.toml -O json | /usr/bin/jq -r '.[] | select (.content == "'${ip}'").id'`" = "" ] )
-                do
-                        count="`/usr/bin/expr ${count} + 1`"
-                        /usr/bin/exo dns add A ${domainurl} -a ${ip} -n ${subdomain} -t 60 --config /root/.config/exoscale/dns-exoscale.toml
-                done
-        fi
-
-        if ( [ "${count}" = "5" ] || [ "${id}" = "" ] )
-        then
-                ${HOME}/services/email/SendEmail.sh "FAILED TO ADD IP ADDRESS TO DNS SYSTEM" "IP address (${ip}) for domain ${domainurl}) could not be added to the DNS system" "ERROR"
+               record_id="`/usr/bin/exo dns show ${domain_id} --config /root/.config/exoscale/dns-exoscale.toml -O json | /usr/bin/jq -r '.[] | select (.content == "'${ip}'").id'`"
+               if ( [ "${record_id}" != "" ] )
+               then
+                       /usr/bin/exo dns remove A ${domain_id} ${record_id} --config /root/.config/exoscale/dns-exoscale.toml
+                fi
         fi
 fi
 
