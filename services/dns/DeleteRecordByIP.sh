@@ -48,8 +48,6 @@ dns="${6}"
 
 if ( [ "${dns}" = "digitalocean" ] )
 then
-        #Make damn sure that the DNS record gets added to the DNS system
-        count="0"
         record_id="`/usr/local/bin/doctl compute domain records list ${domainurl} --config /root/.config/doctl/dns-do-config.yaml -o json | /usr/bin/jq -r '.[] | select (.data == "'${ip}'").id'`"
         if ( [ "${record_id}" != "" ] )
         then
@@ -65,8 +63,6 @@ dns="${6}"
 
 if ( [ "${dns}" = "exoscale" ] )
 then
-        #Make damn sure that the DNS record gets added to the DNS system
-        count="0"
         domain_id="`/usr/bin/exo dns list --config /root/.config/exoscale/dns-exoscale.toml -O json | /usr/bin/jq -r '.[] | select (.name == "'${domainurl}'").id'`"
 
         if ( [ "${domain_id}" != "" ] )
