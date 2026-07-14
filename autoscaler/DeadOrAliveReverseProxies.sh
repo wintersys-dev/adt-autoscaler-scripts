@@ -46,7 +46,6 @@ probe_by_curl()
                 ${HOME}/autoscaler/RemoveIPFromDNS.sh ${ip}     
                 ${HOME}/services/email/SendEmail.sh "IP ADDRESS REMOVED FROM DNS" "IP address of remote proxy IP address (${ip}) removed from DNS system due to an error" "ERROR"
         else
-        then
                 ips="`${HOME}/autoscaler/GetDNSIPs.sh`"
                 if ( [ "`/bin/echo ${ips} | /bin/grep ${ip}`" = "" ] )
                 then
