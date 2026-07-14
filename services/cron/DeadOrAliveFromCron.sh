@@ -55,6 +55,9 @@ then
         fi
 
         ${HOME}/autoscaler/DeadOrAliveWebservers.sh
-	
-        /bin/rm ${lockfile}
+
+		if ( [ -f ${lockfile} ] )
+		then
+        	/bin/rm ${lockfile}
+		fi
 fi
