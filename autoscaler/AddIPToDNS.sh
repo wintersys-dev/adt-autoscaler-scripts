@@ -43,7 +43,7 @@ ipcheck="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${ip} ${CLOUD
 if ( [ "${ipcheck}" != "" ] )
 then
 	#If the ip address exists in our beingbuilt list then we don't want to add it and as long as it hasn't been removed we are all set
-	if ( [ "`/bin/ls ${HOME}/runtime/beingbuiltips | /bin/grep ${ipcheck}`" = "" ] )
+	if ( [ -d ${HOME}/runtime/beingbuiltips ] && [ "`/bin/ls ${HOME}/runtime/beingbuiltips | /bin/grep ${ipcheck}`" = "" ] )
 	then
 		#Add the ip address to the DNS provider. Once this is done, the webserver should be online then.
 		zonename="`/bin/echo ${WEBSITE_URL} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
