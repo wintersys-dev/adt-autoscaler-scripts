@@ -50,15 +50,10 @@ if ( [ "${dns}" = "digitalocean" ] )
 then
         #Make damn sure that the DNS record gets added to the DNS system
         count="0"
-        while ( [ "${count}" -lt "5" ] && [ "`/usr/local/bin/doctl compute domain records list ${domainurl} --config /root/.config/doctl/dns-do-config.yaml -o json | /usr/bin/jq -r '.[] | select (.data == "'${ip}'").id'`" = "" ] )
-        do
-                count="`/usr/bin/expr ${count} + 1`"
-                /usr/local/bin/doctl compute domain records create --record-type A --record-name ${subdomain} --record-data ${ip}  --record-ttl 60 --config /root/.config/doctl/dns-do-config.yaml ${domainurl} 
-        done
-
-        if ( [ "${count}" = "5" ] )
+        record_id="`/usr/local/bin/doctl compute domain records list ${domainurl} --config /root/.config/doctl/dns-do-config.yaml -o json | /usr/bin/jq -r '.[] | select (.data == "'${ip}'").id'`"
+        if ( [ "${record_id}" != "" ] )
         then
-                ${HOME}/services/email/SendEmail.sh "FAILED TO ADD IP ADDRESS TO DNS SYSTEM" "IP address (${ip}) for domain ${domainurl}) could not be added to the DNS system" "ERROR"
+                /usr/local/bin/doctl compute domain records delete  ${domainurl} ${record_id} --config /root/.config/doctl/dns-do-config.yaml
         fi
 fi
 
