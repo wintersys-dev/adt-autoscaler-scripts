@@ -8,7 +8,7 @@ marker="`${HOME}/services/datastore/operations/ListFromDatastore.sh "config" "AC
 if ( [ "${marker}" != "" ] )
 then
         /bin/touch ${HOME}/runtime/EMERGENCY_RESTORATION_IN_PROGRESS
-        ${HOME}/application/backup/EmergencyRestoration.sh
+        ${HOME}/application/EmergencyRestoration.sh
 else
         exit
 fi
