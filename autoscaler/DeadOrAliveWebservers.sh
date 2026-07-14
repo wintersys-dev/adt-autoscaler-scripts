@@ -80,7 +80,7 @@ endit ()
         public_ip_address="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${down_ip} ${CLOUDHOST}`"
         webserver_name="`${HOME}/services/server/GetServerName.sh "${public_ip_address}" "${CLOUDHOST}"`"
         #We don't want to go lower than 2 webservers no matter what
-        if ( [  "`/bin/echo ${webserver_name} | /bin/grep "\-init\-"`" = "" ] && [ "`/bin/ls -l ${HOME}/runtime/INITIALLY_PROVISIONING* 2>/dev/null`" = "" ] && [ "`${HOME}/services/server/NumberOfServers.sh "ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}" "${CLOUDHOST}"`" -gt "0" ] )
+        if ( [  "`/bin/echo ${webserver_name} | /bin/grep "\-init\-"`" = "" ] || [ "`/bin/ls -l ${HOME}/runtime/INITIALLY_PROVISIONING* 2>/dev/null`" = "" ] && [ "`${HOME}/services/server/NumberOfServers.sh "ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}" "${CLOUDHOST}"`" -gt "0" ] )
         then  
                 autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
 
