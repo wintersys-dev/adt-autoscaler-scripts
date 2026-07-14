@@ -224,7 +224,12 @@ NO_WEBSERVERS="`${HOME}/services/datastore/operations/ListFromDatastore.sh "scal
 
 if ( [ "${NO_WEBSERVERS}" = "" ] )
 then
-        exit
+        NO_WEBSERVERS="`${HOME}/services/server/NumberOfServers.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
+        autoscaler_no="0"
+        if ( [ "${NO_WEBSERVERS}" = "0" ] )
+        then
+                exit
+        fi
 fi
 
 noactivewebservers="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}" ${CLOUDHOST} | /usr/bin/tr '\n' ' ' | /usr/bin/wc -w`"
