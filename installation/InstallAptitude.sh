@@ -65,5 +65,5 @@ if ( [ ! -x /usr/bin/aptitude ] && [ "${count}" = "5" ] )
 then
 	${HOME}/services/email/SendEmail.sh "INSTALLATION ERROR nala" "I believe that aptitude hasn't installed correctly, please investigate" "ERROR"
 else
-	/bin/touch ${HOME}/runtime/installedsoftware/InstallNala.sh	
+	/bin/touch ${HOME}/runtime/installedsoftware/InstallAptitude.sh	
 fi
