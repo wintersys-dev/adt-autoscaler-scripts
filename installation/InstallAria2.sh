@@ -47,9 +47,9 @@ elif ( [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "PACKAGEMANAGER" 
 then
 	manager="${HOME}/installation/nala_wrapper.sh"
 	tail_options="-y"
-elif ( [ "`/bin/grep "^PACKAGEMANAGER:*" ${BUILD_HOME}/configuration/software.dat | /usr/bin/awk -F':' '{print $NF}'`" = "aptitude" ] )
+elif ( [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "PACKAGEMANAGER" | /usr/bin/awk -F':' '{print $NF}'`" = "aptitude" ] )
 then
-        manager="/usr/bin/aptitude"
+        manager="${HOME}/installation/aptitude_wrapper.sh"
         options="-y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold'"
 fi
 
