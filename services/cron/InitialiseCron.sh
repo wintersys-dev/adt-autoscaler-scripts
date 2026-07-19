@@ -58,8 +58,8 @@ fi
 
 /bin/echo "@hourly export HOME="${HOME}" && ${HOME}/utilities/status/LoadMonitoring.sh" >> /var/spool/cron/crontabs/root
 
-
 /bin/echo "22 4 * * *  export HOME="${HOME}" && ${HOME}/utilities/software/UpdateSoftware.sh" >> /var/spool/cron/crontabs/root
+/bin/echo "44 4 * * *  export HOME="${HOME}" && ${HOME}/installation/UpdateAndUpgrade.sh" >> /var/spool/cron/crontabs/root
 
 SERVER_TIMEZONE_CONTINENT="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERTIMEZONECONTINENT'`"
 SERVER_TIMEZONE_CITY="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERTIMEZONECITY'`"
