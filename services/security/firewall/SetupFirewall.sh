@@ -182,7 +182,7 @@ if ( [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" 
 then
 	if ( [ "${firewall}" = "ufw" ] )
 	then
-		if ( [ "`/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw status | /bin/grep "${SSH_PORT}.*ALLOW.*${BUILD_MACHINE_IP}"`" = "" ] )
+		if ( [ "`/usr/sbin/ufw status | /bin/grep "${SSH_PORT}.*ALLOW.*${BUILD_MACHINE_IP}"`" = "" ] )
 		then
 			/usr/sbin/ufw allow from ${BUILD_MACHINE_IP} to any port ${SSH_PORT}
 			/bin/sleep 2
