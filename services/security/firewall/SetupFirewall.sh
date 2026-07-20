@@ -27,7 +27,6 @@ CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 VPC_IP_RANGE="`${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE'`"
 BUILD_MACHINE_IP="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDMACHINEIP'`"
 SERVER_USER="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERUSER'`"
-SERVER_USER_PASSWORD="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERUSERPASSWORD'`"
 
 if ( [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "FAIL2BAN" | /usr/bin/awk -F':' '{print $NF}'`" = "active" ] )
 then
@@ -156,7 +155,7 @@ then
 	then
 		if ( [ "${firewall}" = "ufw" ] )
 		then
-			/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw deny from ${authenticator_ip}
+			/usr/sbin/ufw deny from ${authenticator_ip}
 		fi
 
 		if ( [ "${firewall}" = "iptables" ] )
@@ -169,7 +168,7 @@ then
 	then
 		if ( [ "${firewall}" = "ufw" ] )
 		then
-			/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw deny from ${authenticator_public_ip}
+			/usr/sbin/ufw deny from ${authenticator_public_ip}
 		fi
 
 		if ( [ "${firewall}" = "iptables" ] )
@@ -185,7 +184,7 @@ then
 	then
 		if ( [ "`/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw status | /bin/grep "${SSH_PORT}.*ALLOW.*${BUILD_MACHINE_IP}"`" = "" ] )
 		then
-			/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw allow from ${BUILD_MACHINE_IP} to any port ${SSH_PORT}
+			/usr/sbin/ufw allow from ${BUILD_MACHINE_IP} to any port ${SSH_PORT}
 			/bin/sleep 2
 			updated="1"
 		fi
@@ -204,9 +203,9 @@ fi
 
 if ( [ "${firewall}" = "ufw" ] )
 then
-	if ( [ "`/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw status | /bin/grep "${SSH_PORT}.*ALLOW.*${VPC_IP_RANGE}"`" = "" ] )
+	if ( [ "`//usr/sbin/ufw status | /bin/grep "${SSH_PORT}.*ALLOW.*${VPC_IP_RANGE}"`" = "" ] )
 	then
-		/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw allow from ${VPC_IP_RANGE} to any port ${SSH_PORT}
+		/usr/sbin/ufw allow from ${VPC_IP_RANGE} to any port ${SSH_PORT}
 		/bin/sleep 5
 		updated="1"
 	fi
@@ -240,12 +239,12 @@ then
 
 		if ( [ "${firewall}" = "ufw" ] )
 		then
-			if ( [ "`/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw status | /bin/grep "${port}.*ALLOW.*${ip_address}"`" = "" ] && [ "${delete}" != "yes" ] )
+			if ( [ "`/usr/sbin/ufw status | /bin/grep "${port}.*ALLOW.*${ip_address}"`" = "" ] && [ "${delete}" != "yes" ] )
 			then
-				/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw allow from ${ip_address} to any port ${port}
+				/usr/sbin/ufw allow from ${ip_address} to any port ${port}
 				updated="1"
 			else
-				if ( [ "`/bin/echo ${SERVER_USER_PASSWORD} | /usr/bin/sudo -S /usr/sbin/ufw status | /bin/grep "${port}.*ALLOW.*${ip_address}"`" != "" ] && [ "${delete}" = "yes" ] )
+				if ( [ "`/usr/sbin/ufw status | /bin/grep "${port}.*ALLOW.*${ip_address}"`" != "" ] && [ "${delete}" = "yes" ] )
 				then
 					/usr/bin/yes | /usr/sbin/ufw delete `/usr/sbin/ufw status numbered | /bin/grep ${port} | /usr/bin/awk -F"[\[\]]" '{print $2}' | /bin/sed 's/ //g'`
 					updated="1"
