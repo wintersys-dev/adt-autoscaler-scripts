@@ -25,6 +25,11 @@ then
         exit
 fi
 
+if ( [ ! -f ${HOME}/runtime/AUTOSCALER_READY ] )
+then
+        exit
+fi
+
 if ( [ -f ${HOME}/runtime/CPU_OVERLOAD_ACKNOWLEDGED ] )
 then
         if test "`/usr/bin/find ${HOME}/runtime/CPU_OVERLOAD_ACKNOWLEDGED -mmin +1440`"
