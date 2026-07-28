@@ -21,6 +21,8 @@
 #######################################################################################################
 #set -x
 
+HOME="`/bin/cat /home/homedir.dat`"
+
 /bin/echo ""
 /bin/echo "#######################################################################"
 /bin/echo "Shutting down an autoscaler instance. Please wait whilst I clean the place first."
