@@ -25,7 +25,7 @@ HOME="`/bin/cat /home/homedir.dat`"
 
 /bin/echo ""
 /bin/echo "#######################################################################"
-/bin/echo "Shutting down an autoscaler instance. Please wait whilst I clean the place first."
+/bin/echo "Shutting down a machine with IP ADDRESS: `${HOME}/utilities/processing/GetPublicIP.sh`"
 /bin/echo "#######################################################################"
 /bin/echo ""
 
