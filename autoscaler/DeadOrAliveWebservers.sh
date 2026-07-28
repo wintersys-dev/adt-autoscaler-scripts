@@ -61,6 +61,11 @@ SUDO=" DEBIAN_FRONTEND=noninteractive /bin/echo ${SERVER_USER_PASSWORD} | /usr/b
 OPTIONS=" -o ConnectTimeout=10 -o ConnectionAttempts=10 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
 BUILD_KEY="${HOME}/.ssh/id_${ALGORITHM}_AGILE_DEPLOYMENT_BUILD_KEY_${BUILD_IDENTIFIER}"
 
+if ( [ -f ${HOME}/runtime/PREVENT_WEBSERVER_TERMINATIONS ] )
+then
+        exit
+fi
+
 autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
 autoscaler_name="`${HOME}/services/server/GetServerName.sh ${autoscalerip} ${CLOUDHOST}`"
 if ( [ "${autoscaler_name}" != "" ] )
