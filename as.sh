@@ -75,6 +75,8 @@ X11Forwarding no" > /etc/ssh/sshd_config.d/99-hardening.conf
 
 ${HOME}/utilities/processing/RunServiceCommand.sh "ssh" restart
 
+/usr/sbin/sshd -T >  ${HOME}/logs/initialbuild/sshd-initial-settings.log
+
 /bin/sed -i "s/managed=false/managed=true/" /etc/NetworkManager/NetworkManager.conf
 /bin/echo "[keyfile]
 unmanaged-devices=none" > /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf
