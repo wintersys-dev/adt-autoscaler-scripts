@@ -26,8 +26,8 @@ then
         /bin/mkdir -p ${HOME}/logs/remove_ip_from_dns 
 fi
 
-log_file="ip_out_`/bin/date | /bin/sed 's/ //g'`"
-err_file="ip_err_`/bin/date | /bin/sed 's/ //g'`"
+log_file="removed_ip_out"
+err_file="removed_ip_err"
 
 /bin/echo "Log file is at: ${HOME}/logs/remove_ip_from_dns/${log_file}"
 /bin/echo "Error file is at: ${HOME}/logs/remove_ip_from_dns/${err_file}"
