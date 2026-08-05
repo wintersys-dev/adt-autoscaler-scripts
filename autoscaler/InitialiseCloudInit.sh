@@ -22,6 +22,20 @@
 #######################################################################################################
 #set -x
 
+if ( [ ! -d ${HOME}/logs/initialise_cloudinit] )
+then
+        /bin/mkdir -p ${HOME}/logs/initialise_cloudinit
+fi
+
+log_file="cloudinit_out_`/bin/date | /bin/sed 's/ //g'`"
+err_file="cloudinit_err_`/bin/date | /bin/sed 's/ //g'`"
+
+/bin/echo "Log file is at: ${HOME}/logs/initialise_cloudinit/${log_file}"
+/bin/echo "Error file is at: ${HOME}/logs/einitialise_cloudinit/${err_file}"
+
+exec 1>>${HOME}/logs/initialise_cloudinit/${log_file}
+exec 2>>${HOME}/logs/initialise_cloudinit/${err_file}
+
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 SERVER_USER="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERUSER'`"
 SERVER_USER_PASSWORD="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERUSERPASSWORD'`"
