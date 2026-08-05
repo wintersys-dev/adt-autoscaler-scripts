@@ -33,19 +33,19 @@
 #############################################################################################
 #set -x
 
-logdate="`/usr/bin/date | /usr/bin/awk '{print $1,$2,$3}' | /bin/sed 's/ //g'`"
-logdir="scaling-events-`/usr/bin/date | /usr/bin/awk '{print $1,$2,$3}' | /bin/sed 's/ //g'`"
-
-#You can uncomment these if you want to see what is going on with the status monitoring of your webservers
-if ( [ ! -d ${HOME}/logs/deadoralive-${logdate} ] )
+if ( [ ! -d ${HOME}/logs/dead_or_alive_webserver ] )
 then
-        /bin/mkdir -p ${HOME}/logs/deadoralive-${logdate} 
+        /bin/mkdir -p ${HOME}/logs/dead_or_alive_webserver 
 fi
 
-OUT_FILE="dead-or-alive.out"
-exec 1>>${HOME}/logs/deadoralive-${logdate}/${OUT_FILE}
-ERR_FILE="dead-or-alive.err"
-exec 2>>${HOME}/logs/deadoralive-${logdate}/${ERR_FILE}
+log_file="dead_or_alive_out_`/bin/date | /bin/sed 's/ //g'`"
+err_file="dead_or_alive_err_`/bin/date | /bin/sed 's/ //g'`"
+
+/bin/echo "Log file is at: ${HOME}/logs/dead_or_alive_webserver/${log_file}"
+/bin/echo "Error file is at: ${HOME}/logs/dead_or_alive_webserver/${err_file}"
+
+exec 1>>${HOME}/logs/dead_or_alive_webserver/${log_file}
+exec 2>>${HOME}/logs/dead_or_alive_webserver/${err_file}
 
 /bin/echo "#######################`/usr/bin/date`##################################"
 
