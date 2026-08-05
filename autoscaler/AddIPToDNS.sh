@@ -24,6 +24,20 @@
 #######################################################################################################
 #set -x
 
+if ( [ ! -d ${HOME}/logs/add_ip_to_dns ] )
+then
+        /bin/mkdir -p ${HOME}/logs/add_ip_to_dns 
+fi
+
+log_file="ip_out_`/bin/date | /bin/sed 's/ //g'`"
+err_file="ip_err_`/bin/date | /bin/sed 's/ //g'`"
+
+/bin/echo "Log file is at: ${HOME}/logs/dadd_ip_to_dns/${log_file}"
+/bin/echo "Error file is at: ${HOME}/logs/add_ip_to_dns/${err_file}"
+
+exec 1>>${HOME}/logs/add_ip_to_dns/${log_file}
+exec 2>>${HOME}/logs/add_ip_to_dns/${err_file}
+
 WEBSITE_URL="`${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL'`"
 DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValues.sh 'DNSSECURITYKEY' stripped | /bin/sed 's/ /:/g'`"
