@@ -21,6 +21,20 @@
 ###############################################################################
 #set -x
 
+if ( [ ! -d ${HOME}/logs/remove_ip_from_dns ] )
+then
+        /bin/mkdir -p ${HOME}/logs/remove_ip_from_dns 
+fi
+
+log_file="ip_out_`/bin/date | /bin/sed 's/ //g'`"
+err_file="ip_err_`/bin/date | /bin/sed 's/ //g'`"
+
+/bin/echo "Log file is at: ${HOME}/logs/remove_ip_from_dns/${log_file}"
+/bin/echo "Error file is at: ${HOME}/logs/remove_ip_from_dns/${err_file}"
+
+exec 1>>${HOME}/logs/remove_ip_from_dns/${log_file}
+exec 2>>${HOME}/logs/remove_ip_from_dns/${err_file}
+
 #If the toolkit hasn't fully installed, we don't do anything
 
 if ( [ "`${HOME}/services/datastore/config/wrapper/ListFromDatastore.sh "config" "INSTALLED_SUCCESSFULLY"`" = "" ] )
