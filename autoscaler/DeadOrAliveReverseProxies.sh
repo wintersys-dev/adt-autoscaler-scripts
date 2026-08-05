@@ -79,8 +79,7 @@ for ip in ${dns_ips}
 do
         if ( [ "`/bin/echo ${public_ips} | /bin/grep ${ip}`" = "" ] )
         then
-        :
-               # ${HOME}/autoscaler/RemoveIPFromDNS.sh ${ip}     
+               ${HOME}/autoscaler/RemoveIPFromDNS.sh ${ip}     
         fi
 done
 
