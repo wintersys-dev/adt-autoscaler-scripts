@@ -82,49 +82,50 @@ endit ()
         reason="${2}"
 
         public_ip_address="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${down_ip} ${CLOUDHOST}`"
-        webserver_name="`${HOME}/services/server/GetServerName.sh "${public_ip_address}" "${CLOUDHOST}"`"
-        #We don't want to go lower than 2 webservers no matter what
-        if ( [  "`/bin/echo ${webserver_name} | /bin/grep "\-init\-"`" = "" ] || [ "`/bin/ls -l ${HOME}/runtime/INITIALLY_PROVISIONING* 2>/dev/null`" = "" ] && [ "`${HOME}/services/server/NumberOfServers.sh "ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}" "${CLOUDHOST}"`" -gt "0" ] )
-        then  
-                autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
+        
+        if ( [ "`${HOME}/services/server/GetServerName.sh "${public_ip_address}" "${CLOUDHOST}" | /bin/grep "\-init\-"`" = "" ] )
+        then
+                if ( [ "`/bin/ls -l ${HOME}/runtime/INITIALLY_PROVISIONING* 2>/dev/null`" = "" ] && [ "`${HOME}/services/server/NumberOfServers.sh "ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}" "${CLOUDHOST}"`" -gt "0" ] )
+                then  
+                        autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
 
-                if (  [ "`${HOME}/services/datastore/config/wrapper/ListFromDatastore.sh "config" "beingbuiltips/*" | /bin/grep ${down_ip}`" = "" ] || [ "`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} -mmin +30`" != "" ] )
-                then
-                        /bin/echo "Ending server with ip address ${down_ip}"
-
-                        public_ip_address="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${down_ip} ${CLOUDHOST}`"
-                        if ( [ "${NO_REVERSE_PROXIES}" = "0" ] )
+                        if (  [ "`${HOME}/services/datastore/config/wrapper/ListFromDatastore.sh "config" "beingbuiltips/*" | /bin/grep ${down_ip}`" = "" ] || [ "`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} -mmin +30`" != "" ] )
                         then
-                                /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip} is having it's ip address removed from the DNS system" 
-                                ${HOME}/autoscaler/RemoveIPFromDNS.sh ${public_ip_address}
-                                ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${public_ip_address}"
-                                ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${down_ip}"
+                                /bin/echo "Ending server with ip address ${down_ip}"
 
-                        else
-                                /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip} is having it's ip address removed from the Reverse Proxy" 
-                                ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${public_ip_address}"
-                                ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${down_ip}"
-                        fi
+                                if ( [ "${NO_REVERSE_PROXIES}" = "0" ] )
+                                then
+                                        /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip} is having it's ip address removed from the DNS system" 
+                                        ${HOME}/autoscaler/RemoveIPFromDNS.sh ${public_ip_address}
+                                        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${public_ip_address}"
+                                        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${down_ip}"
+                                else
+                                        /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip} is having it's ip address removed from the Reverse Proxy" 
+                                        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${public_ip_address}"
+                                        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${down_ip}"
+                                fi
 
-                        ${HOME}/services/email/SendEmail.sh "A WEBSERVER IS BEING SHUTDOWN ${down_ip}" "${reason}" "INFO"
+                                ${HOME}/services/email/SendEmail.sh "A WEBSERVER IS BEING SHUTDOWN ${down_ip}" "${reason}" "INFO"
 
-                        /usr/bin/ssh -q -p ${SSH_PORT} -i ${HOME}/.ssh/id_${ALGORITHM}_AGILE_DEPLOYMENT_BUILD_KEY_${BUILD_IDENTIFIER} -o ConnectTimeout=10 -o ConnectionAttempts=3 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${SERVER_USER}@${down_ip} "${SUDO} ${HOME}/utilities/housekeeping/ShutdownThisWebserver.sh"
-                        /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip}  has been shutdown" 
-                        ${HOME}/services/server/DestroyServer.sh ${public_ip_address} ${CLOUDHOST} ${down_ip}
-                        /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip}  has been destroyed and its resources released"
+                                /usr/bin/ssh -q -p ${SSH_PORT} -i ${HOME}/.ssh/id_${ALGORITHM}_AGILE_DEPLOYMENT_BUILD_KEY_${BUILD_IDENTIFIER} -o ConnectTimeout=10 -o ConnectionAttempts=3 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${SERVER_USER}@${down_ip} "${SUDO} ${HOME}/utilities/housekeeping/ShutdownThisWebserver.sh"
+                                /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip}  has been shutdown" 
+                                ${HOME}/services/server/DestroyServer.sh ${public_ip_address} ${CLOUDHOST} ${down_ip}
+                                /bin/echo "${0} `/bin/date`: Webserver with ip address: ${down_ip}  has been destroyed and its resources released"
 
-                        if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} ] )
-                        then
-                                /bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
-                        fi
+                                if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} ] )
+                                then
+                                        /bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
+                                fi
 
-                        if ( [ "`${HOME}/services/datastore/config/wrapper/ListFromDatastore.sh "config" "beenonline/${down_ip}"`" != "" ] )
-                        then
-                                ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${down_ip}"
-                        fi
-                        if ( [ "`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASEINSTALLATIONTYPE'`" = "DBaaS" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" ] )
-                        then
-                                ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh ${public_ip_address}
+                                if ( [ "`${HOME}/services/datastore/config/wrapper/ListFromDatastore.sh "config" "beenonline/${down_ip}"`" != "" ] )
+                                then
+                                        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${down_ip}"
+                                fi
+
+                                if ( [ "`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASEINSTALLATIONTYPE'`" = "DBaaS" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" ] )
+                                then
+                                        ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh ${public_ip_address}
+                                fi
                         fi
                 fi
         fi
