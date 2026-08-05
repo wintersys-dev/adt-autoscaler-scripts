@@ -61,10 +61,11 @@ fi
 /bin/echo "22 4 * * *  export HOME="${HOME}" && ${HOME}/utilities/software/UpdateSoftware.sh" >> /var/spool/cron/crontabs/root
 /bin/echo "44 4 * * *  export HOME="${HOME}" && ${HOME}/installation/UpdateAndUpgrade.sh" >> /var/spool/cron/crontabs/root
 
+/bin/echo "@daily  export HOME="${HOME}" && ${HOME}/utilities/housekeeping/ArchiveErrorLogs.sh" >> /var/spool/cron/crontabs/root
+
 SERVER_TIMEZONE_CONTINENT="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERTIMEZONECONTINENT'`"
 SERVER_TIMEZONE_CITY="`${HOME}/utilities/config/ExtractConfigValue.sh 'SERVERTIMEZONECITY'`"
 /bin/echo '@reboot export TZ="':${SERVER_TIMEZONE_CONTINENT}/${SERVER_TIMEZONE_CITY}'"' >> /var/spool/cron/crontabs/root
-
 /bin/echo "@reboot export HOME="${HOME}" && ${HOME}/utilities/software/UpdateInfrastructure.sh" >>/var/spool/cron/crontabs/root
 /bin/echo "@reboot export HOME="${HOME}" && ${HOME}/utilities/housekeeping/RemoveExpiredLocks.sh reboot" >> /var/spool/cron/crontabs/root
 /bin/echo "@reboot export HOME="${HOME}" && ${HOME}/utilities/status/LoadMonitoring.sh 'reboot'" >> /var/spool/cron/crontabs/root
