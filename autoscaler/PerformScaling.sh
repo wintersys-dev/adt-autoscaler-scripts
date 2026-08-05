@@ -25,14 +25,19 @@
 #######################################################################################################
 #set -x
 
-
-logdate="`/usr/bin/date | /usr/bin/awk '{print $1 $2 $3 $NF}'`"
-logdir="scaling-events-`/usr/bin/date | /usr/bin/awk '{print $1,$2,$3}' | /bin/sed 's/ //g'`"
-
-if ( [ ! -d ${HOME}/logs/${logdir} ] )
+if ( [ ! -d ${HOME}/logs/scaling_event] )
 then
-	/bin/mkdir -p ${HOME}/logs/${logdir}
+        /bin/mkdir -p ${HOME}/logs/scaling_event
 fi
+
+log_file="event_out_`/bin/date | /bin/sed 's/ //g'`"
+err_file="event_err_`/bin/date | /bin/sed 's/ //g'`"
+
+/bin/echo "Log file is at: ${HOME}/logs/scaling_event/${log_file}"
+/bin/echo "Error file is at: ${HOME}/logs/scaling_event/${err_file}"
+
+exec 1>>${HOME}/logs/scaling_event/${log_file}
+exec 2>>${HOME}/logs/scaling_event/${err_file}
 
 #Scaling can be switched off if you create a file SWITCH_OFF_SCALING in the config datastore
 if ( [ "`${HOME}/services/datastore/config/wrapper/ListFromDatastore.sh "config" "SWITCH_OFF_SCALING"`" != "" ] )
