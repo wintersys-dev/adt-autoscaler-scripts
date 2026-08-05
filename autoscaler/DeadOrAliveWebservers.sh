@@ -47,8 +47,6 @@ err_file="dead_or_alive_err_`/bin/date | /bin/sed 's/ //g'`"
 exec 1>>${HOME}/logs/dead_or_alive_webserver/${log_file}
 exec 2>>${HOME}/logs/dead_or_alive_webserver/${err_file}
 
-/bin/echo "#######################`/usr/bin/date`##################################"
-
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
 REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
