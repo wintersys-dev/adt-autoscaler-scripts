@@ -458,7 +458,7 @@ do
                                 proxy_server_ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh ${proxy_server_name} ${CLOUDHOST}`"
                                 for proxy_server_ip in ${proxy_server_ips}
                                 do
-                                        /usr/bin/ssh -q -p ${SSH_PORT} -i ${BUILD_KEY} ${OPTIONS} ${SERVER_USER}@${proxy_server_ip}  "${SUDO} /home/${SERVER_USER}/webserver/configuration/reverseproxy/AddNewIPToReverseProxyIPList.sh ${ip}"
+                                        /usr/bin/ssh -q -p ${SSH_PORT} -i ${BUILD_KEY} ${OPTIONS} ${SERVER_USER}@${proxy_server_ip}  "${SUDO} /usr/bin/run /home/${SERVER_USER}/webserver/configuration/reverseproxy/AddNewIPToReverseProxyIPList.sh ${ip}"
                                 done
                         fi
                         if ( [ -f ${HOME}/runtime/potentialenders/listofipstoend.dat ] )
