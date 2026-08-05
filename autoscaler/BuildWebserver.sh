@@ -69,20 +69,19 @@ autoscaler_name="`${HOME}/services/server/GetServerName.sh ${autoscalerip} ${CLO
 autoscaler_no="`/bin/echo ${autoscaler_name} | /usr/bin/awk -F'-' '{print $2}'`"
 webserver_name="ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}-${rnd}"
 
-#Check there is a directory for logging
-logdir="scaling-events-`/usr/bin/date | /usr/bin/awk '{print $1,$2,$3}' | /bin/sed 's/ //g'`"
-logdir="${logdir}/${webserver_name}"
-
-if ( [ ! -d ${HOME}/logs/${logdir} ] )
+if ( [ ! -d ${HOME}/logs/build_webserver ] )
 then
-	/bin/mkdir -p ${HOME}/logs/${logdir}
+        /bin/mkdir -p ${HOME}/logs/build_webserver
 fi
 
-#The log files for the server build are written here... 
 log_file="webserver_out_`/bin/date | /bin/sed 's/ //g'`"
-exec 1>>${HOME}/logs/${logdir}/${log_file}
 err_file="webserver_err_`/bin/date | /bin/sed 's/ //g'`"
-exec 2>>${HOME}/logs/${logdir}/${err_file}
+
+/bin/echo "Log file is at: ${HOME}/logs/build_webserver/${log_file}"
+/bin/echo "Error file is at: ${HOME}/logs/build_webserver/${err_file}"
+
+exec 1>>${HOME}/logs/build_webserver/${log_file}
+exec 2>>${HOME}/logs/build_webserver/${err_file}
 
 #Make the cloud-init script for building the webserver live and primed
 /bin/echo "Initialising Cloud Init for webserver ${webserver_name}"
