@@ -13,3 +13,15 @@ fi
 
 cd ${HOME}/logs
 /bin/tar cvfz ${HOME}/logs/archives/${archive_date}/archive.tar.gz --exclude "./archives" .
+
+if ( [ ! -d ${HOME}/runtime/logging_archive_workarea ] )
+then
+        /bin/mkdir -p ${HOME}/runtime/logging_archive_workarea
+fi
+
+if ( [ "$?" = "0" ] )
+then
+        /bin/mv ${HOME}/logs/archives ${HOME}/runtime/logging_archive_workarea
+        /bin/rm -r ${HOME}/logs/*
+        /bin/mv ${HOME}/runtime/logging_archive_workarea/archives ${HOME}/logs/
+fi
