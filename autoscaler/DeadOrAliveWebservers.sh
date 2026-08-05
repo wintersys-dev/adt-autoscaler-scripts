@@ -38,8 +38,8 @@ then
         /bin/mkdir -p ${HOME}/logs/dead_or_alive_webserver 
 fi
 
-log_file="dead_or_alive_out_`/bin/date | /bin/sed 's/ //g'`"
-err_file="dead_or_alive_err_`/bin/date | /bin/sed 's/ //g'`"
+log_file="dead_or_alive_out"
+err_file="dead_or_alive_err"
 
 /bin/echo "Log file is at: ${HOME}/logs/dead_or_alive_webserver/${log_file}"
 /bin/echo "Error file is at: ${HOME}/logs/dead_or_alive_webserver/${err_file}"
