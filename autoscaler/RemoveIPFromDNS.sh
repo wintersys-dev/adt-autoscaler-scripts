@@ -29,9 +29,6 @@ fi
 log_file="removed_ip_out"
 err_file="removed_ip_err"
 
-/bin/echo "Log file is at: ${HOME}/logs/remove_ip_from_dns/${log_file}"
-/bin/echo "Error file is at: ${HOME}/logs/remove_ip_from_dns/${err_file}"
-
 exec 1>>${HOME}/logs/remove_ip_from_dns/${log_file}
 exec 2>>${HOME}/logs/remove_ip_from_dns/${err_file}
 
