@@ -82,12 +82,12 @@ then
                        ${HOME}/autoscaler/RemoveIPFromDNS.sh ${ip}     
                 fi
         done
+
+        ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+
+        for ip in ${ips}
+        do
+                probe_by_curl
+        done
 fi
-
-ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
-
-for ip in ${ips}
-do
-        probe_by_curl
-done
 
