@@ -32,9 +32,6 @@ fi
 log_file="ip_out_`/bin/date | /bin/sed 's/ //g'`"
 err_file="ip_err_`/bin/date | /bin/sed 's/ //g'`"
 
-/bin/echo "Log file is at: ${HOME}/logs/add_ip_to_dns/${log_file}"
-/bin/echo "Error file is at: ${HOME}/logs/add_ip_to_dns/${err_file}"
-
 exec 1>>${HOME}/logs/add_ip_to_dns/${log_file}
 exec 2>>${HOME}/logs/add_ip_to_dns/${err_file}
 
