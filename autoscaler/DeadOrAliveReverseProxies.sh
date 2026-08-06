@@ -68,17 +68,21 @@ probe_by_curl()
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
 REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
+AUTHENTICATOR_TYPE="`${HOME}/utilities/config/ExtractConfigValue.sh 'AUTHENTICATORTYPE'`"
 
-dns_ips="`${HOME}/autoscaler/GetDNSIPs.sh`"
-public_ips="`${HOME}/services/server/GetServerIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+if ( [ "${AUTHENTICATOR_TYPE}" != "wire-guard" ] )
+then
+        dns_ips="`${HOME}/autoscaler/GetDNSIPs.sh`"
+        public_ips="`${HOME}/services/server/GetServerIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
 
-for ip in ${dns_ips}
-do
-        if ( [ "`/bin/echo ${public_ips} | /bin/grep ${ip}`" = "" ] )
-        then
-               ${HOME}/autoscaler/RemoveIPFromDNS.sh ${ip}     
-        fi
-done
+        for ip in ${dns_ips}
+        do
+                if ( [ "`/bin/echo ${public_ips} | /bin/grep ${ip}`" = "" ] )
+                then
+                       ${HOME}/autoscaler/RemoveIPFromDNS.sh ${ip}     
+                fi
+        done
+fi
 
 ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
 
