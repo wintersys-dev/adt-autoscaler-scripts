@@ -41,9 +41,6 @@ fi
 log_file="dead_or_alive_out"
 err_file="dead_or_alive_err"
 
-/bin/echo "Log file is at: ${HOME}/logs/dead_or_alive_webserver/${log_file}"
-/bin/echo "Error file is at: ${HOME}/logs/dead_or_alive_webserver/${err_file}"
-
 exec 1>>${HOME}/logs/dead_or_alive_webserver/${log_file}
 exec 2>>${HOME}/logs/dead_or_alive_webserver/${err_file}
 
