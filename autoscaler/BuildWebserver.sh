@@ -218,6 +218,9 @@ do
 	count1="`/usr/bin/expr ${count1} + 1`"
 done
 
+/usr/bin/ssh -q -p ${SSH_PORT} -i ${BUILD_KEY} ${OPTIONS} ${SERVER_USER}@${private_ip}  "${SUDO} /home/${SERVER_USER}/utilities/security/EnforcePermissions.sh"
+
+
 #If we got through to here we simply want to check that the website is online using curl
 failedonlinecheck="1"
 count="1"
