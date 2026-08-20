@@ -25,7 +25,7 @@
 #######################################################################################################
 #set -x
 
-if ( [ ! -d ${HOME}/logs/scaling_event] )
+if ( [ ! -d ${HOME}/logs/scaling_event ] )
 then
         /bin/mkdir -p ${HOME}/logs/scaling_event
 fi
