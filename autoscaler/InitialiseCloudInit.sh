@@ -22,7 +22,7 @@
 #######################################################################################################
 #set -x
 
-if ( [ ! -d ${HOME}/logs/initialise_cloudinit] )
+if ( [ ! -d ${HOME}/logs/initialise_cloudinit ] )
 then
         /bin/mkdir -p ${HOME}/logs/initialise_cloudinit
 fi
