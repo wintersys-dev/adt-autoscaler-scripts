@@ -69,10 +69,10 @@ else
 	/bin/cp ${HOME}/services/server/cloud-init/${CLOUDHOST}/webserver.yaml ${HOME}/runtime/cloud-init/webserver.yaml
 fi
 
-if ( [ -f ${BUILD_HOME}/runtime/${CLOUDHOST}/${BUILD_IDENTIFIER}/DBaaS_CERT ] )
+if ( [ -f ${HOME}/runtime/DBaaS_CERT  ] )
 then
 	/bin/sed -i 's/#DBAAS_CERT//g' ${HOME}/runtime/cloud-init/webserver.yaml
-    dbaas_cert="`/bin/cat ${BUILD_HOME}/runtime/${CLOUDHOST}/${BUILD_IDENTIFIER}/DBaaS_CERT  | /usr/bin/gzip -f | /usr/bin/base64 | /usr/bin/tr -d '\n'`"
+    dbaas_cert="`/bin/cat ${HOME}/runtime/DBaaS_CERT  | /usr/bin/gzip -f | /usr/bin/base64 | /usr/bin/tr -d '\n'`"
 else
 	/bin/sed -i '/#DBAAS_CERT/d' ${HOME}/runtime/cloud-init/webserver.yaml
 fi
