@@ -69,6 +69,14 @@ else
 	/bin/cp ${HOME}/services/server/cloud-init/${CLOUDHOST}/webserver.yaml ${HOME}/runtime/cloud-init/webserver.yaml
 fi
 
+if ( [ -f ${BUILD_HOME}/runtime/${CLOUDHOST}/${BUILD_IDENTIFIER}/DBaaS_CERT ] )
+then
+	/bin/sed -i 's/#DBAAS_CERT//g' ${HOME}/runtime/cloud-init/webserver.yaml
+    dbaas_cert="`/bin/cat ${BUILD_HOME}/runtime/${CLOUDHOST}/${BUILD_IDENTIFIER}/DBaaS_CERT  | /usr/bin/gzip -f | /usr/bin/base64 | /usr/bin/tr -d '\n'`"
+else
+	/bin/sed -i '/#DBAAS_CERT/d' ${HOME}/runtime/cloud-init/webserver.yaml
+fi
+
 git_provider_domain="`${HOME}/services/git/GitProviderDomain.sh ${INFRASTRUCTURE_REPOSITORY_PROVIDER}`"
 
 # Replace placholder tokens with live data that is needed for this build
@@ -77,6 +85,7 @@ git_provider_domain="`${HOME}/services/git/GitProviderDomain.sh ${INFRASTRUCTURE
 /bin/sed -i "s/XXXXALGORITHMXXXX/${ALGORITHM}/g" ${HOME}/runtime/cloud-init/webserver.yaml 
 /bin/sed -i "s/XXXXSERVER_USERXXXX/${SERVER_USER}/g" ${HOME}/runtime/cloud-init/webserver.yaml 
 /bin/sed -i "s;XXXXSERVER_USER_PASSWORDXXXX;${SERVER_USER_PASSWORD_HASHED};g" ${HOME}/runtime/cloud-init/webserver.yaml 
+/bin/sed -i "s;XXXXDBAAS_CERTXXXX;${dbaas_cert};g" ${HOME}/runtime/cloud-init/webserver.yaml
 /bin/sed -i "s/XXXXBUILD_IDENTIFIERXXXX/${BUILD_IDENTIFIER}/g" ${HOME}/runtime/cloud-init/webserver.yaml 
 /bin/sed -i "s/XXXXINFRASTRUCTURE_REPOSITORY_OWNERXXXX/${INFRASTRUCTURE_REPOSITORY_OWNER}/g" ${HOME}/runtime/cloud-init/webserver.yaml 
 /bin/sed -i "s;XXXXSSH_PUBLIC_KEYXXXX;${SSH_PUBLIC_KEY};g" ${HOME}/runtime/cloud-init/webserver.yaml 
