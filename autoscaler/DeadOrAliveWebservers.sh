@@ -268,7 +268,7 @@ do
         if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} ] && [ "`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} -mmin +30`" != "" ] )
         then
                 /bin/echo "${0} `/bin/date`: Webserver ${ip} was found to be offline because it looked like a stalled build" 
-                /bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
+         #       /bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
                 online_ips="`/bin/echo ${online_ips} | /bin/sed "s/${ip}//g"`"
         fi
 done
