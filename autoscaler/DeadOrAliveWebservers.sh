@@ -130,6 +130,7 @@ endit ()
 
 probe_by_ssh ()
 {
+        ip="${1}"
         connectable="0"
         probecount="0"
 
@@ -302,7 +303,7 @@ fi
 
 for ip in ${online_ips}
 do
-        probe_by_ssh &
+        probe_by_ssh ${ip} &
 done
 
 no_processed_ips="0"
