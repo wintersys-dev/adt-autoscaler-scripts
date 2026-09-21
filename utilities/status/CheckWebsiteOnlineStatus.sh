@@ -32,13 +32,21 @@ then
         timeout 23 /usr/bin/lynx -cfg=/tmp/cfg.txt -dump https://${website} 2>&1 >/dev/null
         status="$?"
         /bin/rm /tmp/cfg.txt
-fi
-
-if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:w3m'`" = "1" ] )
+elif ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:w3m'`" = "1" ] )
 then
         checked="1"
         error="`/usr/bin/yes | timeout 23 /usr/bin/w3m -dump -o ssl_verify_server=0  https://${website} | /bin/grep 'error'`"
         /usr/bin/yes | timeout 23 /usr/bin/w3m -dump -o ssl_verify_server=0  https://${website}
+        status="$?"
+        if ( [ "${error}" != "" ] )
+        then
+                status="1"
+        fi
+elif ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:elinks'`" = "1" ] )
+then
+        checked="1"
+        error="`/usr/bin/yes | timeout 23 /usr/bin/elinks -dump -o ssl_verify_server=0  https://${website} | /bin/grep 'error'`"
+        /usr/bin/yes | timeout 23 /usr/bin/elinks -dump -o ssl_verify_server=0  https://${website}
         status="$?"
         if ( [ "${error}" != "" ] )
         then
