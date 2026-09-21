@@ -28,9 +28,10 @@ checked="0"
 if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:lynx'`" = "1" ] )
 then
         checked="1"
-       # timeout 23 /usr/bin/lynx -dump -accept_all_cookies https://${ip} 2>&1 >/dev/null
-        timeout 23 /usr/bin/lynx -cfg=<(echo "FORCE_SSL_PROMPT:YES") -dump https://${website}
+        /bin/echo "FORCE_SSL_PROMPT:YES" > /tmp/cfg.txt
+        timeout 23 /usr/bin/lynx -cfg=/tmp/cfg.txt -dump https://${website} 2>&1 >/dev/null
         status="$?"
+        /bin/rm /tmp/cfg.txt
 fi
 
 if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:w3m'`" = "1" ] )
