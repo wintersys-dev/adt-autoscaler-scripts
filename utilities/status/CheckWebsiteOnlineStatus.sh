@@ -20,7 +20,7 @@
 ###################################################################################
 #set -x
 
-BUILD_HOME="`/bin/cat /home/buildhome.dat`"
+HOME="`/bin/cat /home/homedir.dat`"
 
 ip="${1}"
 
