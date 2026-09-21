@@ -161,7 +161,8 @@ probe_by_curl()
         file="`${HOME}/autoscaler/SelectHeadFile.sh`"
         while ( [ "${probecount}" -le "3" ] && [ "${status}" = "down" ] )
         do
-                if ( [ "`/usr/bin/curl -s -m 20 --insecure -I "https://${ip}:443/${file}" 2>&1 | /bin/grep "HTTP" | /bin/grep -E "200|301|302|303"`" != "" ] ) 
+               # if ( [ "`/usr/bin/curl -s -m 20 --insecure -I "https://${ip}:443/${file}" 2>&1 | /bin/grep "HTTP" | /bin/grep -E "200|301|302|303"`" != "" ] ) 
+                if ( [ "`${HOME}/utilities/status/CheckWebsiteOnlineStatus.sh ${ip}/${file}`" = "success" ] )
                 then
                         status="up"
                 else
