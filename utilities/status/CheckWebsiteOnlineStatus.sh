@@ -37,7 +37,7 @@ fi
 if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:w3m'`" = "1" ] )
 then
         checked="1"
-        /usr/bin/yes | timeout 23 /usr/bin/w3m -dump -o ssl_verify_server=0  https://${website}
+        /usr/bin/yes | timeout 23 /usr/bin/w3m -dump -o ssl_verify_server=0  https://${website} 2>&1 >/dev/null
         status="$?"
 fi
 
