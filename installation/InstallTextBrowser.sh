@@ -1,7 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# Description: This script installs the CLI database client for our database. This
-# enables scripts to connect to the database from the command line as they need to.
+# Description: Install our text browser of choice
 # Author: Peter Winter
 # Date: 08/01/2017
 ###################################################################################
