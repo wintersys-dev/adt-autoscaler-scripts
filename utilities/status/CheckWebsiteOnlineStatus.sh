@@ -28,7 +28,7 @@ checked="0"
 if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:lynx'`" = "1" ] )
 then
         checked="1"
-        timeout 23 /usr/bin/lynx -dump -accept_all_cookies https://${ip}:443 2>&1 >/dev/null
+        timeout 23 /usr/bin/lynx -dump -accept_all_cookies https://${ip} 2>&1 >/dev/null
         status="$?"
 fi
 
