@@ -22,20 +22,22 @@
 
 HOME="`/bin/cat /home/homedir.dat`"
 
-ip="${1}"
+website="${1}"
 
 checked="0"
 if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:lynx'`" = "1" ] )
 then
         checked="1"
-        timeout 23 /usr/bin/lynx -dump -accept_all_cookies https://${ip} 2>&1 >/dev/null
+       # timeout 23 /usr/bin/lynx -dump -accept_all_cookies https://${ip} 2>&1 >/dev/null
+        timeout 23 /usr/bin/lynx -cfg=<(echo "FORCE_SSL_PROMPT:YES") -dump https://${website}
         status="$?"
 fi
 
 if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:w3m'`" = "1" ] )
 then
         checked="1"
-        :
+        /usr/bin/yes | timeout 23 /usr/bin/w3m -dump -o ssl_verify_server=0  https://${website}
+        status="$?"
 fi
 
 if ( [ "${status}" = "0" ] && [ "${checked}" = "1" ] )
