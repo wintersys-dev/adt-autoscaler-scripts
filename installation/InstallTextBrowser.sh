@@ -41,3 +41,8 @@ if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:w3m'`" = "1" ]
 then
 	${HOME}/installation/InstallW3M.sh ${BUILDOS}
 fi
+
+if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'TEXTBROWSER:elinks'`" = "1" ] )
+then
+	${HOME}/installation/InstallELinks.sh ${BUILDOS}
+fi
