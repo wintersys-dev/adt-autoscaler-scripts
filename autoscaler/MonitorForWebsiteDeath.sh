@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -x
+#set -x
 
 check_if_webserver_online()
 {
@@ -20,26 +20,6 @@ check_if_webserver_online()
         fi
 }
 
-if ( [ "`${HOME}/services/datastore/operations/ListFromDatastore.sh "config" "INSTALLED_SUCCESSFULLY"`" = "" ] )
-then
-        exit
-fi
-
-#Move this bit to a cron script
-if ( [ -f ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE ] )
-then
-        if ( [ "`/usr/bin/find ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE -mmin +10 -type f`" != "" ] )
-        then
-                /bin/rm ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE
-        else
-                if ( [ -f ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE ] )
-                then
-                        exit
-                fi
-        fi
-else
-        /bin/touch ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE
-fi
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 stalled_webserver_build_ips="`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD:* -mmin +30 -type f | /usr/bin/awk -F':' '{print $NF}'`"
 
@@ -50,7 +30,6 @@ do
 done
 
 active_webserver_ips="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/private_ips`"
-
 for active_webserver_ip in ${active_webserver_ips}
 do
         check_if_webserver_online ${active_webserver_ip} &
