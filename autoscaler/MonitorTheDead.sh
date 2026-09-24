@@ -1,7 +1,5 @@
+#!/bin/sh
 
-
-
-#If we are trying to build a webserver before the toolkit has been fully installed, we don't want to do anything, so exit
 if ( [ "`${HOME}/services/datastore/operations/ListFromDatastore.sh "config" "INSTALLED_SUCCESSFULLY"`" = "" ] )
 then
 	exit
