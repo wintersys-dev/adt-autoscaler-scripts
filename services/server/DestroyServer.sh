@@ -62,7 +62,6 @@ then
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
 
 		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
@@ -91,7 +90,6 @@ then
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
 
 		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
@@ -122,7 +120,6 @@ then
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
 
 		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
@@ -160,7 +157,6 @@ then
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
 
 		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
