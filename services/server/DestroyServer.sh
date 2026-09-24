@@ -63,11 +63,10 @@ then
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beingbuiltips/${private_server_ip}"
 
-		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip} ] )
+		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
-			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip}
+			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip}
 		fi
 	fi
 fi
@@ -93,11 +92,10 @@ then
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beingbuiltips/${private_server_ip}"
 
-		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip} ] )
+		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
-			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip}
+			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip}
 		fi
 	fi
 fi
@@ -125,11 +123,10 @@ then
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beingbuiltips/${private_server_ip}"
 
-		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip} ] )
+		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
-			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip}
+			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip}
 		fi
 	fi
 fi
@@ -164,11 +161,10 @@ then
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
-		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beingbuiltips/${private_server_ip}"
 
-		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip} ] )
+		if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
 		then
-			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_server_ip}
+			/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip}
 		fi
 	fi
 fi
