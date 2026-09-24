@@ -31,6 +31,8 @@ do
 done
 
 no_webservers_delta="`/usr/bin/expr ${required_no_webservers} - ${no_running_webservers}`"
+no_webservers_to_destroy=""
+no_webservers_to_provision=""
 
 if ( [ "${no_webservers_delta}" -lt "0" ] )
 then
@@ -39,6 +41,14 @@ else
         no_webservers_to_provision="${no_webservers_delta}"
 fi
 
+if ( [ "${no_webservers_to_destroy}" != "" ] )
+then
+        active_webservers="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/public`"
+        webservers_to_destroy_ips="`/bin/echo "${active_webservers}" | /usr/bin/cut -d' ' -f1-${no_webservers_to_destroy}`"
+        for webserver_to_destroy_ip in ${webservers_to_destroy_ips}
+        do
+                ${HOME}/services/server/DestroyServer.sh ${webserver_to_destroy_ip} ${CLOUDHOST}
+        done
 #When a webserver is build store its ip address in runtime directory and when we want to destroy a webserver we select its ip address
 #from the runtime directory and destroy the machine and then delete the ip address from the runtime directory as part of the destroy process
 
