@@ -87,9 +87,6 @@ exec 2>>${HOME}/logs/build_webserver/${err_file}
 /bin/echo "Initialising Cloud Init for webserver ${webserver_name}"
 ${HOME}/autoscaler/InitialiseCloudInit.sh
 
-#Place a marker file which says that this machine is initially provisioning onto the file system
-/bin/touch ${HOME}/runtime/INITIALLY_PROVISIONING-${buildno}.lock
-
 #Actually create the webserver passing in the name we have set for it as well as what machine type/size it should be
 ${HOME}/services/server/CreateServer.sh "${SIZE}" "${webserver_name}"
 
@@ -161,12 +158,6 @@ else
 	then
 		/bin/touch ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip}
 	fi 
-
-	#If we are here then the machine isn't being initially provisioned any more so unset that worry
-	if ( [ -f ${HOME}/runtime/INITIALLY_PROVISIONING-${buildno}.lock ] )
-	then
-		/bin/rm ${HOME}/runtime/INITIALLY_PROVISIONING-${buildno}.lock
-	fi
 
 	#Make a note that the machine with this IP address is currently being built. This will be removed once the machine is built
 	#Until it is built we can tell that it is building by checking this in the datastore
@@ -283,10 +274,6 @@ then
 	fi
 elif ( [ "${failedonlinecheck}" = "1" ] )
 then
-	if ( [ -f ${HOME}/runtime/INITIALLY_PROVISIONING-${buildno}.lock ] )
-	then
-		/bin/rm ${HOME}/runtime/INITIALLY_PROVISIONING-${buildno}.lock
-	fi
 	/bin/echo "${0} `/bin/date`: webserver with ip address: ${ip} failed its online check" 
 	/bin/echo "${0} `/bin/date`: webserver with ip address: ${ip} is being destroyed" 
 	${HOME}/services/server/DestroyServer.sh ${ip} ${CLOUDHOST}
