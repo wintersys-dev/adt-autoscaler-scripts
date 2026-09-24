@@ -1,5 +1,8 @@
 
 
-stalled_builds="`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD: -mmin +30 -type f`"
+stalled_webserver_build_ips="`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD:* -mmin +1 -type f | /usr/bin/awk -F':' '{print $NF}'`"
 
-#${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip}
+for stalled_webserver_build_ip in ${stalled_webserver_build_ips}
+do
+        ${HOME}/services/server/DestroyServer.sh ${stalled_webserver_build_ip} ${CLOUDHOST}
+done
