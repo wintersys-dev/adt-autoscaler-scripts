@@ -32,8 +32,10 @@ else
 	if ( [ -f ${HOME}/runtime/scaling/scaling.conf ] )
 	then
 	        required_no_webservers="`/bin/grep "Autoscaler ${autoscaler_no}" ${HOME}/runtime/scaling/scaling.conf | /usr/bin/awk '{print $7}'`"
-	else
-		exit
+			if ( [ "${required_no_webservers}" = "${no_running_webservers}" ] )
+			then
+				exit
+			fi
 	fi
 fi
 
