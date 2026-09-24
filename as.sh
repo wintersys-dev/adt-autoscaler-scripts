@@ -180,6 +180,13 @@ ${HOME}/services/cron/InitialiseCron.sh
 ${HOME}/utilities/processing/UpdateIPs.sh
 ${HOME}/utilities/housekeeping/CleanupAfterBuild.sh
 
+if ( [ ! -d ${HOME}/runtime/scaling ] )
+then
+	/bin/mkdir -p ${HOME}/runtime/scaling
+fi
+
+/bin/touch ${HOME}/runtime/scaling/SCALING_ENABLED
+
 ${HOME}/services/email/SendEmail.sh "A NEW AUTOSCALER HAS BEEN SUCCESSFULLY BUILT" "A new autoscaler machine has been built and is now going to reboot before coming available" "INFO"
 
 /bin/touch ${HOME}/runtime/DONT_MESS_WITH_THESE_FILES-SYSTEM_BREAK
