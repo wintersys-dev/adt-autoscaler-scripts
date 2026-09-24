@@ -41,6 +41,8 @@ else
         /bin/touch ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE
 fi
 
+lockfile=${HOME}/runtime/websitedeath.file
+
 if ( [ ! -f ${lockfile} ] )
 then
 	/usr/bin/touch ${lockfile}
