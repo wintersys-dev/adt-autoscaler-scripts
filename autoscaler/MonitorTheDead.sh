@@ -22,6 +22,8 @@ if ( [ "`${HOME}/services/datastore/operations/ListFromDatastore.sh "config" "IN
 then
 	exit
 fi
+
+#Move this bit to a cron script
 if ( [ -f ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE ] )
 then
 	if ( [ "`/usr/bin/find ${HOME}/runtime/WEBSITE_MONITORING_ACTIVE -mmin +10 -type f`" != "" ] )
