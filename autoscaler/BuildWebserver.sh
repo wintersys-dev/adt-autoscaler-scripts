@@ -142,15 +142,19 @@ else
 	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${ip}" "webserverpublicips" "no"
 	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${private_ip}" "webserverips" "no"
 
-	if ( [ ! -d ${HOME}/runtime/scaling/active_scaled_webservers/public ] )
+	if ( [ ! -d ${HOME}/runtime/scaling/active_scaled_webservers/public_ips ] )
 	then
-		/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/public/${ip}
+		/bin/mkdir -p  ${HOME}/runtime/scaling/active_scaled_webservers/public_ips
 	fi
 
-	if ( [ ! -d ${HOME}/runtime/scaling/active_scaled_webservers/private ] )
+	/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${ip}
+
+	if ( [ ! -d  ${HOME}/runtime/scaling/active_scaled_webservers/private_ips ] )
 	then
-		/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/private/${private_ip}
+		/bin/mkdir -p ${HOME}/runtime/scaling/active_scaled_webservers/private_ips
 	fi
+
+	/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${private_server_ip}
 
 	#We still need to worry that the build out of the machine might potentially stall for some unknown reason
 	if ( [ ! -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip} ] )
