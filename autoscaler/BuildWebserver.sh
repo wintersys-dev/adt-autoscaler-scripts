@@ -275,7 +275,7 @@ then
 	/bin/mkdir -p ${HOME}/runtime/scaling/active_scaled_webservers/private_ips
 fi
 
-/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${private_server_ip}
+/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${private_ip}
 
 #Output how long the build took
 end=`/bin/date +%s`
