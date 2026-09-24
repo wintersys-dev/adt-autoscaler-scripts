@@ -6,6 +6,7 @@ then
 fi
 
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
+headfile="`${HOME}/autoscaler/SelectHeadFile.sh`"
 stalled_webserver_build_ips="`/usr/bin/find ${HOME}/runtime/POTENTIAL_STALLED_BUILD:* -mmin +30 -type f | /usr/bin/awk -F':' '{print $NF}'`"
 
 #Any machine that takes longer than 30 minutes to build is considered a stalled build and should be destroyed
