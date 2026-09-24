@@ -9,7 +9,7 @@ autoscaler_no="`/usr/bin/hostname | /usr/bin/awk -F'-' '{print $2}'`"
 
 if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
 then
-        :
+        required_no_webservers="`/bin/grep "Autoscaler ${autoscaler_no}" ${HOME}/runtime/scaling/scaling.conf-incoming | /usr/bin/awk '{print $7}'`"
 fi
 
 webserver_names=""
@@ -28,4 +28,5 @@ do
         fi
 done
 
-/bin/echo "${no_running_webservers}"
+no_webservers_delta="`/usr/bin/expr ${required_no_webservers} - ${no_running_webservers}`"
+
