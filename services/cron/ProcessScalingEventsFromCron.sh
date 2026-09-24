@@ -26,7 +26,7 @@ then
 fi
 
 #If a scaling process is already undweway this is our first line of defence against there being more than one scaling event being actioned at once
-if ( [ "`/bin/ps -ef | /bin/grep PerformScaling | /bin/grep -v Cron | /bin/grep -v grep | /usr/bin/wc -l`" != "0" ] )
+if ( [ "`/bin/ps -ef | /bin/grep ProcessScalingEvents | /bin/grep -v Cron | /bin/grep -v grep | /usr/bin/wc -l`" != "0" ] )
 then
 	exit
 fi
@@ -36,6 +36,6 @@ lockfile=${HOME}/runtime/autoscalelock.file
 if ( [ ! -f ${lockfile} ] )
 then
 	/usr/bin/touch ${lockfile}
-	${HOME}/autoscaler/PerformScaling.sh
+	${HOME}/autoscaler/ProcessScalingEvents.sh
 	/bin/rm ${lockfile}
 fi
