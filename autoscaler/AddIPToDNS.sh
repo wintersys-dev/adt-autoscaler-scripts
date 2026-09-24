@@ -63,18 +63,6 @@ then
 		then    
 			${HOME}/services/dns/DeleteRecordByIP.sh "${zoneid}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${WEBSITE_URL}" "${ip}" "${DNS_CHOICE}"
 			${HOME}/services/dns/AddRecord.sh "${zoneid}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${WEBSITE_URL}" "${ip}" "${DNS_CHOICE}" 
-			if ( [ "$?" = "0" ] )
-			then
-				#We are considered live now so remove the default flag of the webserver build potentially having stalled for some reason
-				private_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${ip} ${CLOUDHOST}`"
-				if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip} ] )
-				then
-					/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip}
-				fi
-				#Store our new ip address in the config datastore
-				${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${private_ip}" "beenonline" "no"
-
-			fi
 		fi
 	fi
 fi
