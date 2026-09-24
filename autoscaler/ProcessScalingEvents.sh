@@ -72,13 +72,15 @@ then
 	do
 		wait ${pid}
 	done
+
+	if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
+	then
+		/bin/mv ${HOME}/runtime/scaling/scaling.conf-incoming ${HOME}/runtime/scaling/scaling.conf
+	fi
 	
 	/bin/touch ${HOME}/runtime/scaling/SCALING_ENABLED
 
 fi
 
-if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
-then
-	/bin/mv ${HOME}/runtime/scaling/scaling.conf-incoming ${HOME}/runtime/scaling/scaling.conf
-fi
+
 
