@@ -44,7 +44,7 @@ fi
 if ( [ "${no_webservers_to_destroy}" != "" ] )
 then
         active_webservers="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/public`"
-        webservers_to_destroy_ips="`/bin/echo "${active_webservers}" | /usr/bin/cut -d' ' -f1-${no_webservers_to_destroy}`"
+        webservers_to_destroy_ips="`/bin/echo "${active_webservers}" | /usr/bin/tr '\n' ' ' | /usr/bin/cut -d' ' -f1-${no_webservers_to_destroy}`"
         for webserver_to_destroy_ip in ${webservers_to_destroy_ips}
         do
                 ${HOME}/services/server/DestroyServer.sh ${webserver_to_destroy_ip} ${CLOUDHOST}
