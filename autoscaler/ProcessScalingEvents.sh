@@ -39,5 +39,8 @@ else
         no_webservers_to_provision="${no_webservers_delta}"
 fi
 
+#When a webserver is build store its ip address in runtime directory and when we want to destroy a webserver we select its ip address
+#from the runtime directory and destroy the machine and then delete the ip address from the runtime directory as part of the destroy process
+
 #Have to find a way to select webservers associated to this autoscaler to destroy
 
