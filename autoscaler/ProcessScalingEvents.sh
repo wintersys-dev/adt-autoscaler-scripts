@@ -56,13 +56,25 @@ fi
 
 if ( [ "${no_webservers_to_provision}" != "" ] )
 then
-        provisioned_webserver_no="0"
+    provisioned_webserver_no="0"
+	pids=""
+	/bin/rm ${HOME}/runtime/scaling/SCALING_ENABLED
+	
 	while ( [ "${provisioned_webserver_no}" -le "`/usr/bin/expr ${no_webservers_to_provision} - 1`" ] )
 	do
 		provisioned_webserver_no="`/usr/bin/expr ${provisioned_webserver_no} + 1`"
 		${HOME}/autoscaler/BuildWebserver.sh ${provisioned_webserver_no} &
+		pids="${pids} $!"
   		/bin/sleep 10
 	done
+	
+	for pid in ${pids}
+	do
+		wait ${pid}
+	done
+	
+	/bin/touch ${HOME}/runtime/scaling/SCALING_ENABLED
+
 fi
 
 if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
