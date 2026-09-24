@@ -9,13 +9,6 @@ webserver_ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "ws-${REG
 autoscaler_no="`/usr/bin/hostname | /usr/bin/awk -F'-' '{print $2}'`"
 
 
-if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
-then
-        required_no_webservers="`/bin/grep "Autoscaler ${autoscaler_no}" ${HOME}/runtime/scaling/scaling.conf-incoming | /usr/bin/awk '{print $7}'`"
-else
-	exit
-fi
-
 webserver_names=""
 for ip in ${webserver_public_ips}
 do
@@ -31,6 +24,18 @@ do
                 no_running_webservers="`/usr/bin/expr ${no_running_webservers} + 1`"
         fi
 done
+
+if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
+then
+        required_no_webservers="`/bin/grep "Autoscaler ${autoscaler_no}" ${HOME}/runtime/scaling/scaling.conf-incoming | /usr/bin/awk '{print $7}'`"
+else
+	if ( [ -f ${HOME}/runtime/scaling/scaling.conf ] )
+	then
+	        required_no_webservers="`/bin/grep "Autoscaler ${autoscaler_no}" ${HOME}/runtime/scaling/scaling.conf | /usr/bin/awk '{print $7}'`"
+	else
+		exit
+	fi
+fi
 
 no_webservers_delta="`/usr/bin/expr ${required_no_webservers} - ${no_running_webservers}`"
 no_webservers_to_destroy=""
