@@ -50,6 +50,11 @@ then
 		server_id="`/usr/local/bin/doctl -o json compute droplet list | /usr/bin/jq -r '.[] | select (.name == "'${server_to_delete}'" ).id'`"
 		/usr/local/bin/doctl -force compute droplet delete ${server_id} 
 
+		if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip} ] )
+		then
+			/bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip}
+		fi
+
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beenonline/${server_ip}"
@@ -69,6 +74,11 @@ then
 		zone="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
 		server_name="`${HOME}/services/server/GetServerName.sh ${server_ip} ${cloudhost}`"
 		/bin/echo "Y" | /usr/bin/exo compute instance delete ${server_name} --zone ${zone} 
+
+		if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip} ] )
+		then
+			/bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip}
+		fi
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
@@ -91,6 +101,11 @@ then
 		server_id="`/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "'${server_to_delete}'").id'`"
 		/usr/local/bin/linode-cli linodes shutdown ${server_id}
 		/usr/local/bin/linode-cli linodes delete ${server_id}
+
+		if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip} ] )
+		then
+			/bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip}
+		fi
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
@@ -120,6 +135,11 @@ then
 		fi
 
 		/usr/bin/vultr instance delete ${server_id}
+
+		if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip} ] )
+		then
+			/bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/${server_ip}
+		fi
 
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
 		${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
