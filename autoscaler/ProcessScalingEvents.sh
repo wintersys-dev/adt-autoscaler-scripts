@@ -51,6 +51,17 @@ then
                 ${HOME}/services/server/DestroyServer.sh ${webserver_to_destroy_ip} ${CLOUDHOST}
         done
 fi
+
+if ( [ "${no_webservers_to_provision}" != "" ] )
+then
+        provisioned_webserver_no="0"
+	while ( [ "${provisioned_webserver_no}" -le "`/usr/bin/expr ${no_webservers_to_provision} - 1`" ] )
+	do
+		provisioned_webserver_no="`/usr/bin/expr ${provisioned_webserver_no} + 1`"
+		${HOME}/autoscaler/BuildWebserver.sh ${provisioned_webserver_no} &
+  		/bin/sleep 10
+	done
+fi
 #When a webserver is build store its ip address in runtime directory and when we want to destroy a webserver we select its ip address
 #from the runtime directory and destroy the machine and then delete the ip address from the runtime directory as part of the destroy process
 
