@@ -43,7 +43,7 @@ fi
 
 if ( [ "${no_webservers_to_destroy}" != "" ] )
 then
-        active_webservers="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/public`"
+        active_webservers="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/public_ips`"
         webservers_to_destroy_ips="`/bin/echo "${active_webservers}" | /usr/bin/tr '\n' ' ' | /usr/bin/cut -d' ' -f1-${no_webservers_to_destroy}`"
         for webserver_to_destroy_ip in ${webservers_to_destroy_ips}
         do
