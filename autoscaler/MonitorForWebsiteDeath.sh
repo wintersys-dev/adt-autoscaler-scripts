@@ -14,9 +14,8 @@ check_if_webserver_online()
         done
         if ( [ "${count}" != "0" ] && [ "`${HOME}/utilities/status/CheckWebsiteOnlineStatus.sh ${active_webserver_ip}/${headfile}`" = "failure" ] )
         then
-                /bin/echo "failure"
-        else
-                /bin/echo "success"
+                active_webserver_public_ip="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${active_webserver_ip} ${CLOUDHOST}`"
+                ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip} ${CLOUDHOST}
         fi
 }
 
