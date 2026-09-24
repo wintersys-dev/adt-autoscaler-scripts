@@ -154,9 +154,9 @@ else
 	/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${private_server_ip}
 
 	#We still need to worry that the build out of the machine might potentially stall for some unknown reason
-	if ( [ ! -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip} ] )
+	if ( [ ! -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} ] )
 	then
-		/bin/touch ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip}
+		/bin/touch ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
 	fi 
 
 	#Make a note that the machine with this IP address is currently being built. This will be removed once the machine is built
