@@ -256,19 +256,11 @@ then
 	${HOME}/services/server/DestroyServer.sh ${ip} ${CLOUDHOST}
 fi
 
-# This machine is no longer in a "being built" situation so cleanup
-/bin/echo "${0} `/bin/date`: Deleting the 'beingbuilt' ip address ${private_ip} from the config datastore" 
-${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "beingbuiltips/${private_ip}"
-
-if ( [ -f ${HOME}/runtime/beingbuiltips/${buildno}/${private_ip} ] )
-then
-	/bin/rm ${HOME}/runtime/beingbuiltips/${buildno}/${private_ip}
-fi
 #If we are here then we haven't stalled so we can clean that up also if we need to
-/bin/echo "${0} `/bin/date`: This build hasn't stalled, so, removing file ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip}" 
-if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip} ] )
+/bin/echo "${0} `/bin/date`: This build hasn't stalled, so, removing file ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}" 
+if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} ] )
 then
-	/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip}
+	/bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
 fi 
 
 if ( [ ! -d ${HOME}/runtime/scaling/active_scaled_webservers/public_ips ] )
