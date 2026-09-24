@@ -16,6 +16,10 @@ check_if_webserver_online()
         then
                 active_webserver_public_ip="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${active_webserver_ip} ${CLOUDHOST}`"
                 ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip} ${CLOUDHOST}
+                if ( [ "`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASEINSTALLATIONTYPE'`" = "DBaaS" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" ] )
+                then
+                        ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh ${public_ip_address}
+                fi
         fi
 }
 
