@@ -80,8 +80,8 @@ then
 	/bin/echo "@reboot export HOME="${HOME}" && ${HOME}/services/datastore/config/ActivateConfigDatastoreHeavyweight.sh" >> /var/spool/cron/crontabs/root
 fi
 
-/bin/echo "*/2 * * * * export HOME="${HOME}" && ${HOME}/services/cron/PerformScalingFromCron.sh" >> /var/spool/cron/crontabs/root
-/bin/echo "*/2 * * * * export HOME="${HOME}" && ${HOME}/autoscaler/ProcessScalingEvents.sh" >> /var/spool/cron/crontabs/root
+#/bin/echo "*/2 * * * * export HOME="${HOME}" && ${HOME}/services/cron/PerformScalingFromCron.sh" >> /var/spool/cron/crontabs/root
+/bin/echo "*/2 * * * * export HOME="${HOME}" && ${HOME}/services/cron/ProcessScalingEventsFromCron.sh" >> /var/spool/cron/crontabs/root
 #/bin/echo "*/3 * * * * export HOME="${HOME}" && ${HOME}/services/cron/DeadOrAliveFromCron.sh" >> /var/spool/cron/crontabs/root
 
 /bin/echo "30 3 * * *  export HOME="${HOME}" && ${HOME}/utilities/housekeeping/RemoveExpiredLogs.sh" >> /var/spool/cron/crontabs/root
