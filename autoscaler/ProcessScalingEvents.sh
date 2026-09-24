@@ -47,8 +47,10 @@ then
         webservers_to_destroy_ips="`/bin/echo "${active_webservers}" | /usr/bin/tr '\n' ' ' | /usr/bin/cut -d' ' -f1-${no_webservers_to_destroy}`"
         for webserver_to_destroy_ip in ${webservers_to_destroy_ips}
         do
+                ${HOME}/autoscaler/RemoveIPFromDNS.sh ${webserver_to_destroy_ip}
                 ${HOME}/services/server/DestroyServer.sh ${webserver_to_destroy_ip} ${CLOUDHOST}
         done
+fi
 #When a webserver is build store its ip address in runtime directory and when we want to destroy a webserver we select its ip address
 #from the runtime directory and destroy the machine and then delete the ip address from the runtime directory as part of the destroy process
 
