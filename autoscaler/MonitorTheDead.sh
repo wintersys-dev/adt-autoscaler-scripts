@@ -16,4 +16,9 @@ done
 
 active_webserver_ips="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/private_ips`"
 
+for active_webserver_ip in ${active_webserver_ips}
+do
+	${HOME}/utilities/status/CheckWebsiteOnlineStatus.sh ${active_webserver_ip}/${headfile}
+done
+
 
