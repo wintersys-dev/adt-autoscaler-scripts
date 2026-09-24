@@ -12,6 +12,8 @@ autoscaler_no="`/usr/bin/hostname | /usr/bin/awk -F'-' '{print $2}'`"
 if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
 then
         required_no_webservers="`/bin/grep "Autoscaler ${autoscaler_no}" ${HOME}/runtime/scaling/scaling.conf-incoming | /usr/bin/awk '{print $7}'`"
+else
+	exit
 fi
 
 webserver_names=""
@@ -62,8 +64,9 @@ then
   		/bin/sleep 10
 	done
 fi
-#When a webserver is build store its ip address in runtime directory and when we want to destroy a webserver we select its ip address
-#from the runtime directory and destroy the machine and then delete the ip address from the runtime directory as part of the destroy process
 
-#Have to find a way to select webservers associated to this autoscaler to destroy
+if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
+then
+	/bin/mv ${HOME}/runtime/scaling/scaling.conf-incoming ${HOME}/runtime/scaling/scaling.conf
+fi
 
