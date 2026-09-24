@@ -145,15 +145,6 @@ else
 		/bin/touch ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip}
 	fi 
 
-	#Make a note that the machine with this IP address is currently being built. This will be removed once the machine is built
-	#Until it is built we can tell that it is building by checking this in the datastore
-	if ( [ ! -d ${HOME}/runtime/beingbuiltips/${buildno} ] )
-	then 
-		/bin/mkdir -p ${HOME}/runtime/beingbuiltips/${buildno}
-	fi
-	/bin/touch ${HOME}/runtime/beingbuiltips/${buildno}/${private_ip}
-	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${HOME}/runtime/beingbuiltips/${buildno}/${private_ip}" "beingbuiltips" "no"
-
 	/bin/echo "${0} `/bin/date`: The webserver has been assigned public ip address ${ip} and private ip address ${private_ip}" 
 	/bin/echo "${0} `/bin/date`: The webserver is now provisioned and I am about to start building it out and installing software"
 fi
