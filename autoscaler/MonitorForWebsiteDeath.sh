@@ -22,21 +22,31 @@ check_if_webserver_online()
                 
                 active_webserver_public_ip="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${active_webserver_ip} ${CLOUDHOST}`"
 
-                if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${active_webserver_public_ip} ] )
-                then
-                        /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${active_webserver_public_ip}
-                fi
+                /bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/termination_attempts.dat
                 
-                if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip} ] )
-                then
-                        /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip}
-                fi
-                ${HOME}/autoscaler/RemoveIPFromDNS.sh ${active_webserver_public_ip}
-                ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip} ${CLOUDHOST}
+                no_termination_attempts="`/bin/grep "${active_webserver_public_ip}" ${HOME}/runtime/scaling/active_scaled_webservers/termination_attempts.dat | /usr/bin/wc -l`"
 
-                if ( [ "`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASEINSTALLATIONTYPE'`" = "DBaaS" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" ] )
+                if ( [ "${no_termination_attempts}" = "3" ] )
                 then
-                        ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh ${public_ip_address}
+                        /bin/sed -i "/${active_webserver_public_ip}/d" ${HOME}/runtime/scaling/active_scaled_webservers/termination_attempts.dat
+                        if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${active_webserver_public_ip} ] )
+                        then
+                                /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${active_webserver_public_ip}
+                        fi
+                
+                        if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip} ] )
+                        then
+                                /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip}
+                        fi
+                        ${HOME}/autoscaler/RemoveIPFromDNS.sh ${active_webserver_public_ip}
+                        ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip} ${CLOUDHOST}
+
+                        if ( [ "`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASEINSTALLATIONTYPE'`" = "DBaaS" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" ] )
+                        then
+                                ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh ${public_ip_address}
+                        fi
+                else
+                        /bin/echo "${active_webserver_public_ip}" >> ${HOME}/runtime/scaling/active_scaled_webservers/termination_attempts.dat
                 fi
                 online="failure"
         fi
