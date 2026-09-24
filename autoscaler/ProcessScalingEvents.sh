@@ -3,7 +3,9 @@
 REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
-webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+webserver_public_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+webserver_ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+
 autoscaler_no="`/usr/bin/hostname | /usr/bin/awk -F'-' '{print $2}'`"
 
 
@@ -13,7 +15,7 @@ then
 fi
 
 webserver_names=""
-for ip in ${webserver_ips}
+for ip in ${webserver_public_ips}
 do
         webserver_names="${webserver_names} `${HOME}/services/server/GetServerName.sh ${ip} ${CLOUDHOST} | /bin/grep -v '\-init\-'`"
 done
@@ -36,4 +38,6 @@ then
 else
         no_webservers_to_provision="${no_webservers_delta}"
 fi
+
+#Have to find a way to select webservers associated to this autoscaler to destroy
 
