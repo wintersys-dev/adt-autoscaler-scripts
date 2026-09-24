@@ -19,7 +19,18 @@ check_if_webserver_online()
         online="success"
         if ( [ "${count}" != "0" ] && [ "`${HOME}/utilities/status/CheckWebsiteOnlineStatus.sh ${active_webserver_ip}/${headfile}`" = "failure" ] )
         then
+                
                 active_webserver_public_ip="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${active_webserver_ip} ${CLOUDHOST}`"
+
+                if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${active_webserver_public_ip} ] )
+                then
+                        /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/public_ips/${active_webserver_public_ip}
+                fi
+                
+                if ( [ -f ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip} ] )
+                then
+                        /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip}
+                fi
                 ${HOME}/autoscaler/RemoveIPFromDNS.sh ${active_webserver_public_ip}
                 ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip} ${CLOUDHOST}
 
