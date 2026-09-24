@@ -30,3 +30,10 @@ done
 
 no_webservers_delta="`/usr/bin/expr ${required_no_webservers} - ${no_running_webservers}`"
 
+if ( [ "${no_webservers_delta}" -lt "0" ] )
+then
+        no_webservers_to_destroy="`/bin/echo ${no_webservers_delta} | /bin/sed 's/^-//'`"
+else
+        no_webservers_to_provision="${no_webservers_delta}"
+fi
+
