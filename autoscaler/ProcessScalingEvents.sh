@@ -6,6 +6,12 @@ BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFI
 webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
 autoscaler_no="`/usr/bin/hostname | /usr/bin/awk -F'-' '{print $2}'`"
 
+
+if ( [ -f ${HOME}/runtime/scaling/scaling.conf-incoming ] )
+then
+        :
+fi
+
 webserver_names=""
 for ip in ${webserver_ips}
 do
