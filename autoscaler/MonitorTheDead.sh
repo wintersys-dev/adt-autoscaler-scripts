@@ -13,3 +13,7 @@ for stalled_webserver_build_ip in ${stalled_webserver_build_ips}
 do
         ${HOME}/services/server/DestroyServer.sh ${stalled_webserver_build_ip} ${CLOUDHOST}
 done
+
+active_webserver_ips="`/bin/ls ${HOME}/runtime/scaling/active_scaled_webservers/private_ips`"
+
+
