@@ -142,6 +142,11 @@ else
 	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${ip}" "webserverpublicips" "no"
 	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${private_ip}" "webserverips" "no"
 
+	if ( [ ! -d ${HOME}/runtime/scaling/active_scaled_webservers ] )
+	then
+		/bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/${private_ip}
+	fi
+
 
 	#We still need to worry that the build out of the machine might potentially stall for some unknown reason
 	if ( [ ! -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${private_ip} ] )
