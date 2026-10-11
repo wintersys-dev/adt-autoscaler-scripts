@@ -22,21 +22,5 @@
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
-if ( [ ! -d ${HOME}/logs/firewall ] )
-then
-        /bin/mkdir -p ${HOME}/logs/firewall
-fi
-
-out_file="firewall/firewall-out-`/bin/date | /bin/sed 's/ //g'`"
-exec 1>>${HOME}/logs/${out_file}
-err_file="firewall/firewall-err-`/bin/date | /bin/sed 's/ //g'`"
-exec 2>>${HOME}/logs/${err_file}
-
-
-if ( [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "FIREWALL" | /usr/bin/awk -F':' '{print $2}'`" = "ufw" ] )
-then
-        ${HOME}/services/security/firewall/ufw/SetupFirewall.sh
-elif ( [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "FIREWALL" | /usr/bin/awk -F':' '{print $2}'`" = "iptables" ] )
-then
-        ${HOME}/services/security/firewall/iptables/SetupFirewall.sh
-fi
+firewall_type="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "FIREWALL" | /usr/bin/awk -F':' '{print $2}'`"
+${HOME}/services/security/firewall/${firewall_type}/SetupFirewall.sh
