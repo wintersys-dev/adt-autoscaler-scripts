@@ -12,7 +12,7 @@ autoscaler_no="`/usr/bin/hostname | /usr/bin/awk -F'-' '{print $2}'`"
 webserver_names=""
 for ip in ${webserver_public_ips}
 do
-        webserver_names="${webserver_names} `${HOME}/services/server/GetServerName.sh ${ip} ${CLOUDHOST} | /bin/grep -v '\-init\-'`"
+        webserver_names="${webserver_names} `${HOME}/services/server/GetServerName.sh ${ip} | /bin/grep -v '\-init\-'`"
 done
 
 no_running_webservers="0"
