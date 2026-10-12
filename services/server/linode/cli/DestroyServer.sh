@@ -28,7 +28,7 @@ private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${s
 	if ( [ "${server_ip}" != "" ] )
 	then
 		server_to_delete=""
-		server_to_delete="`${HOME}/services/server/GetServerName.sh ${server_ip} 'linode'`"
+		server_to_delete="`${HOME}/services/server/GetServerName.sh ${server_ip}`"
 		server_id="`/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "'${server_to_delete}'").id'`"
 		/usr/local/bin/linode-cli linodes shutdown ${server_id}
 		/usr/local/bin/linode-cli linodes delete ${server_id}
