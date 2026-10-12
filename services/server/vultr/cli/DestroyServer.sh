@@ -23,7 +23,7 @@
 export HOME="`/bin/cat /home/homedir.dat`"
 
 server_ip="${1}"
-private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${server_ip} ${cloudhost}`"
+private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${server_ip}`"
 
 export VULTR_API_KEY="`/bin/ls ${HOME}/.config/VULTRAPIKEY:* | /usr/bin/awk -F':' '{print $NF}'`"
 
