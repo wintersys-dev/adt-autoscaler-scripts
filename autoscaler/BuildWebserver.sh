@@ -65,7 +65,7 @@ rnd="`/bin/echo ${SERVER_USER} | /usr/bin/fold -w 4 | /usr/bin/head -n 1`"
 rnd="${rnd}-`/usr/bin/openssl rand -base64 32 | /usr/bin/tr -cd 'a-zA-Z0-9' | /usr/bin/cut -b 1-4`"
 server_type="ws-${REGION}-${BUILD_IDENTIFIER}"
 autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
-autoscaler_name="`${HOME}/services/server/GetServerName.sh ${autoscalerip} ${CLOUDHOST}`"
+autoscaler_name="`${HOME}/services/server/GetServerName.sh ${autoscalerip}`"
 autoscaler_no="`/bin/echo ${autoscaler_name} | /usr/bin/awk -F'-' '{print $2}'`"
 webserver_name="ws-${REGION}-${BUILD_IDENTIFIER}-${autoscaler_no}-${rnd}"
 
