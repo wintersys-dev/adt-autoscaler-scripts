@@ -21,30 +21,10 @@
 #set -x
 
 server_type="${1}"
-cloudhost="${2}"
+CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 
-if ( [ -f ${HOME}/DROPLET ] || [ "${cloudhost}" = "digitalocean" ] )
-then
-	/usr/local/bin/doctl compute droplet list -o json | /usr/bin/jq -r '.[] | select (.name | contains("'${server_type}'")).id' | /usr/bin/wc -l
-fi
-
-if ( [ -f ${HOME}/EXOSCALE ] || [ "${cloudhost}" = "exoscale" ] )
-then
-	zone="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
-	/usr/bin/exo compute instance list --zone ${zone} -O json | /usr/bin/jq -r '.[] | select (.name | contains("'${server_type}'")).id' | /usr/bin/wc -l
-fi
-
-if ( [ -f ${HOME}/LINODE ] || [ "${cloudhost}" = "linode" ] )
-then
-	/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label | contains("'${server_type}'")).id' | /usr/bin/wc -l
-fi
-
-if ( [ -f ${HOME}/VULTR ] || [ "${cloudhost}" = "vultr" ] )
-then
-	export VULTR_API_KEY="`/bin/ls ${HOME}/.config/VULTRAPIKEY:* | /usr/bin/awk -F':' '{print $NF}'`"
-	server_type="`/bin/echo ${server_type} | /usr/bin/cut -c -32`"
-	/usr/bin/vultr instance list -o json | /usr/bin/jq -r '.instances[] | select (.label | contains("'${server_type}'")).id' | /usr/bin/wc -l
-fi
+orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
+${HOME}/services/server/${CLOUDHOST}/${orchestration_tool}/NumberOfServers.sh "${server_type}" 
 
 
 
