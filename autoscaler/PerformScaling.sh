@@ -89,7 +89,7 @@ autoscalerip="`${HOME}/utilities/processing/GetPublicIP.sh`"
 /bin/echo "${0} `/bin/date`: This autoscaler's IP address is ${autoscalerip}" >> ${HOME}/logs/${logdir}/ScalingEventsLog.log
 
 #Make very sure we have got the autoscaler name
-autoscaler_name="`${HOME}/services/server/GetServerName.sh ${autoscalerip} ${CLOUDHOST}`"
+autoscaler_name="`${HOME}/services/server/GetServerName.sh ${autoscalerip}`"
 /bin/echo "${0} `/bin/date`: This autoscaler's name is ${autoscaler_name}" >> ${HOME}/logs/${logdir}/ScalingEventsLog.log
 
 autoscaler_no="`/bin/echo ${autoscaler_name} | /usr/bin/awk -F'-' '{print $2}'`"
