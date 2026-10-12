@@ -74,8 +74,8 @@ then
         cluster_name="`/bin/echo ${dbaas} | /usr/bin/awk '{print $8}'`"
         cluster_id="`/usr/local/bin/doctl database list -o json | /usr/bin/jq -r '.[] | select (.name == "'${cluster_name}'").id'`"
 
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
+        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}"`"
 
         ipaddresses="${webserver_ips} ${database_ips}"
 
@@ -118,8 +118,8 @@ then
         zone="`/bin/echo ${dbaas} | /usr/bin/awk '{print $4}'`"
         database_name="`/bin/echo ${dbaas} | /usr/bin/awk '{print $6}'`"
 
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${zone}-${build_identifier}" ${CLOUDHOST}`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${zone}-${build_identifier}" ${CLOUDHOST}`"
+        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${zone}-${build_identifier}"`"
+        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${zone}-${build_identifier}"`"
         ipaddresses="${webserver_ips} ${database_ips} "
         ipaddresses="`/bin/echo ${ipaddresses} | /bin/sed 's/  / /g' | /bin/tr ' ' ',' | /bin/sed 's/,$//g'`"
 
@@ -154,8 +154,8 @@ then
                 database_id="`/usr/local/bin/linode-cli databases postgresql-list --no-defaults --json | /usr/bin/jq '.[] | select(.label | contains ("'${label}'")) | .id'`"
         fi
 
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
+        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}"`"
         ipaddresses="${webserver_ips} ${database_ips}"
 
         if ( [ "${multi_region_ips}" != "" ] )
@@ -210,8 +210,8 @@ then
                 fi
         done
 
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
+        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}"`"
         ipaddresses="${webserver_ips} ${database_ips} "
         ipaddresses="`/bin/echo "${ipaddresses}" | /bin/sed -e 's/  / /g' -e "s# #/32,#"`"
 
