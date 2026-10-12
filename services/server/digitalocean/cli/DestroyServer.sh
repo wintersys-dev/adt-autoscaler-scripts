@@ -28,7 +28,7 @@ private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${s
 
 	if ( [ "${server_ip}" != "" ] )
 	then
-		server_to_delete="`${HOME}/services/server/GetServerName.sh ${server_ip} 'digitalocean'`"
+		server_to_delete="`${HOME}/services/server/GetServerName.sh ${server_ip}`"
 		server_id="`/usr/local/bin/doctl -o json compute droplet list | /usr/bin/jq -r '.[] | select (.name == "'${server_to_delete}'" ).id'`"
 		/usr/local/bin/doctl -force compute droplet delete ${server_id} 
 
