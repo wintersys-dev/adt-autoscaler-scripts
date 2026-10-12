@@ -23,55 +23,8 @@
 export HOME="`/bin/cat /home/homedir.dat`"
 
 ip="${1}"
-cloudhost="${2}"
+CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 
-if ( [ -f ${HOME}/DROPLET ] || [ "${cloudhost}" = "digitalocean" ] )
-then
-	/usr/local/bin/doctl compute droplet list -o json | /usr/bin/jq -r '.[] | select (.networks.v4[] | select (.ip_address == "'${ip}'")).networks.v4[] | select (.type == "public").ip_address'
-fi
-
-if ( [ -f ${HOME}/EXOSCALE ] || [ "${cloudhost}" = "exoscale" ] )
-then
-	zone="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
-	server_name="`/usr/bin/exo compute private-network show adt_private_net_${zone} --zone ${zone} -O json | /usr/bin/jq -r '.leases[] | select(.ip_address=="'${ip}'") | .instance'`"
-	/usr/bin/exo compute instance list --zone ${zone} -O json | /usr/bin/jq -r '.[] | select (.name =="'${server_name}'").ip_address' 
-fi
-
-if ( [ -f ${HOME}/LINODE ] || [ "${cloudhost}" = "linode" ] )
-then
-	linode_ids="`/usr/local/bin/linode-cli --json linodes list | /usr/bin/jq '.[].id'`"
-	matched_linode_id=""
-	for linode_id in ${linode_ids}
-	do
-		if ( [ "`/usr/local/bin/linode-cli --json  linodes ips-list ${linode_id} | /usr/bin/jq -r '.[].ipv4.vpc[].address'`" = "${ip}" ] )
-		then
-			matched_linode_id="${linode_id}"
-		fi
-	done
-
-	if ( [ "${matched_linode_id}" != "" ] )
-	then
-		/usr/local/bin/linode-cli linodes ips-list ${matched_linode_id} --no-defaults --json | /usr/bin/jq -r '.[].ipv4.public[].address'
-	fi
-fi
-
-if ( [ -f ${HOME}/VULTR ] || [ "${cloudhost}" = "vultr" ] )
-then
-	export VULTR_API_KEY="`/bin/ls ${HOME}/.config/VULTRAPIKEY:* | /usr/bin/awk -F':' '{print $NF}'`"
-	#vpc_id="`/usr/bin/vultr vpc2 list -o json | /usr/bin/jq -r '.vpcs[] | select (.description == "adt-vpc").id'`"
-	#id="`/usr/bin/vultr vpc2 nodes list ${vpc_id} -o json | /usr/bin/jq -r '.nodes[] | select (.ip_address == "'${ip}'").id'`"
-	#/usr/bin/vultr instance get ${id} -o json | /usr/bin/jq -r '.instance.main_ip'
-	ids="`/usr/bin/vultr instance list -o json | /usr/bin/jq -r '.instances[] | .id'`"
-	for id in ${ids}
-	do
-		if ( [ "`/usr/bin/vultr instance ipv4 list ${id} -o json | /usr/bin/jq -r '.ipv4s[] | select (.ip == "'${ip}'")'`" != "" ] )
-		then
-			machine_id="${id}"
-		fi
-	done
-	if ( [ "${machine_id}" != "" ] )
-	then
-		/usr/bin/vultr instance list -o json | /usr/bin/jq -r '.instances[] | select (.id == "'${machine_id}'").main_ip'
-	fi
-fi
+orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
+${HOME}/services/server/${CLOUDHOST}/${orchestration_tool}/GetServerPublicIPAddressByIP.sh "${ip}" 
 
