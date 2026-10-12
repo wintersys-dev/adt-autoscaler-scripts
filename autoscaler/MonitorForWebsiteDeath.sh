@@ -39,7 +39,7 @@ check_if_webserver_online()
                                 /bin/rm ${HOME}/runtime/scaling/active_scaled_webservers/private_ips/${active_webserver_ip}
                         fi
                         ${HOME}/autoscaler/RemoveIPFromDNS.sh ${active_webserver_public_ip}
-                        ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip} ${CLOUDHOST}
+                        ${HOME}/services/server/DestroyServer.sh ${active_webserver_public_ip}
 
                         if ( [ "`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASEINSTALLATIONTYPE'`" = "DBaaS" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh BUILDMACHINEVPC:0`" = "1" ] )
                         then
@@ -68,7 +68,7 @@ then
         #Any machine that takes longer than 30 minutes to build is considered a stalled build and should be destroyed
         for stalled_webserver_build_ip in ${stalled_webserver_build_ips}
         do
-                ${HOME}/services/server/DestroyServer.sh ${stalled_webserver_build_ip} ${CLOUDHOST}
+                ${HOME}/services/server/DestroyServer.sh ${stalled_webserver_build_ip}
         done
 fi
 
