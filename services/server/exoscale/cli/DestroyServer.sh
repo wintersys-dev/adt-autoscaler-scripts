@@ -23,7 +23,7 @@
 export HOME="`/bin/cat /home/homedir.dat`"
 
 server_ip="${1}"
-private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${server_ip} ${cloudhost}`"
+private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${server_ip}`"
 
 	if ( [ "${server_ip}" != "" ] )
 	then
