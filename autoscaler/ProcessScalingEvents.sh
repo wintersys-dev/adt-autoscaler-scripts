@@ -57,7 +57,7 @@ then
         for webserver_to_destroy_ip in ${webservers_to_destroy_ips}
         do
                 ${HOME}/autoscaler/RemoveIPFromDNS.sh ${webserver_to_destroy_ip}
-                ${HOME}/services/server/DestroyServer.sh ${webserver_to_destroy_ip} ${CLOUDHOST}
+                ${HOME}/services/server/DestroyServer.sh ${webserver_to_destroy_ip}
         done
 fi
 
