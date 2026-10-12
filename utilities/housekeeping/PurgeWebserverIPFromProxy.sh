@@ -36,7 +36,7 @@ SUDO=" DEBIAN_FRONTEND=noninteractive /bin/echo ${SERVER_USER_PASSWORD} | /usr/b
 
 webserver_ip="${1}"
 
-proxy_ip_addresses="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "rp-" "${CLOUDHOST}"`"
+proxy_ip_addresses="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "rp-"`"
 
 for ip_address in ${proxy_ip_addresses}
 do
