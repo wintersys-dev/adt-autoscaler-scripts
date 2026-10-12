@@ -107,7 +107,7 @@ fi
 
 /bin/echo "${0} `/bin/date`: Interrogating for webserver instance being available....if this goes on forever there is a problem"
 
-while ( [ "`${HOME}/services/server/IsInstanceRunning.sh ${webserver_name} ${CLOUDHOST}`" != "running" ] )
+while ( [ "`${HOME}/services/server/IsInstanceRunning.sh ${webserver_name}`" != "running" ] )
 do
 	/bin/sleep 5
 done
