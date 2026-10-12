@@ -48,7 +48,7 @@ fi
 
 #Get the ip address which has been passed as a parameter and check it
 ip="${1}"
-ipcheck="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${ip} ${CLOUDHOST}`"
+ipcheck="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${ip}`"
 
 #If the ip address checks out we can begin the process of adding it
 if ( [ "${ipcheck}" != "" ] )
