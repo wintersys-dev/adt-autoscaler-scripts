@@ -73,7 +73,7 @@ AUTHENTICATOR_TYPE="`${HOME}/utilities/config/ExtractConfigValue.sh 'AUTHENTICAT
 if ( [ "${AUTHENTICATOR_TYPE}" != "wire-guard" ] )
 then
         dns_ips="`${HOME}/autoscaler/GetDNSIPs.sh`"
-        public_ips="`${HOME}/services/server/GetServerIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST}`"
+        public_ips="`${HOME}/services/server/GetServerIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}"`"
 
         for ip in ${dns_ips}
         do
