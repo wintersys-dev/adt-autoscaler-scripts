@@ -22,4 +22,6 @@
 
 server_type="${1}"
 
+TOKEN="`${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN`"
+
 curl -s -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/linode/instances" |  jq '[.data[] | select(.label | contains("'${server_type}'"))] | length'
