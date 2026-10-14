@@ -24,18 +24,14 @@ export HOME="`/bin/cat /home/homedir.dat`"
 
 ip="${1}"
 
-	linode_ids="`/usr/local/bin/linode-cli --json linodes list | /usr/bin/jq '.[].id'`"
-	matched_linode_id=""
-	for linode_id in ${linode_ids}
-	do
-		if ( [ "`/usr/local/bin/linode-cli --json  linodes ips-list ${linode_id} | /usr/bin/jq -r '.[].ipv4.vpc[].address'`" = "${ip}" ] )
-		then
-			matched_linode_id="${linode_id}"
-		fi
-	done
+server_ip="${1}"
 
-	if ( [ "${matched_linode_id}" != "" ] )
-	then
-		/usr/local/bin/linode-cli linodes ips-list ${matched_linode_id} --no-defaults --json | /usr/bin/jq -r '.[].ipv4.public[].address'
-	fi
+TOKEN="`${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN`"
+
+curl -s -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/vpcs/ips" |  /usr/bin/jq -r --arg ip "$server_ip" '.data[] | select(.address == $ip).nat_1_1'
+
+if ( [ "$?" != "0" ] )
+then
+    exit 1
+fi
 
