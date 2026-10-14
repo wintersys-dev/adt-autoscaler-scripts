@@ -1,9 +1,9 @@
 #!/bin/sh
-############################################################################
+####################################################################################
 # Author : Peter Winter
 # Date   : 13/06/2016
-# Description : This script gets a machine's private ip based on its public ip
-#############################################################################
+# Description : This script gets a list of server ip addresses based on a name/type
+####################################################################################
 # License Agreement:
 # This file is part of The Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
@@ -16,13 +16,17 @@
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-####################################################################################
-####################################################################################
+#######################################################################################
+#######################################################################################
 #set -x
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
-ip="${1}"
+server_type="${1}"
 
-linode_id="`/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.ipv4[] == "'${ip}'").id'`"
-/usr/local/bin/linode-cli linodes ips-list ${linode_id} --no-defaults --json | /usr/bin/jq -r '.[].ipv4.vpc[].address'	
+server_ids="`curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/linode/instances" |  jq -r --arg label_match "$server_type" '.data[] | select(.label | contains($label_match)) | .id'`"
+
+for id in ${server_ids} 
+do
+        curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/linode/instances/${id}/ips" | jq -r '.ipv4.vpc[] | .address'
+done
