@@ -18,22 +18,9 @@
 # along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
 ####################################################################################
 ####################################################################################
-set -x
+#set -x
 
-status () {
-        /bin/echo "${1}" | /usr/bin/tee /dev/fd/3 2>/dev/null
-        script_name="`/bin/echo ${0} | /usr/bin/awk -F'/' '{print $NF}'`"
-        /bin/echo "${script_name}: ${1}" | /usr/bin/tee -a /dev/fd/4 2>/dev/null
-}
-
-BUILD_HOME="`/bin/cat /home/buildhome.dat`"
-
-if ( [ "${1}" = "" ] )
-then
-        status "Error: Server ip argument is required."
-        status "Usage: $0 <server_ip>" 
-        exit 1
-fi
+export HOME="`/bin/cat /home/homedir.dat`"
 
 server_ip="${1}"
 
