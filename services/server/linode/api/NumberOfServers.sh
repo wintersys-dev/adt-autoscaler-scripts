@@ -1,9 +1,9 @@
 #!/bin/sh
 ############################################################################################
 # Author : Peter Winter
-# Date   : 13/07/2016
-# Description : This scripts lists the number of servers of a particular type that are running
-############################################################################################
+# Date   : 13/06/2016
+# Description : This script gets the number of servers of a particular type which are running
+#############################################################################################
 # License Agreement:
 # This file is part of The Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
@@ -16,29 +16,10 @@
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-##########################################################################################
-##########################################################################################
+######################################################################################
+######################################################################################
 #set -x
 
-status () {
-        /bin/echo "${1}" | /usr/bin/tee /dev/fd/3 2>/dev/null
-        script_name="`/bin/echo ${0} | /usr/bin/awk -F'/' '{print $NF}'`"
-        /bin/echo "${script_name}: ${1}" | /usr/bin/tee -a /dev/fd/4 2>/dev/null
-}
-
-
-BUILD_HOME="`/bin/cat /home/buildhome.dat`"
-
-
-if ( [ "${1}" = "" ] )
-then
-        status "Error: Server type argument is required."
-        status "Usage: $0 <server_type>" 
-        exit 1
-fi
-
 server_type="${1}"
-
-TOKEN="`${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN`"
 
 curl -s -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/linode/instances" |  jq '[.data[] | select(.label | contains("'${server_type}'"))] | length'
