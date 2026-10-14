@@ -20,6 +20,8 @@
 ######################################################################################
 #set -x
 
+export HOME="`/bin/cat /home/homedir.dat`"
+
 server_type="${1}"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
