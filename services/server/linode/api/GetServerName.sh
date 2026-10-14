@@ -21,6 +21,8 @@
 #set -x
 
 export HOME="`/bin/cat /home/homedir.dat`"
+TOKEN="`${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN`"
+
 server_ip="${1}"
 
-	/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.ipv4[] == "'${server_ip}'").label' 
+curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/linode/instances"  |  jq -r '.data[] | select(.ipv4[] == "'${server_ip}'").label'
