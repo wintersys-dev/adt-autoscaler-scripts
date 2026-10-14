@@ -24,6 +24,6 @@ export HOME="`/bin/cat /home/homedir.dat`"
 
 server_type="${1}"
 
-TOKEN="`${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN`"
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
 
 curl -s -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/linode/instances" |  jq -r '.data[] | select(.label | contains("'${server_type}'")).id'
