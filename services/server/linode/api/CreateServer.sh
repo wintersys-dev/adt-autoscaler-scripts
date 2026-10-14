@@ -30,7 +30,7 @@ BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFI
 BUILDOS="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDOS'`"
 BUILDOS_VERSION="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDOSVERSION'`"
 REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
-DDOS_PROTECTION="`${HOME}/utilities/config/ExtractConfigValue.sh 'ENABLEDDOSPROTECTION'`"
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
 VPC_IP_RANGE="`${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE'`"
 VPC_NAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'VPCNAME'`"
 BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
@@ -46,7 +46,7 @@ fi
 
 if ( [ -f ${HOME}/.ssh/EMERGENCY_PASSWORD ] )
 then
-        emergency_password="`/bin/cat ${HOME}/.ssh/EMERGENCY_PASSWORD`"
+	emergency_password="`/bin/cat ${HOME}/.ssh/EMERGENCY_PASSWORD`"
 fi
 
 vpc_id="`/usr/local/bin/linode-cli vpcs list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "'${VPC_NAME}'").id'`"
@@ -55,25 +55,21 @@ subnet_id="`/usr/local/bin/linode-cli vpcs subnets-list ${vpc_id} --no-defaults 
 /bin/sed -i "s/XXXXWEBSERVER_HOSTNAMEXXXX/${server_name}/g" ${HOME}/runtime/cloud-init/webserver.yaml
 cloud_config="`/bin/cat ${HOME}/runtime/cloud-init/webserver.yaml | /usr/bin/base64 -w 0`"
 
-firewall_id="`/usr/local/bin/linode-cli firewalls list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "adt-webserver-'${BUILD_IDENTIFIER}'").id'`"
+image="--image ${OS_CHOICE}"
+if ( [ "${BUILD_FROM_SNAPSHOT}" = "1" ] && [ "${SNAPSHOT_ID}" != "" ] )
+then
+	image="--image ${SNAPSHOT_ID}"
+fi
+ 
+user_data="--metadata.user_data ${cloud_config}"
+
+firewall_id="`curl -s -X GET "https://linode.com" -H "Authorization: Bearer $TOKEN" | jq -r '.data[] | select(.label == "adt-webserver-'"${BUILD_IDENTIFIER}"'").id'`"
 
 firewall_active=""
 if ( [ "${ACTIVE_FIREWALL}" = "2" ] || [ "${ACTIVE_FIREWALL}" = "3" ] )
 then
         firewall_active='"firewall_id": '${firewall_id}', '
 fi
-
-image="--image ${OS_CHOICE}"
-
-if ( [ "${BUILD_FROM_SNAPSHOT}" = "1" ] && [ "${SNAPSHOT_ID}" != "" ] )
-then
-        image="--image ${SNAPSHOT_ID}"
-fi
  
-user_data="--metadata.user_data ${cloud_config}"
 /usr/bin/curl -X POST "https://api.linode.com/v4/linode/instances" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{ "root_pass": "'"${emergency_password}"'", "region": "'"${REGION}"'", "image": "'"${image}"'", "type": "'"${server_size}"'", "label": "'"${server_name}"'", "interface_generation": "linode", "interfaces": [ {  '"${firewall_active}"' "vpc": { "subnet_id": '"${subnet_id}"', "ipv4": { "addresses": [ { "address": "auto", "nat_1_1_address": "auto" } ] } } } ], "metadata": { "user_data": "'"${user_data}"'" }, "disk_encryption": "enabled" }'
 
-if ( [ "$?" != "0" ] )
-then
-        exit 1
-fi
