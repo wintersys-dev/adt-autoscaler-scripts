@@ -22,11 +22,10 @@
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
-TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
-
 server_ip="${1}"
 private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${server_ip}`"
 
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
 
 if ( [ "${server_ip}" != "" ] )
 then
