@@ -49,8 +49,8 @@ then
 	emergency_password="`/bin/cat ${HOME}/.ssh/EMERGENCY_PASSWORD`"
 fi
 
-vpc_id="`/usr/local/bin/linode-cli vpcs list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "'${VPC_NAME}'").id'`"
-subnet_id="`/usr/local/bin/linode-cli vpcs subnets-list ${vpc_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "adt-subnet").id'`"
+vpc_id="`curl -H "Authorization: Bearer $TOKEN" -s "https://api.linode.com/v4/vpcs" | /usr/bin/jq -r '.data[] | select(.label == "'${VPC_NAME}'").id'`"
+subnet_id="`curl -H "Authorization: Bearer $TOKEN" -s "https://api.linode.com/v4/vpcs/${vpc_id}/subnets" | /usr/bin/jq -r '.data[] | select(.label == "adt-subnet").id'`"
 
 /bin/sed -i "s/XXXXWEBSERVER_HOSTNAMEXXXX/${server_name}/g" ${HOME}/runtime/cloud-init/webserver.yaml
 cloud_config="`/bin/cat ${HOME}/runtime/cloud-init/webserver.yaml | /usr/bin/base64 -w 0`"
