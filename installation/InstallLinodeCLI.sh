@@ -71,7 +71,7 @@ do
                 snap="`/usr/bin/whereis snap | /usr/bin/awk -F':' '{print $NF}' | /usr/bin/awk '{print $1}'`"
                 ${snap} install linode-cli
                 /usr/bin/ln -s /snap/bin/linode-cli /usr/local/bin/linode-cli
-        elif ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${HOME}/runtime/software.dat | /bin/grep CLOUDCLITOOL:linode-cli:pip`" != "" ] )
+        elif ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${HOME}/runtime/software.dat | /bin/grep CLOUDCLITOOL:linode-cli:pipx`" != "" ] )
         then
                 eval ${install_command} pipx ${tail_options}
                 if ( [ -f /usr/local/bin/linode-cli ] )
@@ -83,7 +83,27 @@ do
                        # /usr/bin/ln -s /root/.local/bin/linode-cli /usr/local/bin/linode-cli
 						/bin/ln -s ${HOME}/.local/share/pipx/venvs/linode-cli/bin/linode-cli /usr/local/bin/linode-cli
                 fi
-        fi												
+		elif ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${BUILD_HOME}/configuration/software.dat | /bin/grep CLOUDCLITOOL:linode-cli:pip`" != "" ] )
+		then
+			if ( [ ! -d ${HOME}/runtime/linode-env ] )
+			then
+				/bin/mkdir -p ${HOME}/runtime/linode-env
+			fi
+
+			${install_command} python3 python3-venv python3-pip ${tail_options}
+			python3 -m venv ${HOME}/runtime/linode-env
+			. ${HOME}/runtime/linode-env/bin/activate
+
+            pip install --upgrade pip
+            pip install linode-cli
+            pip install boto3
+
+            /bin/echo "HOME=`/bin/cat /home/homedir.dat`" >  /usr/local/bin/linode-cli
+            /bin/echo ". ${HOME}/runtime/linode-env/bin/activate" >> /usr/local/bin/linode-cli
+            /bin/echo 'exec  ${HOME}/runtime/linode-env/bin/linode-cli "$@"' >> /usr/local/bin/linode-cli
+            /bin/chown root:root /usr/local/bin/linode-cli
+            /bin/chmod 750 /usr/local/bin/linode-cli											
+		fi
 	fi
 
 	if ( [ "${BUILDOS}" = "debian" ] )
@@ -107,7 +127,27 @@ do
                        # /usr/bin/ln -s /root/.local/bin/linode-cli /usr/local/bin/linode-cli
 					   /bin/ln -s ${HOME}/.local/share/pipx/venvs/linode-cli/bin/linode-cli /usr/local/bin/linode-cli
                 fi
-        fi
+		elif ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${BUILD_HOME}/configuration/software.dat | /bin/grep CLOUDCLITOOL:linode-cli:pip`" != "" ] )
+		then
+			if ( [ ! -d ${HOME}/runtime/linode-env ] )
+			then
+				/bin/mkdir -p ${HOME}/runtime/linode-env
+			fi
+
+			${install_command} python3 python3-venv python3-pip ${tail_options}
+			python3 -m venv ${HOME}/runtime/linode-env
+			. ${HOME}/runtime/linode-env/bin/activate
+
+            pip install --upgrade pip
+            pip install linode-cli
+            pip install boto3
+
+            /bin/echo "HOME=`/bin/cat /home/homedir.dat`" >  /usr/local/bin/linode-cli
+            /bin/echo ". ${HOME}/runtime/linode-env/bin/activate" >> /usr/local/bin/linode-cli
+            /bin/echo 'exec  ${HOME}/runtime/linode-env/bin/linode-cli "$@"' >> /usr/local/bin/linode-cli
+            /bin/chown root:root /usr/local/bin/linode-cli
+            /bin/chmod 750 /usr/local/bin/linode-cli											
+		fi
 		count="`/usr/bin/expr ${count} + 1`"
 	fi
 done
