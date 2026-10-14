@@ -24,7 +24,7 @@ export HOME="`/bin/cat /home/homedir.dat`"
 
 ip="${1}"
 
-TOKEN="`${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN`"
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
 
 linode_id="`/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.ipv4[] == "'${ip}'").id'`"
 /usr/local/bin/linode-cli linodes ips-list ${linode_id} --no-defaults --json | /usr/bin/jq -r '.[].ipv4.vpc[].address'	
