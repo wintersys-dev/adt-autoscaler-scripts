@@ -22,6 +22,8 @@
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
+
 server_ip="${1}"
 private_server_ip="`${HOME}/services/server/GetServerPrivateIPAddressByIP.sh ${server_ip}`"
 
@@ -64,24 +66,3 @@ then
 fi
 
 
-
-
-
-
-if ( [ "${server_ip}" != "" ] )
-then
-        server_to_delete=""
-        server_to_delete="`${HOME}/services/server/GetServerName.sh ${server_ip}`"
-        server_id="`/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label == "'${server_to_delete}'").id'`"
-		
-        /usr/local/bin/linode-cli linodes shutdown ${server_id}
-        /usr/local/bin/linode-cli linodes delete ${server_id}
-
-        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverips/${private_server_ip}"
-        ${HOME}/services/datastore/config/wrapper/DeleteFromDatastore.sh "config"  "webserverpublicips/${server_ip}"
-
-        if ( [ -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip} ] )
-        then
-                /bin/rm ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${server_ip}
-        fi
-fi
