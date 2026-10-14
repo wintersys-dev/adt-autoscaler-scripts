@@ -24,4 +24,4 @@ export HOME="`/bin/cat /home/homedir.dat`"
 
 server_type="${1}"
 
-/usr/local/bin/linode-cli linodes list --no-defaults --json | /usr/bin/jq -r '.[] | select (.label | contains("'${server_type}'")).id'
+curl -s -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/linode/instances" |  jq -r '.data[] | select(.label | contains("'${server_type}'")).id'
