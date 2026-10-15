@@ -22,7 +22,7 @@
 
 if ( [ "${1}" = "" ] )
 then
-    status "Error: One argument argument is required."
+    status "Error: One argument is required."
     status "Usage: $0 <record_id>" 
     exit 1
 fi
