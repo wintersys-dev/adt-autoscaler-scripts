@@ -22,7 +22,7 @@
 #set -x
 
 domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
-subdomain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
+sub_domain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
 
 
 linode_config_file="/root/.config/dns-linode-cli"
@@ -41,7 +41,7 @@ then
 	exit 1
 fi
 
-/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r --arg tmp_subdomain "${subdomain}" '(.[] | select(.name | contains($tmp_subdomain)) | .target)'
+/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r --arg tmp_subdomain "${sub_domain}" '(.[] | select(.name | contains($tmp_subdomain)) | .target)'
 if ( [ "$?" != "0" ] )
 then
 	/bin/echo "DNS record  not successfully obtained"
