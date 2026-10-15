@@ -24,8 +24,8 @@ set -e
 
 if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
 then
-    status "Error: One argument are required."
-    status "Usage: $0 <record_id> " 
+    status "Error: Two arguments are required."
+    status "Usage: $0 <website_url> <ip>" 
     exit 1
 fi
 
