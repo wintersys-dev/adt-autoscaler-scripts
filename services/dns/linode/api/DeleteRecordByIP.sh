@@ -20,6 +20,13 @@
 ####################################################################################
 #set -x
 
+if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
+then
+    status "Error: Two arguments are required."
+    status "Usage: $0 <website_url> <ip>" 
+    exit 1
+fi
+
 domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
 ip="${2}"
 
