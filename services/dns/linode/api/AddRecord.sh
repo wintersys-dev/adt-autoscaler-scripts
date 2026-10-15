@@ -19,33 +19,39 @@
 ####################################################################################
 ####################################################################################
 #set -x
+set -e
 
-subdomain="`/bin/echo ${4} | /usr/bin/awk -F'.' '{print $1}'`"
-domain_url="`/bin/echo ${4} | /usr/bin/cut -d'.' -f2-`"
-ip="${5}"
-dns="${6}"
+sub_domain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
+domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
+ip="${2}"
 
-	linode_config_file="/root/.config/dns-linode-cli"
-        
-    if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
-    then
-    	linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
-    fi
-                        
-    export LINODE_CLI_CONFIG=${linode_config_file}
-	
-	domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
-    #Make damn sure that the DNS record gets added to the DNS system
-    count="0"
-    while ( [ "${count}" -lt "5" ] && [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
-    do
-    	count="`/usr/bin/expr ${count} + 1`"
-        /usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${subdomain} --target ${ip} --ttl_sec 60 --no-defaults 
-    done
+linode_config_file="/root/.config/dns-linode-cli"
 
-	unset LINODE_CLI_CONFIG
- 
- 	if ( [ "${count}" = "5" ] )
-  	then
-		${HOME}/services/email/SendEmail.sh "FAILED TO ADD IP ADDRESS TO DNS SYSTEM" "IP address (${ip}) for domain ${domainurl}) could not be added to the DNS system" "ERROR"
-	fi
+if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
+then
+        linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
+fi
+
+export LINODE_CLI_CONFIG=${linode_config_file}
+
+domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
+
+if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+then
+        /bin/echo "Domain ID not successfully obtained"
+        unset LINODE_CLI_CONFIG
+        exit 1
+fi
+
+if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
+then
+        /usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${sub_domain} --target ${ip} --ttl_sec 60 --no-defaults 
+        if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+        then
+                /bin/echo "DNS Record not successfully created"
+                unset LINODE_CLI_CONFIG
+                exit 1
+        fi
+fi
+
+unset LINODE_CLI_CONFIG
