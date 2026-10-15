@@ -21,10 +21,9 @@
 #set -x
 set -e
 
-${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${zone_id} ${dns_username} ${dns_security_key} ${website_url} ${ip} ${dns_choice}
-
 auth_key="${3}"
-
+subdomain="`/bin/echo ${4} | /usr/bin/awk -F'.' '{print $1}'`"
+domainurl="`/bin/echo ${4} | /usr/bin/cut -d'.' -f2-`"
 ip="${4}"
 
 linode_config_file="/root/.config/dns-linode-cli"
@@ -37,12 +36,21 @@ fi
 export LINODE_CLI_CONFIG=${linode_config_file}
 	
 domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
+
+if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+then
+	/bin/echo "Domain ID not successfully obtained"
+	exit 1
+fi
     
-count="0"
-while ( [ "${count}" -lt "5" ] && [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
+if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id`" = "" ] )
 do
-	count="`/usr/bin/expr ${count} + 1`"
 	/usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${subdomain} --target ${ip} --ttl_sec 60 --no-defaults 
+	if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+	then
+		/bin/echo "DNS Record not successfully created"
+		exit 1
+	fi
 done
 
 unset LINODE_CLI_CONFIG
