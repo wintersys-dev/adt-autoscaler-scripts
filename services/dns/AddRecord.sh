@@ -32,4 +32,5 @@ ip="${5}"
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
 DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
-${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${zone_id} ${dns_username} ${dns_security_key} ${website_url} ${ip} ${dns_choice}
+#${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${zone_id} ${dns_username} ${dns_security_key} ${website_url} ${ip} ${dns_choice}
+${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${website_url} ${ip} 
