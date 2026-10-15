@@ -35,7 +35,7 @@ then
         exit 1
 fi
 
-if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
+if ( [ "`curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/domains/${domain_id}/records" | /usr/bin/jq -r '.data[] | select(.target == "'"${ip}"'").id'`" = "" ] )
 then
         curl -s -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{ "type": "A", "name": "'"${sub_domain}"'", "target": "'"${ip}"'", "ttl_sec": 60 }' https://api.linode.com/v4/domains/${domain_id}/records
 
