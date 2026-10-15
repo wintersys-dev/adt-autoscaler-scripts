@@ -21,40 +21,38 @@
 #set -x
 set -e
 
-#DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
-
-
-#auth_key="${3}"
-subdomain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
-domainurl="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
+sub_domain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
+domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
 ip="${2}"
 
 linode_config_file="/root/.config/dns-linode-cli"
-        
+
 if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
 then
-	linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
+        linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
 fi
-                        
+
 export LINODE_CLI_CONFIG=${linode_config_file}
-	
+
 domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
 
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
-	/bin/echo "Domain ID not successfully obtained"
-	exit 1
+        /bin/echo "Domain ID not successfully obtained"
+        unset LINODE_CLI_CONFIG
+        exit 1
 fi
-    
-if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id`" = "" ] )
-do
-	/usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${subdomain} --target ${ip} --ttl_sec 60 --no-defaults 
-	if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
-	then
-		/bin/echo "DNS Record not successfully created"
-		exit 1
-	fi
-done
+
+if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
+then
+        /usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${sub_domain} --target ${ip} --ttl_sec 60 --no-defaults 
+        if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+        then
+                /bin/echo "DNS Record not successfully created"
+                unset LINODE_CLI_CONFIG
+                exit 1
+        fi
+fi
 
 unset LINODE_CLI_CONFIG
  
