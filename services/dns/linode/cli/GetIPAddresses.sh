@@ -41,7 +41,7 @@ then
 	exit 1
 fi
 
-/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r --arg tmp_subdomain "${sub_domain}" '(.[] | select(.name | contains($tmp_subdomain)) | .target)'
+/usr/local/bin/linode-cli domains records-list "${domain_id}" --json | jq -r ' .[] | select(.name == "'"${sub_domain}"'").target'
 if ( [ "$?" != "0" ] )
 then
 	/bin/echo "DNS record  not successfully obtained"
