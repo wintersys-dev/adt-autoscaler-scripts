@@ -21,17 +21,17 @@
 #set -x
 set -e
 
-if ( [ "${1}" = "" ] )
+if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
 then
     status "Error: One argument is required."
-    status "Usage: $0 <record_id>" 
+    status "Usage: $0 <record_id> <website_url>" 
     exit 1
 fi
 
 HOME="`/bin/cat /home/homedir.dat`"
 
 record_id="${1}"
-domain_url="`${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL' | /usr/bin/cut -d'.' -f2-`"
+domain_url="`/bin/echo ${2} | /usr/bin/cut -d'.' -f2-`"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
