@@ -54,5 +54,5 @@ recordid="`${HOME}/services/dns/GetRecordID.sh "${WEBSITE_URL}" "${ip}"`"
 
 if ( [ "${recordid}" != "" ] )
 then
-	${HOME}/services/dns/DeleteRecord.sh "${recordid}"
+	${HOME}/services/dns/DeleteRecord.sh "${recordid}" "${WEBSITE_URL}"
 fi
