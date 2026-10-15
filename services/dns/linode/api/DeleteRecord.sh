@@ -34,6 +34,6 @@ fi
                         
 export LINODE_CLI_CONFIG=${linode_config_file}
 domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
-/usr/local/bin/linode-cli domains records-delete ${domain_id} ${record_id} --no-defaults
+curl -s -X DELETE -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
 
 unset LINODE_CLI_CONFIG
