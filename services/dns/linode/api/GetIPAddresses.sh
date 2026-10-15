@@ -41,7 +41,8 @@ then
 	exit 1
 fi
 
-/usr/local/bin/linode-cli domains records-list "${domain_id}" --json | jq -r ' .[] | select(.name == "'"${sub_domain}"'").target'
+curl -s -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.name == "'"${sub_domain}"'").target'
+
 if ( [ "$?" != "0" ] )
 then
 	/bin/echo "DNS record  not successfully obtained"
