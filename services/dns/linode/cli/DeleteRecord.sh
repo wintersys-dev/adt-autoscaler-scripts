@@ -20,6 +20,13 @@
 #####################################################################################
 #set -x
 
+if ( [ "${1}" = "" ] )
+then
+    status "Error: One argument argument is required."
+    status "Usage: $0 <record_id>" 
+    exit 1
+fi
+
 HOME="`/bin/cat /home/homedir.dat`"
 
 record_id="${1}"
