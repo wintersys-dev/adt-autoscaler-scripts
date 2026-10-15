@@ -25,21 +25,13 @@ sub_domain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
 domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
 ip="${2}"
 
-linode_config_file="/root/.config/dns-linode-cli"
-
-if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
-then
-        linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
-fi
-
-export LINODE_CLI_CONFIG=${linode_config_file}
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
 domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
         /bin/echo "Domain ID not successfully obtained"
-        unset LINODE_CLI_CONFIG
         exit 1
 fi
 
@@ -50,9 +42,7 @@ then
         if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
         then
                 /bin/echo "DNS Record not successfully created"
-                unset LINODE_CLI_CONFIG
                 exit 1
         fi
 fi
 
-unset LINODE_CLI_CONFIG
