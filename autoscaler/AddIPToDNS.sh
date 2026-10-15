@@ -58,7 +58,7 @@ then
 	#zoneid="`${HOME}/services/dns/GetZoneID.sh "${zonename}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
 	if ( [ "`${HOME}/services/dns/GetRecordID.sh "${WEBSITE_URL}" "${ip}"`" != "" ] )
 	then    
-		${HOME}/services/dns/DeleteRecordByIP.sh "${WEBSITE_URL}" 
+		${HOME}/services/dns/DeleteRecordByIP.sh "${WEBSITE_URL}" "${ip}"
 	fi
 	${HOME}/services/dns/AddRecord.sh "${WEBSITE_URL}" "${ip}"
 fi
