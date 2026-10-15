@@ -22,8 +22,8 @@
 
 HOME="`/bin/cat /home/homedir.dat`"
 
-record_id="${2}"
-dns="${5}"
+record_id="${1}"
+#dns="${5}"
 domain_url="`${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL' | /usr/bin/cut -d'.' -f2-`"
 
 linode_config_file="/root/.config/dns-linode-cli"
