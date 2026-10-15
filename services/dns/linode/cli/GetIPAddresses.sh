@@ -23,7 +23,7 @@
 
 if ( [ "${1}" = "" ] )
 then
-    status "Error: One argument argument is required."
+    status "Error: One argument is required."
     status "Usage: $0 <website_url>" 
     exit 1
 fi
