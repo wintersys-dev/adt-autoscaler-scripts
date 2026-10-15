@@ -20,6 +20,8 @@
 ######################################################################################
 #set -x
 
+HOME="`/bin/cat /home/homedir.dat`"
+
 server_type="${1}"
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 
