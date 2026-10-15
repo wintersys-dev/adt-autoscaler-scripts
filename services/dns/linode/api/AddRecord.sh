@@ -45,7 +45,8 @@ fi
 
 if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
 then
-        /usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${sub_domain} --target ${ip} --ttl_sec 60 --no-defaults 
+        curl -s -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{ "type": "A", "name": "'"${sub_domain}"'", "target": "'"${ip}"'", "ttl_sec": 60 }' https://api.linode.com/v4/domains/${domain_id}/records
+
         if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
         then
                 /bin/echo "DNS Record not successfully created"
