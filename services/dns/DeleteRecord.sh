@@ -21,16 +21,17 @@
 #set -x
 set -e
 
-if ( [ "${1}" = "" ] )
+if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
 then
-    status "Error: One arguments argument is required."
-    status "Usage: $0 <record_id>" 
+    status "Error: Two arguments  are required."
+    status "Usage: $0 <record_id> <website_url>" 
     exit 1
 fi
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
 record_id="${1}"
+website_url="${2}"
 
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
@@ -41,5 +42,5 @@ then
   orchestration_tool="api"
 fi
 
-${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/DeleteRecord.sh ${record_id} 
+${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/DeleteRecord.sh ${record_id} ${website_url}
 
