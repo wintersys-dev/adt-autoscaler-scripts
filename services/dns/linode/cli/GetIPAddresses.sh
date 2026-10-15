@@ -33,7 +33,7 @@ then
 fi
                         
 export LINODE_CLI_CONFIG=${linode_config_file}
-domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r --arg tmp_domain_url "${domain_url}" '(.[] | select(.domain | contains($tmp_domain_url)) | .id)'`"
+domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
 	/bin/echo "DNS domain ID not successfully obtained"
