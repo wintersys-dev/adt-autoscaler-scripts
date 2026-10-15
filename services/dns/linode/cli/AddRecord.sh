@@ -19,33 +19,31 @@
 ####################################################################################
 ####################################################################################
 #set -x
+set -e
 
-subdomain="`/bin/echo ${4} | /usr/bin/awk -F'.' '{print $1}'`"
-domain_url="`/bin/echo ${4} | /usr/bin/cut -d'.' -f2-`"
-ip="${5}"
-dns="${6}"
+auth_key="${1}"
+sub_domain="${2}"
+domain_url="${3}"
+ip="${4}"
 
-	linode_config_file="/root/.config/dns-linode-cli"
+linode_config_file="/root/.config/dns-linode-cli"
         
-    if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
-    then
-    	linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
-    fi
+if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
+then
+	linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
+fi
                         
-    export LINODE_CLI_CONFIG=${linode_config_file}
+export LINODE_CLI_CONFIG=${linode_config_file}
 	
-	domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
-    #Make damn sure that the DNS record gets added to the DNS system
-    count="0"
-    while ( [ "${count}" -lt "5" ] && [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
-    do
-    	count="`/usr/bin/expr ${count} + 1`"
-        /usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${subdomain} --target ${ip} --ttl_sec 60 --no-defaults 
-    done
+domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
+    
+#Make damn sure that the DNS record gets added to the DNS system
+count="0"
+while ( [ "${count}" -lt "5" ] && [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
+do
+	count="`/usr/bin/expr ${count} + 1`"
+	/usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${subdomain} --target ${ip} --ttl_sec 60 --no-defaults 
+done
 
-	unset LINODE_CLI_CONFIG
+unset LINODE_CLI_CONFIG
  
- 	if ( [ "${count}" = "5" ] )
-  	then
-		${HOME}/services/email/SendEmail.sh "FAILED TO ADD IP ADDRESS TO DNS SYSTEM" "IP address (${ip}) for domain ${domainurl}) could not be added to the DNS system" "ERROR"
-	fi
