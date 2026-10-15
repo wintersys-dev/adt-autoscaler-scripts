@@ -33,7 +33,7 @@ then
 fi
                         
 export LINODE_CLI_CONFIG=${linode_config_file}
-domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
+domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 /usr/local/bin/linode-cli domains records-delete ${domain_id} ${record_id} --no-defaults
 
 unset LINODE_CLI_CONFIG
