@@ -2,9 +2,6 @@
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
-#zone_id="${1}"
-#dns_username="${2}"
-#dns_security_key="${3}"
 website_url="${1}"
 ip="${2}
 
