@@ -27,6 +27,9 @@ websiteurl="${4}"
 ip="${5}"
 dns="${6}"
 
+	#zonename="`/bin/echo ${WEBSITE_URL} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
+	#zoneid="`${HOME}/services/dns/GetZoneID.sh "${zonename}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
+
 if ( [ "${dns}" = "cloudflare" ] )
 then
         if ( [ "`/bin/echo ${credentials} | /bin/grep ':::'`" != "" ] )
