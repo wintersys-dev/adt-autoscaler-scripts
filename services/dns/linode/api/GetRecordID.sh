@@ -42,7 +42,7 @@ then
         exit  1
 fi
 
-/usr/local/bin/linode-cli domains records-list ${domain_id} --name "${sub_domain}" --no-defaults --json | /usr/bin/jq -r '(.[] | select(.target == "'${ip}'")) | .id'
+curl -s "https://api.linode.com/v4/domains/${domain_id}/records" -H "Authorization: Bearer $TOKEN" | jq --arg sub "${sub_domain}" -r '.data[] | select(.name == $sub) | .id'
 if ( [ "$?" != "0" ] )
 then
         /bin/echo "DNS record could not be listed"
