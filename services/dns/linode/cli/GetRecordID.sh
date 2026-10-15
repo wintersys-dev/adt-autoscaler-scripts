@@ -42,7 +42,7 @@ then
         exit  1
 fi
 
-record_id="`/usr/local/bin/linode-cli domains records-list ${domain_id} --name "${sub_domain}" --no-defaults --json | /usr/bin/jq -r '(.[] | select(.target == "'${ip}'")) | .id'`"
+/usr/local/bin/linode-cli domains records-list ${domain_id} --name "${sub_domain}" --no-defaults --json | /usr/bin/jq -r '(.[] | select(.target == "'${ip}'")) | .id'
 if ( [ "$?" != "0" ] )
 then
         /bin/echo "DNS record could not be listed"
