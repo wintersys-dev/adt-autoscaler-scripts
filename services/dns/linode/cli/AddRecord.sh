@@ -37,7 +37,6 @@ export LINODE_CLI_CONFIG=${linode_config_file}
 	
 domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
     
-#Make damn sure that the DNS record gets added to the DNS system
 count="0"
 while ( [ "${count}" -lt "5" ] && [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
 do
