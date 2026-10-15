@@ -1,6 +1,7 @@
 #!/bin/sh
 
-ip="${1}"
+website_url="${1}"
+ip="${2}"
 
 DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
 DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
