@@ -40,7 +40,7 @@ then
         exit 1
 fi
 
-record_id="`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`"
+record_id="`curl -s -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains/${domain_id}/records | /usr/bin/jq -r '.data[] | select(.target == "'"${ip}"'").id'`"
 if ( [ "$?" != "0" ] || [ "${record_id}" = "" ] )
 then
         /bin/echo "DNS record ID not successfully obtained"
@@ -48,7 +48,8 @@ then
         exit 1
 fi
 
-/usr/local/bin/linode-cli domains records-delete ${domain_id} ${record_id}
+curl -s -X DELETE -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
+
 if ( [ "$?" != "0" ] )
 then
         /bin/echo "DNS record not successfully deleted"
