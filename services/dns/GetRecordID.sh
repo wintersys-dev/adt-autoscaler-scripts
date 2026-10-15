@@ -12,4 +12,9 @@ orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHES
 
 DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 
+if ( [ ! -d ${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool} ] )
+then
+  orchestration_tool="api"
+fi
+
 ${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/GetRecordID.sh ${website_url} ${ip}
