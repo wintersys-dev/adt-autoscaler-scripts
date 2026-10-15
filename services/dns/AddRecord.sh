@@ -23,11 +23,11 @@
 export HOME="`/bin/cat /home/homedir.dat`"
 
 zone_id="${1}"
-dns_username="${2}"
-dns_security_key="${3}"
+#dns_username="${2}"
+#dns_security_key="${3}"
 website_url="${4}"
 ip="${5}"
-dns_choice="${6}"
+#dns_choice="${6}"
 
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
