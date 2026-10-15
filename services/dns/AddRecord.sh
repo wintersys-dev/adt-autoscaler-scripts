@@ -22,8 +22,11 @@
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
-server_size="${1}"
-server_name="${2}"
+authkey="${3}"
+subdomain="`/bin/echo ${4} | /usr/bin/awk -F'.' '{print $1}'`"
+domainurl="`/bin/echo ${4} | /usr/bin/cut -d'.' -f2-`"
+ip="${5}"
+dns="${6}"
 
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
