@@ -1,21 +1,20 @@
-zoneid="${1}"
-email="${2}"
-credentials="${3}"
-websiteurl="${4}"
-ip="${5}"
-dns="${6}"
+#!/bin/sh
 
-        #zonename="`/bin/echo ${WEBSITE_URL} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
-        #zoneid="`${HOME}/services/dns/GetZoneID.sh "${zonename}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
+record_id="${1}"
 
+DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
+DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
+DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 
-        if ( [ "`/bin/echo ${credentials} | /bin/grep ':::'`" != "" ] )
-        then
-                api_token="`/bin/echo ${credentials} | /usr/bin/awk -F':::' '{print $2}'`"
-                /usr/bin/curl -X POST "https://api.cloudflare.com/client/v4/zones/${zoneid}/dns_records" --header "Authorization: Bearer ${api_token}" --header "Content-Type: application/json" --data '{"type":"A
-","name":"'${websiteurl}'","content":"'${ip}'","proxiable":true,"proxied":'true',"ttl":120}'
-        else
-                authkey="${credentials}"
-                /usr/bin/curl -X POST "https://api.cloudflare.com/client/v4/zones/${zoneid}/dns_records" -H "X-Auth-Email: ${email}" -H "X-Auth-Key: ${authkey}" -H "Content-Type: application/json" --data '{"type
-":"A","name":"'${websiteurl}'","content":"'${ip}'","proxiable":true,"proxied":'true',"ttl":120}'
-        fi
+zone_name="`/bin/echo ${website_url} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
+zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
+
+if ( [ "`/bin/echo ${DNS_SECURITY_KEY} | /bin/grep ':::'`" != "" ] )
+then
+        api_token="`/bin/echo ${DNS_SECURITY_KEY} | /usr/bin/awk -F':::' '{print $2}'`"
+        /usr/bin/curl -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" --header "Authorization: Bearer ${api_token}" --header "Content-Type: application/json"
+else
+        auth_key="${DNS_SECURITY_KEY}"
+        /usr/bin/curl -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" -H "X-Auth-Email: ${email}"  -H "X-Auth-Key: ${auth_key}" -H "Content-Type: application/json"
+fi
+
