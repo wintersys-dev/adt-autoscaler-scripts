@@ -20,6 +20,13 @@
 ####################################################################################
 #set -x
 
+if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
+then
+    status "Error: Two arguments argument are required."
+    status "Usage: $0 <website_url> <ip>" 
+    exit 1
+fi
+
 subdomain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
 domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
 ip="${2}"
