@@ -25,15 +25,8 @@ HOME="`/bin/cat /home/homedir.dat`"
 record_id="${1}"
 domain_url="`${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL' | /usr/bin/cut -d'.' -f2-`"
 
-linode_config_file="/root/.config/dns-linode-cli"
-        
-if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
-then
-	linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
-fi
-                        
-export LINODE_CLI_CONFIG=${linode_config_file}
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
+
 domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 curl -s -X DELETE -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
 
-unset LINODE_CLI_CONFIG
