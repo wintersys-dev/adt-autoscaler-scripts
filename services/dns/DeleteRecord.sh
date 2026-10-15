@@ -1,3 +1,11 @@
+
+if ( [ "${1}" = "" ] )
+then
+    status "Error: One arguments argument is required."
+    status "Usage: $0 <record_id>" 
+    exit 1
+fi
+
 export HOME="`/bin/cat /home/homedir.dat`"
 
 record_id="${1}"
