@@ -18,19 +18,14 @@
 # along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################################################
 #######################################################################################################
-#set -x
+set -x
 
 export HOME="`/bin/cat /home/homedir.dat`"
 
-zone_id="${1}"
-#dns_username="${2}"
-#dns_security_key="${3}"
-website_url="${4}"
-ip="${5}"
-#dns_choice="${6}"
+website_url="${1}"
+ip="${2}"
 
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
 DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
-#${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${zone_id} ${dns_username} ${dns_security_key} ${website_url} ${ip} ${dns_choice}
 ${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${website_url} ${ip} 
