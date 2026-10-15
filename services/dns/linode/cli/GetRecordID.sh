@@ -20,33 +20,34 @@
 #######################################################################################
 #######################################################################################
 #set -x
+set -e
 
-domainurl="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
-subdomain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
+domain_url="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
+sub_domain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
 ip="${2}"
 
 linode_config_file="/root/.config/dns-linode-cli"
-        
+
 if ( [ -f /root/snap/linode-cli/current/.config/linode-cli ] )
 then
-	linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
+        linode_config_file="/root/snap/linode-cli/current/.config/linode-cli"
 fi
-                        
+
 export LINODE_CLI_CONFIG=${linode_config_file}
 domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
-	/bin/echo "DNS domain ID not successfully obtained"
-	unset LINODE_CLI_CONFIG
-	exit  1
+        /bin/echo "DNS domain ID not successfully obtained"
+        unset LINODE_CLI_CONFIG
+        exit  1
 fi
 
-/usr/local/bin/linode-cli domains records-list ${domain_id} --name "${subdomain}" --no-defaults --json | /usr/bin/jq -r '(.[] | select(.target == "'${ip}'")) | .id'
+record_id="`/usr/local/bin/linode-cli domains records-list ${domain_id} --name "${sub_domain}" --no-defaults --json | /usr/bin/jq -r '(.[] | select(.target == "'${ip}'")) | .id'`"
 if ( [ "$?" != "0" ] )
 then
-	/bin/echo "DNS record could not be listed"
-	unset LINODE_CLI_CONFIG
-	exit  1
+        /bin/echo "DNS record could not be listed"
+        unset LINODE_CLI_CONFIG
+        exit  1
 fi
 
 unset LINODE_CLI_CONFIG
