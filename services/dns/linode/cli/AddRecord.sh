@@ -21,7 +21,10 @@
 #set -x
 set -e
 
-auth_key="${3}"
+#DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
+
+
+#auth_key="${3}"
 subdomain="`/bin/echo ${4} | /usr/bin/awk -F'.' '{print $1}'`"
 domainurl="`/bin/echo ${4} | /usr/bin/cut -d'.' -f2-`"
 ip="${4}"
