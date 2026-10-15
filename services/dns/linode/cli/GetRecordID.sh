@@ -21,11 +21,9 @@
 #######################################################################################
 #set -x
 
-domainurl="`/bin/echo ${2} | /usr/bin/cut -d'.' -f2-`"
-subdomain="`/bin/echo ${2} | /usr/bin/awk -F'.' '{print $1}'`"
-ip="${3}"
-auth_key="${5}"
-dns="${6}"
+domainurl="`/bin/echo ${1} | /usr/bin/cut -d'.' -f2-`"
+subdomain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
+ip="${2}"
 
 linode_config_file="/root/.config/dns-linode-cli"
         
