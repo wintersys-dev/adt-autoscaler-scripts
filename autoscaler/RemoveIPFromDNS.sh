@@ -48,11 +48,11 @@ CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 ip="${1}"
 
 #remove the ip address which has been passed as a parameter from the DNS provider
-zonename="`/bin/echo ${WEBSITE_URL} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
-zoneid="`${HOME}/services/dns/GetZoneID.sh "${zonename}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
-recordid="`${HOME}/services/dns/GetRecordID.sh "${zoneid}" "${WEBSITE_URL}" "${ip}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
+#zonename="`/bin/echo ${WEBSITE_URL} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
+#zoneid="`${HOME}/services/dns/GetZoneID.sh "${zonename}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"`"
+recordid="`${HOME}/services/dns/GetRecordID.sh "${WEBSITE_URL}" "${ip}"`"
 
 if ( [ "${recordid}" != "" ] )
 then
-	${HOME}/services/dns/DeleteRecord.sh "${zoneid}" "${recordid}" "${DNS_USERNAME}" "${DNS_SECURITY_KEY}" "${DNS_CHOICE}"
+	${HOME}/services/dns/DeleteRecord.sh "${recordid}"
 fi
