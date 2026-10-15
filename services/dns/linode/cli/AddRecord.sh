@@ -21,9 +21,10 @@
 #set -x
 set -e
 
-auth_key="${1}"
-sub_domain="${2}"
-domain_url="${3}"
+${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh ${zone_id} ${dns_username} ${dns_security_key} ${website_url} ${ip} ${dns_choice}
+
+auth_key="${3}"
+
 ip="${4}"
 
 linode_config_file="/root/.config/dns-linode-cli"
