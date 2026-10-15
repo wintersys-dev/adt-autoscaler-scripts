@@ -20,6 +20,12 @@
 ####################################################################################
 #set -x
 
+authkey="${3}"
+subdomain="`/bin/echo ${4} | /usr/bin/awk -F'.' '{print $1}'`"
+domainurl="`/bin/echo ${4} | /usr/bin/cut -d'.' -f2-`"
+ip="${5}"
+dns="${6}"
+
         count="0"
         id="`/usr/bin/exo dns list --config /root/.config/exoscale/dns-exoscale.toml -O json | /usr/bin/jq -r '.[] | select (.name == "'${domainurl}'").id'`"
 
