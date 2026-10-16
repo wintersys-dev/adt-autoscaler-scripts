@@ -1,10 +1,10 @@
 #!/bin/sh
-#######################################################################################
+######################################################################################
 # Author : Peter Winter
-# Date   : 13/06/2016
-# Description : This will get the zone id  when we are using cloudflare as our DNS
-# provider
-#######################################################################################
+# Date   : 13/07/2016
+# Description : This script is used to get the "zoneid" for a particular "zone name".
+# Please refer to your DNS provider's documentation for more information
+######################################################################################
 # License Agreement:
 # This file is part of The Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
@@ -17,39 +17,26 @@
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-#####################################################################################
-#####################################################################################
+#######################################################################################
+#######################################################################################
 #set -x
-set -e
 
-zonename="${1}"
-email="${2}"
-credentials="${3}"
-dns="${4}"
+zone_name="${1}"
 
-if ( [ "${dns}" = "cloudflare" ] )
-then    
-	zoneid=""
-	#Storing it in a file stops us hitting cloudflare rate limits
-	if ( [ -f ${HOME}/runtime/zoneid.dat ] )
-	then
-		zoneid="`/bin/cat ${HOME}/runtime/zoneid.dat`"
-	else
-        if ( [ "`/bin/echo ${credentials} | /bin/grep ':::'`" != "" ] )
-        then
-                api_token="`/bin/echo ${credentials} | /usr/bin/awk -F':::' '{print $2}'`"
-                zoneid="`/usr/bin/curl -X GET "https://api.cloudflare.com/client/v4/zones?name=${zonename}&status=active&page=1&per_page=20&order=status&direction=desc&match=all" --header "Authorization: Bearer ${api_token}" --header "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'`" 
-        else
-                authkey="${credentials}"
-                zoneid="`/usr/bin/curl -X GET "https://api.cloudflare.com/client/v4/zones?name=${zonename}&status=active&page=1&per_page=20&order=status&direction=desc&match=all" -H "X-Auth-Email: ${email}" -H "X-Auth-Key: ${authkey}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'`"
-        fi
-	fi
-	
-	if ( [ "${zoneid}" != "" ] )
-	then
-		/bin/echo "${zoneid}" > ${HOME}/runtime/zoneid.dat
-		/bin/echo ${zoneid}
-	fi
+HOME="`/bin/cat /home/homedir.dat`"
+
+DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
+DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
+
+
+if ( [ "`/bin/echo ${DNS_SECURITY_KEY} | /bin/grep ':::'`" != "" ] )
+then
+        api_token="`/bin/echo ${DNS_SECURITY_KEY} | /usr/bin/awk -F':::' '{print $2}'`"
+        curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${zone_name}"  -H "Authorization: Bearer ${api_token}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'
+else
+        auth_key="${DNS_SECURITY_KEY}"
+        curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${zone_name}" -H "X-Auth-Email: ${DNS_USERNAME}"  -H "X-Auth-Key: ${auth_key}"  -H "Content-Type: application/json" | /usr/bin/jq -r '.result[]? | .id'
+
 fi
 
 
