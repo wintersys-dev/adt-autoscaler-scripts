@@ -46,7 +46,7 @@ if ( [ "`curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/do
 then
         curl -s -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{ "type": "A", "name": "'"${sub_domain}"'", "target": "'"${ip}"'", "ttl_sec": 60 }' https://api.linode.com/v4/domains/${domain_id}/records
 
-        if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+        if ( [ "$?" != "0" ] )
         then
                 /bin/echo "DNS Record not successfully created"
                 exit 1
