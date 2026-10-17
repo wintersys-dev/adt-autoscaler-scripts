@@ -22,7 +22,6 @@
 #set -x
 set -e
 
-
 if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
 then
     status "Error: Two arguments are required."
@@ -53,7 +52,7 @@ fi
 /usr/local/bin/linode-cli domains records-list ${domain_id} --name "${sub_domain}" --no-defaults --json | /usr/bin/jq -r '(.[] | select(.target == "'${ip}'")) | .id'
 if ( [ "$?" != "0" ] )
 then
-        /bin/echo "DNS record could not be listed"
+        /bin/echo "DNS record id could not be listed"
         unset LINODE_CLI_CONFIG
         exit  1
 fi
