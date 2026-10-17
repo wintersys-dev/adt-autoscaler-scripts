@@ -22,13 +22,6 @@
 
 set -e
 
-status () {
-        /bin/echo "${1}" | /usr/bin/tee /dev/fd/3 2>/dev/null
-        script_name="`/bin/echo ${0} | /usr/bin/awk -F'/' '{print $NF}'`"
-        /bin/echo "${script_name}: ${1}" | /usr/bin/tee -a /dev/fd/4 2>/dev/null
-}
-
-
 website_url="${1}"
 ip="${2}"
 
@@ -57,6 +50,6 @@ fi
 
 if ( [ "$?" != "0" ] )
 then
-        status "Failed to Add record to for url ${website_url} with ip address ${ip} to the DNS system"
+        /bin/echo "Failed to Add record to for url ${website_url} with ip address ${ip} to the DNS system"
         exit 1
 fi
