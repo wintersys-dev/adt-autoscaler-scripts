@@ -33,12 +33,11 @@ DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 zone_name="`/bin/echo ${website_url} | /usr/bin/cut -d'.' -f2-`"
 zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
 
-if ( [ "${zone_id}" = "" ] )
+if ( [ "$?" ! = "0" ] )
 then
-        ${HOME}/services/dns/CreateZone.sh  "${website_url}"
-        zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
+        /bin/echo "Failed to get zone_id from DNS system"
+        exit 1
 fi
-
 
 if ( [ "`/bin/echo ${DNS_SECURITY_KEY} | /bin/grep ':::'`" != "" ] )
 then
