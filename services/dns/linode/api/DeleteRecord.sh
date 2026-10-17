@@ -38,3 +38,9 @@ TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 curl -s -X DELETE -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
 
+if ( [ "$?" != "0" ] )
+then
+    /bin/echo "Failed to delete DNS record"
+    exit 1
+fi
+
