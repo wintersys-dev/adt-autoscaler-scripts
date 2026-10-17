@@ -53,7 +53,7 @@ fi
 if ( [ "`/usr/local/bin/linode-cli domains records-list ${domain_id} --no-defaults --json | /usr/bin/jq -r '.[] | select (.target == "'${ip}'").id'`" = "" ] )
 then
         /usr/local/bin/linode-cli domains records-create ${domain_id} --type A --name ${sub_domain} --target ${ip} --ttl_sec 60 --no-defaults 
-        if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
+        if ( [ "$?" != "0" ] )
         then
                 /bin/echo "DNS Record not successfully created"
                 unset LINODE_CLI_CONFIG
