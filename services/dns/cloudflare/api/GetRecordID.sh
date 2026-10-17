@@ -1,4 +1,27 @@
-set -x
+#!/bin/sh
+######################################################################################
+# Author : Peter Winter
+# Date   : 13/07/2016
+# Description : This will get all the record ID for a given website url and ip from the DNS
+# system
+######################################################################################
+# License Agreement:
+# This file is part of The Agile Deployment Toolkit.
+# The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# The Agile Deployment Toolkit is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################################
+#######################################################################################
+#set -x
+
+set -e
 
 website_url="${1}"
 ip="${2}"
@@ -12,10 +35,10 @@ DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 zone_name="`/bin/echo ${website_url} | /usr/bin/cut -d'.' -f2-`"
 zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
 
-if ( [ "${zone_id}" = "" ] )
+if ( [ "$?" ! = "0" ] )
 then
-        ${HOME}/services/dns/CreateZone.sh "${website_url}"
-        zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
+        /bin/echo "Failed to get zone_id from DNS system"
+        exit 1
 fi
 
 if ( [ "`/bin/echo ${DNS_SECURITY_KEY} | /bin/grep ':::'`" != "" ] )
@@ -24,6 +47,12 @@ then
         /usr/bin/curl -X GET "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?type=A&name=${website_url}&content=${ip}" -H "Authorization: Bearer ${api_token}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'
 else
         /usr/bin/curl -X GET "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?type=A&name=${website_url}&content=${ip}" -H "X-Auth-Email: ${DNS_USERNAME}" -H "X-Auth-Key: ${DNS_SECURITY_KEY}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'
+fi
+
+if ( [ "$?" ! = "0" ] )
+then
+        /bin/echo "Failed to get record id from DNS system"
+        exit 1
 fi
 
 
