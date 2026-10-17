@@ -52,7 +52,7 @@ fi
 /usr/local/bin/linode-cli domains records-list "${domain_id}" --json | jq -r ' .[] | select(.name == "'"${sub_domain}"'").target'
 if ( [ "$?" != "0" ] )
 then
-	/bin/echo "DNS record  not successfully obtained"
+	/bin/echo "DNS ip addresses not successfully obtained"
 	unset LINODE_CLI_CONFIG
 	exit 1
 fi
