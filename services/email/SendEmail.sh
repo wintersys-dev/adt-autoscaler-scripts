@@ -52,7 +52,9 @@ then
 fi
 if ( [ "${FROM_ADDRESS}" != "" ] && [ "${TO_ADDRESS}" != "" ] && [ "${USERNAME}" != "" ] && [ "${PASSWORD}" != "" ] && [ "${subject}" != "" ] && [ "${message}" != "" ] )
 then
-	${HOME}/service/email/
+	${HOME}/service/email/sendemail/SendEmail.sh ${subject} ${message} ${to_address}
+
+	
 	if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'EMAILUTIL:sendemail'`" = "1" ] )
 	then
 		if ( [ "${EMAIL_PROVIDER}" = "1" ] )
