@@ -20,6 +20,16 @@
 #####################################################################################
 #####################################################################################
 #set -x
+set -e
+
+HOME="`/bin/cat /home/homedir.dat`"
+
+if ( [ "${1}" = "" ] || [ "${2}" = "" ] || [ "${3}" = "" ] )
+then
+        status "Error: Minimum of 3 arguments required."
+        status "Usage: $0 <subject> <message> <level>"
+        exit 1
+fi
 
 subject="$1"
 message="$2"
@@ -29,20 +39,25 @@ content_type="$5"
 
 if ( [ "${level}" = "ERROR" ] || [ "${level}" = "INFO" ] || [ "${level}" = "MANDATORY" ] )
 then
-	ip_address="`${HOME}/utilities/processing/GetPublicIP.sh`"
-	message="MESSAGE RELATED TO MACHINE WITH IP ADDRESS: ${ip_address}: ${message}"
+        ip_address="`${HOME}/utilities/processing/GetPublicIP.sh`"
+        message="MESSAGE RELATED TO MACHINE WITH IP ADDRESS: ${ip_address}: ${message}"
 fi
 
-email_util="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "EMAILUTIL:" | /usr/bin/awk -F':' '{print $NF}'`"
+email_util="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "EMAILUTIL" | /usr/bin/awk -F':' '{print $NF}'`"
 
 if ( [ "${level}" != "MANDATORY" ] && [ "`${HOME}/utilities/config/CheckConfigValue.sh EMAILNOTIFICATIONLEVEL:ERROR`" = "1" ] && [ "${level}" != "ERROR" ] )
 then
-	exit
+        exit
 fi
 
-if ( [ "${FROM_ADDRESS}" != "" ] && [ "${TO_ADDRESS}" != "" ] && [ "${USERNAME}" != "" ] && [ "${PASSWORD}" != "" ] && [ "${subject}" != "" ] && [ "${message}" != "" ] )
+if ( [ "${to_address}" = "" ] )
 then
-	${HOME}/service/email/${email_util}/SendEmail.sh ${subject} ${message} ${to_address}	
-else
-	/bin/echo "${0} `/bin/date`:Email not sent because of missing parameter(s)"
+        to_address="system"
 fi
+
+if ( [ "${content_type}" = "" ] )
+then
+        content_type="default"
+fi
+
+${HOME}/services/email/${email_util}/SendEmail.sh "${subject}" "${message}" "${to_address}" "${content_type}"
