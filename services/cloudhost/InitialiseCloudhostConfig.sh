@@ -35,11 +35,6 @@ if ( [ "${CLOUDHOST}" = "digitalocean" ] )
 then
         TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
 
-        if ( [ -f ${HOME}/.config/doctl/config.yaml ] )
-        then
-                /bin/rm ${HOME}/.config/doctl/config.yaml
-        fi
-
         /bin/echo "${0} Configuring Digital Ocean CLI tool" 
 
         if ( [ ! -d ${HOME}/.config/doctl ] )
@@ -47,8 +42,11 @@ then
                 /bin/mkdir -p ${HOME}/.config/doctl
         fi
 
-        /bin/cp ${HOME}/services/cloudhost/configfiles/digitalocean/digitalocean.tmpl ${HOME}/.config/doctl/config.yaml
-
+		if ( [ -f ${HOME}/services/cloudhost/configfiles/digitalocean/digitalocean.tmpl ] )
+		then
+        	/bin/cp ${HOME}/services/cloudhost/configfiles/digitalocean/digitalocean.tmpl ${HOME}/.config/doctl/config.yaml
+		fi
+		
         if ( [ "${TOKEN}" != "" ] )
         then
                 /bin/sed -i "s/XXXXTOKENXXXX/${TOKEN}/" ${HOME}/.config/doctl/config.yaml
@@ -80,11 +78,6 @@ then
         ACCESS_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'ACCESSKEY'`"
         SECRET_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'SECRETKEY'`"
 
-        if ( [ -f ${HOME}/.config/exoscale/exoscale.toml ] )
-        then
-                /bin/rm ${HOME}/.config/exoscale/exoscale.toml
-        fi
-
         /bin/echo "${0} Configuring Exoscale CLI tool" 
 
         if ( [ ! -d ${HOME}/.config/exoscale ] )
@@ -92,8 +85,11 @@ then
                 /bin/mkdir -p ${HOME}/.config/exoscale
         fi
 
-        /bin/cp ${HOME}/services/cloudhost/configfiles/exoscale/exoscale.tmpl  ${HOME}/.config/exoscale/exoscale.toml
-
+		if ( [ -f ${HOME}/services/cloudhost/configfiles/exoscale/exoscale.tmpl ] )
+		then
+        	/bin/cp ${HOME}/services/cloudhost/configfiles/exoscale/exoscale.tmpl  ${HOME}/.config/exoscale/exoscale.toml
+		fi
+		
         if ( [ "${CLOUDHOST_ACCOUNT_ID}" != "" ] )
         then
                 /bin/sed -i "s/XXXXCLOUDEMAILADDRESSXXXX/${CLOUDHOST_ACCOUNT_ID}/" ${HOME}/.config/exoscale/exoscale.toml
@@ -146,16 +142,11 @@ then
         /bin/sed -i 's/secret.*/secret = "'${DNS_SECRET_KEY}'"/' /root/.config/exoscale/dns-exoscale.toml
 fi
 
-if ( [ "${CLOUDHOST}" = "linode" ] )
+if ( [ "${CLOUDHOST}" = "linode" ] && [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`" = "cli" ] )
 then
-	CLOUDHOST_ACCOUNT_ID="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOSTACCOUNTID'`"
+		CLOUDHOST_ACCOUNT_ID="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOSTACCOUNTID'`"
         TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
         REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
-
-        if ( [ -f ${HOME}/.config/linode-cli ] )
-        then
-                /bin/rm ${HOME}/.config/linode-cli
-        fi
 
         if ( [ ! -d ${HOME}/.config ] )
         then
@@ -164,8 +155,11 @@ then
 
         /bin/echo "${0} Configuring Linode CLI tool" >> ${HOME}/logs/initialbuild/BUILD_PROCESS_MONITORING.log
 
-        /bin/cp ${HOME}/services/cloudhost/configfiles/linode/linode-cli.tmpl  ${HOME}/.config/linode-cli
-
+		if ( [ -f ${HOME}/services/cloudhost/configfiles/linode/linode-cli.tmpl ] )
+		then
+        	/bin/cp ${HOME}/services/cloudhost/configfiles/linode/linode-cli.tmpl  ${HOME}/.config/linode-cli
+		fi
+		
         if ( [ "${CLOUDHOST_ACCOUNT_ID}" != "" ] )
         then
                 /bin/sed -i "s/XXXXLINODEACCOUNTUSERNAMEXXXX/${CLOUDHOST_ACCOUNT_ID}/" ${HOME}/.config/linode-cli
