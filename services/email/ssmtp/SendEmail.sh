@@ -62,3 +62,9 @@ else
         /bin/echo "${message}" | /usr/bin/mail -s "${subject}" -a "From: ${FROM_NAME} <${FROM_ADDRESS}>" "${TO_ADDRESS}"
 fi
 
+if ( [ "$?" != "0" ] )
+then
+        /bin/echo "Failed to send email"
+        exit 1
+fi
+
