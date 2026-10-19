@@ -2,6 +2,7 @@
 
 subject="$1"
 message="$2"
+to_address="$3"
 
 
 EMAIL_PROVIDER="`${HOME}/utilities/config/ExtractConfigValue.sh 'EMAILPROVIDER'`"
@@ -10,6 +11,12 @@ FROM_NAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEDISPLAYNAME |
 TO_ADDRESS="`${HOME}/utilities/config/ExtractConfigValue.sh 'SYSTEMTOEMAILADDRESS'`"
 USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'EMAILUSERNAME'`"
 PASSWORD="`${HOME}/utilities/config/ExtractConfigValue.sh 'EMAILPASSWORD'`"
+
+
+if ( [ "${to_address}" != "" ] )
+then
+	TO_ADDRESS="${to_address}"
+fi
 
 if ( [ "${EMAIL_PROVIDER}" = "1" ] )
 then
