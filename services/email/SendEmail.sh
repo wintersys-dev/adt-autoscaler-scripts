@@ -1,7 +1,7 @@
 #!/bin/sh
 ################################################################################
-# Description: This script is used for sending system emails. Scripts can make use
-# of this whenever they need to send a system notification. 
+# Description: This script is using for sending emails based on whatever email utility
+# is configured for use in software.dat
 # Date: 16-11-2016
 # Author: Peter Winter
 ##################################################################################
