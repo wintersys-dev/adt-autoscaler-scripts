@@ -38,4 +38,10 @@ if ( [ "${EMAIL_PROVIDER}" = "3" ] )
 then
         /usr/bin/sendemail -o tls=no -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -s email-smtp.eu-west-1.amazonaws.com -xu ${USERNAME} -xp ${PASSWORD} -u "${subject} `/bin/date`" -m "${message}"
 fi
+
+if ( [ "$?" != "0" ] )
+then
+	/bin/echo "Failed to send email"
+	exit 1
+fi
 	
