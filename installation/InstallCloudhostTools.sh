@@ -22,8 +22,7 @@
 #############################################################################
 #############################################################################
 
-#Configure the machine for the current provider. Each new provider that is added will need a config process like these to be added
-#here
+HOME="`/bin/cat /home/homedir.dat`"
 
 if ( [ "${1}" != "" ] )
 then
@@ -56,7 +55,7 @@ then
 fi
 
 
-if ( [ "${CLOUDHOST}" = "linode" ] )
+if ( [ "${CLOUDHOST}" = "linode" ] && [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`" = "cli" ] )
 then
 	/bin/echo "${0} `/bin/date`: Building for the Linode provider" 
 	${HOME}/installation/InstallLinodeCLI.sh ${BUILDOS}
