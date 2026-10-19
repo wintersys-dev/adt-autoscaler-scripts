@@ -1,5 +1,13 @@
 
 
+
+if ( [ "${1}" = "" ] || [ "${2}" = "" ] || [ "${3}" = "" ] )
+then
+        status "Error: 3 arguments are required."
+        status "Usage: $0 <subject> <message> <to_address>"
+        exit 1
+fi
+
 subject="$1"
 message="$2"
 to_address="$3"
