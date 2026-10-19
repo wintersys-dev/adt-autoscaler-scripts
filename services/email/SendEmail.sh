@@ -61,3 +61,9 @@ then
 fi
 
 ${HOME}/services/email/${email_util}/SendEmail.sh "${subject}" "${message}" "${to_address}" "${content_type}"
+
+if ( [ "$?" != "0" ] )
+then
+        /bin/echo "SendEmail.sh failed to send email"
+        exit 1
+fi
