@@ -39,56 +39,10 @@ if ( [ "${level}" != "MANDATORY" ] && [ "`${HOME}/utilities/config/CheckConfigVa
 then
 	exit
 fi
+
 if ( [ "${FROM_ADDRESS}" != "" ] && [ "${TO_ADDRESS}" != "" ] && [ "${USERNAME}" != "" ] && [ "${PASSWORD}" != "" ] && [ "${subject}" != "" ] && [ "${message}" != "" ] )
 then
-	${HOME}/service/email/${email_util}/SendEmail.sh ${subject} ${message} ${to_address}
-
-	
-#	if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'EMAILUTIL:sendemail'`" = "1" ] )
-#	then
-#		if ( [ "${EMAIL_PROVIDER}" = "1" ] )
-#		then
-#			/usr/bin/sendemail -o tls=no -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -s smtp-pulse.com:2525 -xu ${USERNAME} -xp ${PASSWORD} -u "${subject} `/bin/date`" -m "${message}"
-#		fi
-#		if ( [ "${EMAIL_PROVIDER}" = "2" ] )
-#		then
-#			/usr/bin/sendemail -o tls=no -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -s in.mailjet.com:2525 -xu ${USERNAME} -xp ${PASSWORD} -u "${subject} `/bin/date`" -m "${message}"            
-#		fi
-#		if ( [ "${EMAIL_PROVIDER}" = "3" ] )
-#		then
-#			/usr/bin/sendemail -o tls=no -f ${FROM_ADDRESS} -t ${TO_ADDRESS} -s email-smtp.eu-west-1.amazonaws.com -xu ${USERNAME} -xp ${PASSWORD} -u "${subject} `/bin/date`" -m "${message}"
-#		fi
-#	fi
-#	if ( [ "`${HOME}/utilities/config/CheckBuildStyle.sh 'EMAILUTIL:ssmtp'`" = "1" ] )
-#	then
-#		if ( [ ! -f ${HOME}/runtime/SSMTP_INITIALISED ] )
-#		then
-#			if ( [ "${EMAIL_PROVIDER}" = "1" ] )
-#			then
-#				/bin/echo "mailhub=smtp-pulse.com:2525" >> /etc/ssmtp/ssmtp.conf
-#			fi
-#			if ( [ "${EMAIL_PROVIDER}" = "2" ] )
-#			then
-#				/bin/echo "mailhub=in-v3.mailjet.com:587" >> /etc/ssmtp/ssmtp.conf
-#			fi
-#			if ( [ "${EMAIL_PROVIDER}" = "3" ] )
-#			then
-#				/bin/echo "mailhub=email-smtp.eu-west-1.amazonaws.com" >> /etc/ssmtp/ssmtp.conf
-#			fi
-#			/bin/echo "AuthUser=${USERNAME}" >> /etc/ssmtp/ssmtp.conf
-#			/bin/echo "AuthPass=${PASSWORD}" >> /etc/ssmtp/ssmtp.conf
-#			/bin/echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
-#			/bin/echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
-#			/bin/touch ${HOME}/runtime/SSMTP_INITIALISED
-#		fi
-#
-#		if ( [ "${content_type}" = "HTML" ] )
-#		then
-#			/bin/echo "${message}" | /usr/bin/mail -s "${subject}" -a "From: ${FROM_NAME} <${FROM_ADDRESS}>" "${TO_ADDRESS}" -a 'Content-Type: text/html'
-#		else
-#			/bin/echo "${message}" | /usr/bin/mail -s "${subject}" -a "From: ${FROM_NAME} <${FROM_ADDRESS}>" "${TO_ADDRESS}"
-#		fi
-#	fi
+	${HOME}/service/email/${email_util}/SendEmail.sh ${subject} ${message} ${to_address}	
 else
 	/bin/echo "${0} `/bin/date`:Email not sent because of missing parameter(s)"
 fi
