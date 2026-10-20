@@ -58,7 +58,7 @@ then
         orchestration_tool="api"
 fi
 
-script_path="${HOME/services/dbaas/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh"
+script_path="${HOME/services/dbaas/${DNS_CHOICE}/${orchestration_tool}/AdjustDBaaSFirewall.sh"
 
 if ( [ ! -f "${script_path}" ] )
 then
