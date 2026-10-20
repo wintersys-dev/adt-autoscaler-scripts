@@ -20,9 +20,6 @@
 ########################################################################################
 ########################################################################################
 #set -x
-
-
-#set -x
 set -e
 
 status () {
@@ -56,12 +53,12 @@ then
         exit 1
 fi
 
-if ( [ ! -d ${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool} ] )
+if ( [ ! -d ${HOME}/services/dbaas/${DNS_CHOICE}/${orchestration_tool} ] )
 then
         orchestration_tool="api"
 fi
 
-script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh"
+script_path="${HOME/services/dbaas/${DNS_CHOICE}/${orchestration_tool}/AddRecord.sh"
 
 if ( [ ! -f "${script_path}" ] )
 then
@@ -76,7 +73,7 @@ then
 fi
 
 
-"${script_path}" "${website_url}" "${ip}"
+"${script_path}" "${ip_to_delete}"
 
 exit_code=$?
 
