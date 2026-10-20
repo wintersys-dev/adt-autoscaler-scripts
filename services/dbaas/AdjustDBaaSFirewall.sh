@@ -28,13 +28,7 @@ status () {
         /bin/echo "${script_name}: ${1}" | /usr/bin/tee -a /dev/fd/4 2>/dev/null
 }
 
-if ( [ "${1}" = "" ] )
-then
-        status "Error: 1 arguments are required."
-        status "Usage: $0 <ip_to_delete> "
-        exit 1
-fi
-
+#ip to delete may or may not be set its Ok either way
 ip_to_delete="${1}"
 
 
