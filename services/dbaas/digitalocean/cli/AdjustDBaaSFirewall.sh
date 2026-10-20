@@ -37,7 +37,7 @@ then
         /bin/mkdir -p ${HOME}/runtime/dbaas_allowed_ips
 fi
 
-if ( [ "${MULTI_REGION}" = "1" ] )
+if ( [ "${MULTI_REGION}" = "1" ] && [ "${PRIMARY_REGION}" != "1" ] )
 then
         multi_region_bucket="`/bin/echo ${WEBSITE_URL} | /bin/sed 's/\./-/g'`-multi-region"
         multi_region_ips="`${HOME}/services/datastore/operations/ListFromDatastore.sh "multi-region" "dbaas_ips/*" | /usr/bin/awk -F'/' '{print $NF}'`"
