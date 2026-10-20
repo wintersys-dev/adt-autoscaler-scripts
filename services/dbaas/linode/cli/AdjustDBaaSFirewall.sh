@@ -109,6 +109,4 @@ then
   /usr/local/bin/linode-cli databases postgresql-update ${database_id} ${allow_list} --no-defaults 
 fi
 
-
-
 /bin/echo "${ipaddresses}" > ${HOME}/runtime/dbaas_allowed_ips/ip_list.dat
