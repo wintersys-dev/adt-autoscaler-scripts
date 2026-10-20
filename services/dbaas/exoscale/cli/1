@@ -68,169 +68,33 @@ then
         fi
 fi
 
-if ( [ "${CLOUDHOST}" = "digitalocean" ] )
+dbaas="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped"`"
+build_identifier="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
+zone="`/bin/echo ${dbaas} | /usr/bin/awk '{print $4}'`"
+database_name="`/bin/echo ${dbaas} | /usr/bin/awk '{print $6}'`"
+
+webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${zone}-${build_identifier}"`"
+database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${zone}-${build_identifier}"`"
+ipaddresses="${webserver_ips} ${database_ips} "
+ipaddresses="`/bin/echo ${ipaddresses} | /bin/sed 's/  / /g' | /bin/tr ' ' ',' | /bin/sed 's/,$//g'`"
+
+if ( [ "${multi_region_ips}" != "" ] )
 then
-        dbaas="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped"`"
-        cluster_name="`/bin/echo ${dbaas} | /usr/bin/awk '{print $8}'`"
-        cluster_id="`/usr/local/bin/doctl database list -o json | /usr/bin/jq -r '.[] | select (.name == "'${cluster_name}'").id'`"
-
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}"`"
-
-        ipaddresses="${webserver_ips} ${database_ips}"
-
-        if ( [ "${multi_region_ips}" != "" ] )
-        then
-                for ip in ${multi_region_ips}
-                do
-                        ipaddresses="${ipaddresses} ${ip}"
-                done
-        fi
-
-        ipaddresses="${ipaddresses} ${VPC_IP_RANGE}"
-
-        if ( [ "${cluster_id}" != "" ] )
-        then
-                if ( [ "${ip_to_delete}" != "" ] )
-                then
-                        uuid="`/usr/local/bin/doctl databases firewalls list ${cluster_id} -o json | /usr/bin/jq -r '.[] | select (.value == "'${ip_to_delete}'").uuid'`"
-                        if ( [ "${uuid}" != "" ] )
-                        then
-                                /usr/local/bin/doctl databases firewalls remove ${cluster_id} --uuid ${uuid}
-                        fi
-                elif ( [ "${ipaddresses}" != "" ] )
-                then
-                        for ip in ${ipaddresses}
-                        do
-                                if ( [ "`/usr/local/bin/doctl databases firewalls list ${cluster_id} | /bin/grep -w "${ip}"`" = "" ] )
-                                then
-                                        /usr/local/bin/doctl databases firewalls append ${cluster_id} --rule ip_addr:${ip}
-                                fi
-                        done
-                fi
-        fi
-fi
-
-if ( [ "${CLOUDHOST}" = "exoscale" ] )
-then
-        dbaas="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped"`"
-        build_identifier="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
-        zone="`/bin/echo ${dbaas} | /usr/bin/awk '{print $4}'`"
-        database_name="`/bin/echo ${dbaas} | /usr/bin/awk '{print $6}'`"
-
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${zone}-${build_identifier}"`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${zone}-${build_identifier}"`"
-        ipaddresses="${webserver_ips} ${database_ips} "
-        ipaddresses="`/bin/echo ${ipaddresses} | /bin/sed 's/  / /g' | /bin/tr ' ' ',' | /bin/sed 's/,$//g'`"
-
-        if ( [ "${multi_region_ips}" != "" ] )
-        then
-                for ip in ${multi_region_ips}
-                do
-                        ipaddresses="${ipaddresses} ${ip}"
-                done
-                ipaddresses="`/bin/echo ${ipaddresses} | /bin/sed 's/ /,/g' | /usr/bin/sort -u`"
-        fi
-
-        ipaddresses="${ipaddresses} ${VPC_IP_RANGE}"
-
-        if ( [ "`/bin/echo ${dbaas} | /bin/grep ' pg '`" != "" ] )
-        then
-                /usr/bin/yes | /usr/bin/exo dbaas update -z ${zone}  ${database_name} --pg-ip-filter=${ipaddresses}
-        elif ( [ "`/bin/echo ${dbaas} | /bin/grep ' mysql '`" != "" ] )
-        then
-                /usr/bin/yes | /usr/bin/exo dbaas update -z ${zone}  ${database_name} --mysql-ip-filter=${ipaddresses}
-        fi
-fi
-
-if ( [ "${CLOUDHOST}" = "linode" ] )
-then
-        dbaas="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped"`"
-        label="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped" | /usr/bin/awk '{print $7}'`"
-        database_id="`/usr/local/bin/linode-cli databases mysql-list --no-defaults --json | /usr/bin/jq '.[] | select(.label | contains ("'${label}'")) | .id'`"
-
-        if ( [ "${database_id}" = "" ] )
-        then
-                database_id="`/usr/local/bin/linode-cli databases postgresql-list --no-defaults --json | /usr/bin/jq '.[] | select(.label | contains ("'${label}'")) | .id'`"
-        fi
-
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}"`"
-        ipaddresses="${webserver_ips} ${database_ips}"
-
-        if ( [ "${multi_region_ips}" != "" ] )
-        then
-                for ip in ${multi_region_ips}
-                do
-                        ipaddresses="${ipaddresses} ${ip}"
-                done
-        fi
-
-        ipaddresses="`/bin/echo ${ipaddresses} | /usr/bin/tr ' ' '\n' | /usr/bin/sort -u`"
-
-        allow_list=" "
-        for ipaddress in ${ipaddresses}
+        for ip in ${multi_region_ips}
         do
-                allow_list="${allow_list} --allow_list ${ipaddress}/32"
+                ipaddresses="${ipaddresses} ${ip}"
         done
-
-        allow_list="${allow_list} --allow_list ${VPC_IP_RANGE}"
-
-        if ( [ "`/bin/echo ${dbaas} | /bin/grep 'mysql'`" != "" ] )
-        then
-                /usr/local/bin/linode-cli databases mysql-update ${database_id} ${allow_list} --no-defaults
-        fi
-
-        if ( [ "`/bin/echo ${dbaas} | /bin/grep 'postgresql'`" != "" ] )
-        then        
-                /usr/local/bin/linode-cli databases postgresql-update ${database_id} ${allow_list} --no-defaults 
-        fi
+        ipaddresses="`/bin/echo ${ipaddresses} | /bin/sed 's/ /,/g' | /usr/bin/sort -u`"
 fi
 
-if ( [ "${CLOUDHOST}" = "vultr" ] )
+ipaddresses="${ipaddresses} ${VPC_IP_RANGE}"
+
+if ( [ "`/bin/echo ${dbaas} | /bin/grep ' pg '`" != "" ] )
 then
-        export VULTR_API_KEY="`/bin/ls ${HOME}/.config/VULTRAPIKEY:* | /usr/bin/awk -F':' '{print $NF}'`"
-        label="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped" | /usr/bin/awk '{print $10}'`"
-        databaseids="`/usr/bin/vultr database list -o json | /usr/bin/jq -r '.databases[] | select (.label == "'${label}'").id'`"
-        selected_databaseid=""
-
-        DB_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'DBIDENTIFIER'`"
-        for databaseid in ${databaseids}
-        do
-                if ( [ "`/usr/bin/vultr database get ${databaseid} -o json | /usr/bin/jq -r '.database | select (.host | contains ("'${DB_IDENTIFIER}'")).id'`" != "" ] )
-                then
-                        selected_databaseid="${databaseid}"
-                fi
-                if ( [ "${selected_databaseid}" = "" ] )
-                then
-                        if ( [ "`/usr/bin/vultr database get ${databaseid} -o json | /usr/bin/jq -r '.database | select (.public_host | contains ("'${DB_IDENTIFIER}'")).id'`" != "" ] )
-                        then
-                                selected_databaseid="${databaseid}"
-                        fi
-                fi
-        done
-
-        webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}"`"
-        database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}"`"
-        ipaddresses="${webserver_ips} ${database_ips} "
-        ipaddresses="`/bin/echo "${ipaddresses}" | /bin/sed -e 's/  / /g' -e "s# #/32,#"`"
-
-        if ( [ "${multi_region_ips}" != "" ] )
-        then
-                for ip in ${multi_region_ips}
-                do
-                        ipaddresses="${ipaddresses}${ip}/32,"
-                done
-        fi
-
-        db_vpc_id="`${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped" | /usr/bin/awk '{print $11}'`"
-        db_subnet="`/usr/bin/vultr vpc list -o json | /usr/bin/jq -r '.vpcs[] | select (.id == "'${db_vpc_id}'").v4_subnet'`/20 "
-        ip_addresses="${ipaddresses}${db_subnet}"
-
-        if ( [ "${selected_databaseid}" != "" ] )
-        then
-                /usr/bin/vultr database update ${selected_databaseid} --trusted-ips="${ipaddresses}"
-        fi
+        /usr/bin/yes | /usr/bin/exo dbaas update -z ${zone}  ${database_name} --pg-ip-filter=${ipaddresses}
+elif ( [ "`/bin/echo ${dbaas} | /bin/grep ' mysql '`" != "" ] )
+then
+        /usr/bin/yes | /usr/bin/exo dbaas update -z ${zone}  ${database_name} --mysql-ip-filter=${ipaddresses}
 fi
 
 /bin/echo "${ipaddresses}" > ${HOME}/runtime/dbaas_allowed_ips/ip_list.dat
