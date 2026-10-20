@@ -81,7 +81,7 @@ exit_code=$?
 
 if ( [ ${exit_code} -ne 0 ] )
 then
-        status "Error: DeleteRecord.sh failed with exit code $exit_code"
+        status "Error: DeleteRecordByIP.sh failed with exit code $exit_code"
         exit $exit_code
 fi
 
