@@ -14,7 +14,7 @@
 #              $2 - <count>              : Integer ID used to select the rclone config profile.
 #
 # Requirements:
-#              - /usr/bin/s3cmd installed and accessible.
+#              - /usr/bin/s5cmd installed and accessible.
 #              - A valid profile located at /root/.config/rclone/rclone.conf-${count}
 #              - Standard output/logging routes configured on File Descriptors 3 and 4.
 ##########################################################################################
@@ -33,7 +33,6 @@
 #########################################################################################
 #########################################################################################
 #set -x
-
 set -e
 
 if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
@@ -46,10 +45,11 @@ fi
 datastore_to_mount="$1"
 count="${2}"
 
-host_base="`/bin/grep ^host_base /root/.s3cfg-${count} | /usr/bin/awk -F'=' '{print  $NF}' | /bin/sed 's/ //g'`" 
-if ( [ "`/usr/bin/s3cmd --config=/root/.s3cfg-${count} --host=https://${host_base} ls s3://${datastore_to_mount} 2>/dev/null`" = "" ] )
+host_base="`/bin/grep ^host_base /root/.s5cfg-${count} | /usr/bin/awk -F'=' '{print  $NF}' | /bin/sed 's/ //g'`" 
+
+if ( [ "`/usr/bin/s5cmd --credentials-file /root/.s5cfg-${count} --endpoint-url https://${host_base} ls s3://${datastore_to_mount}  2>/dev/null`" = "" ] )
 then
-  /usr/bin/s3cmd --config=/root/.s3cfg-${count} --host=https://${host_base} mb s3://${datastore_to_mount}  2>&1 >/dev/null
+  /usr/bin/s5cmd --credentials-file /root/.s5cfg-${count} --endpoint-url https://${host_base} mb s3://${datastore_to_mount}  2>&1 >/dev/null
   if ( [ "$?" != "0" ] )
   then
     /bin/echo "Failed to mount bucket s3://${datastore_to_mount}"
