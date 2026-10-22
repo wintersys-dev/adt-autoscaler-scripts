@@ -44,36 +44,11 @@ then
         branch_command=" -b ${repository_branch} "
 fi
 
-${BUILD_HOME}/services/git/${repository_provider}/GitClone "${branch_command}" "${repository_provider}" "${authentication_token}" "${repository_username}" "${repository_ownername}" "${repository_name}" "${destination_directory}"
+${HOME}/services/git/${repository_provider}/GitClone "${branch_command}" "${repository_provider}" "${authentication_token}" "${repository_username}" "${repository_ownername}" "${repository_name}" "${destination_directory}"
 
 
 
 
-count="0"
-/bin/ls /tmp/test.$$ 2>/dev/null
-while ( [ $? != "0" ] && [ "${count}" -lt "5" ] )
-do
-        count="`/usr/bin/expr ${count} + 1`"
-
-        if ( [ "${repository_provider}" = "bitbucket" ] )
-        then
-                /usr/bin/git clone --depth 1 ${branch_command} https://${repository_username}${authentication_token}@bitbucket.org/${repository_ownername}/${repository_name}.git  ${destination_directory}
-        fi
-
-        if ( [ "${repository_provider}" = "github" ] )
-        then
-                /usr/bin/git clone --depth 1 ${branch_command} https://${repository_username}${authentication_token}@github.com/${repository_ownername}/${repository_name}.git ${destination_directory}
-        fi
-
-        if ( [ "${repository_provider}" = "gitlab" ] )
-        then
-                /usr/bin/git clone --depth 1 ${branch_command} https://${repository_username}${authentication_token}@gitlab.com/${repository_ownername}/${repository_name}.git ${destination_directory}
-        fi
-done
-
-
-
-BUILD_HOME="`/bin/cat /home/buildhome.dat`"
 
 
 
