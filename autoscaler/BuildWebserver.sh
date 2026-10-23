@@ -136,8 +136,8 @@ then
 	/bin/echo "${0} `/bin/date`: The webserver didn't come online, no ip address assigned or available, this could be an API availability issue" 
 	/usr/bin/kill -TERM $$
 else
-	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${ip}" "webserverpublicips" "no"
-	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${private_ip}" "webserverips" "no"
+	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${ip}" "webserverpublicips/" "no"
+	${HOME}/services/datastore/operations/PutToDatastore.sh "config" "${private_ip}" "webserverips/" "no"
 
 	#We still need to worry that the build out of the machine might potentially stall for some unknown reason
 	if ( [ ! -f ${HOME}/runtime/POTENTIAL_STALLED_BUILD:${ip} ] )
