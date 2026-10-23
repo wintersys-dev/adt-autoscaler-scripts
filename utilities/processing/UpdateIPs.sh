@@ -29,6 +29,6 @@ then
         exit
 fi
 
-${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${ip}" "autoscalerips" "no"
-${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${public_ip}" "autoscalerpublicips" "no"
-${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${build_machine_ip}" "buildmachineip" "no"
+${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${ip}" "autoscalerips/" "no"
+${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${public_ip}" "autoscalerpublicips/" "no"
+${HOME}/services/datastore/config/wrapper/PutToDatastore.sh "config" "${build_machine_ip}" "buildmachineip/" "no"
