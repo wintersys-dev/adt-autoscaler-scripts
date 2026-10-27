@@ -45,9 +45,8 @@ then
         record_id="`/bin/echo "Authorization: Bearer ${api_token}" | curl -H @- -s "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records" --header "Content-Type: application/json" | /usr/bin/jq -r '.result[]  | select (.content == "'${ip}'").id'`"
         /bin/echo "Authorization: Bearer ${api_token}" | curl -H @- -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" --header "Content-Type: application/json"
 else
-        auth_key="${DNS_SECURITY_KEY}"
-        record_id="`/usr/bin/curl "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records" -H "X-Auth-Email: ${DNS_USERNAME}" -H "X-Auth-Key: ${auth_key}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[]  | select (.content == "'${ip}'").id'`"
-        /usr/bin/curl -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" -H "X-Auth-Email: ${DNS_USERNAME}"  -H "X-Auth-Key: ${auth_key}" -H "Content-Type: application/json"
+        record_id="`/bin/echo "X-Auth-Key: ${DNS_SECURITY_KEY}" | curl -H @- -s  "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records" -H "X-Auth-Email: ${DNS_USERNAME}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[]  | select (.content == "'${ip}'").id'`"
+        /bin/echo "X-Auth-Key: ${DNS_SECURITY_KEY}" | curl -H @- -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" -H "X-Auth-Email: ${DNS_USERNAME}" -H "Content-Type: application/json"
 fi
 
 if ( [ "$?" != "0" ] )
