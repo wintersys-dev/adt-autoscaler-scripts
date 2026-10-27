@@ -33,21 +33,21 @@ ip="${2}"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
-domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
+domain_id="`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains" | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
         /bin/echo "DNS domain ID not successfully obtained"
         exit 1
 fi
 
-record_id="`curl -s -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains/${domain_id}/records | /usr/bin/jq -r '.data[] | select(.target == "'"${ip}"'").id'`"
+record_id="`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains/${domain_id}/records" | /usr/bin/jq -r '.data[] | select(.target == "'"${ip}"'").id'`"
 if ( [ "$?" != "0" ] || [ "${record_id}" = "" ] )
 then
         /bin/echo "DNS record ID not successfully obtained"
         exit 1
 fi
 
-curl -s -X DELETE -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
+/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s -X DELETE  "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
 
 if ( [ "$?" != "0" ] )
 then
