@@ -26,4 +26,4 @@ server_type="${1}"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
 
-curl -s -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/linode/instances" |  jq -r '.data[] | select(.label | contains("'${server_type}'")).id'
+/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/linode/instances" |  jq -r '.data[] | select(.label | contains("'${server_type}'")).id'
