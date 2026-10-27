@@ -39,14 +39,14 @@ then
         fi
 
         count="0"
-        while ( [ "`curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/linode/instances/${server_id}" | jq -r '.status'`" != "offline" ] && [ "${count}" -lt "21" ] )
+        while ( [ "`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/linode/instances/${server_id}" | jq -r '.status'`" != "offline" ] && [ "${count}" -lt "21" ] )
         do
                 status "Waiting for machine with id: ${server_id} and ip address ${server_ip} to be offline following a shutdown request"
                 /bin/sleep 10
                 count="`/usr/bin/expr ${count} + 1`"
         done
 
-        curl -s -X DELETE -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/linode/instances/${server_id}" > /dev/null
+        /bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s -X DELETE "https://api.linode.com/v4/linode/instances/${server_id}" > /dev/null
 
         if ( [ "$?" != "0" ] )
         then
