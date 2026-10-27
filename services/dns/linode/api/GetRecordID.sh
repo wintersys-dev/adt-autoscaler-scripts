@@ -35,14 +35,14 @@ ip="${2}"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
-domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
+domain_id="`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains" | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
         /bin/echo "DNS domain ID not successfully obtained"
         exit  1
 fi
 
-curl -s "https://api.linode.com/v4/domains/${domain_id}/records" -H "Authorization: Bearer $TOKEN" | jq --arg sub "${sub_domain}" -r '.data[] | select(.name == $sub) | .id'
+/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains/${domain_id}/records" | jq --arg sub "${sub_domain}" -r '.data[] | select(.name == $sub) | .id'
 if ( [ "$?" != "0" ] )
 then
         /bin/echo "DNS record could not be listed"
