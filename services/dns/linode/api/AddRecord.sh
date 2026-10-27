@@ -34,7 +34,7 @@ ip="${2}"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
-domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
+domain_id="`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains" | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
@@ -42,9 +42,9 @@ then
         exit 1
 fi
 
-if ( [ "`curl -s -H "Authorization: Bearer $TOKEN" "https://api.linode.com/v4/domains/${domain_id}/records" | /usr/bin/jq -r '.data[] | select(.target == "'"${ip}"'").id'`" = "" ] )
+if ( [ "`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains/${domain_id}/records" | /usr/bin/jq -r '.data[] | select(.target == "'"${ip}"'").id'`" = "" ] )
 then
-        curl -s -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{ "type": "A", "name": "'"${sub_domain}"'", "target": "'"${ip}"'", "ttl_sec": 60 }' https://api.linode.com/v4/domains/${domain_id}/records
+        /bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s -X POST -H "Content-Type: application/json" -d '{ "type": "A", "name": "'"${sub_domain}"'", "target": "'"${ip}"'", "ttl_sec": 60 }' https://api.linode.com/v4/domains/${domain_id}/records
 
         if ( [ "$?" != "0" ] )
         then
