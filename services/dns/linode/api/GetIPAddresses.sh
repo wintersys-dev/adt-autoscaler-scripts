@@ -35,14 +35,14 @@ sub_domain="`/bin/echo ${1} | /usr/bin/awk -F'.' '{print $1}'`"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
-domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
+domain_id="`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains" | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
 if ( [ "$?" != "0" ] || [ "${domain_id}" = "" ] )
 then
 	/bin/echo "DNS domain ID not successfully obtained"
 	exit 1
 fi
 
-curl -s -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.name == "'"${sub_domain}"'").target'
+/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s  "https://api.linode.com/v4/domains" | jq -r '.data[] | select(.name == "'"${sub_domain}"'").target'
 
 if ( [ "$?" != "0" ] )
 then
