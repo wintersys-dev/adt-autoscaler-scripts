@@ -35,8 +35,8 @@ domain_url="`/bin/echo ${2} | /usr/bin/cut -d'.' -f2-`"
 
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
-domain_id="`curl -H "Authorization: Bearer $TOKEN" https://api.linode.com/v4/domains | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
-curl -s -X DELETE -H "Authorization: Bearer $TOKEN"  "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
+domain_id="`/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s "https://api.linode.com/v4/domains" | jq -r '.data[] | select(.domain | contains("'$domain_url'")).id'`"
+/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -s -X DELETE "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}"
 
 if ( [ "$?" != "0" ] )
 then
