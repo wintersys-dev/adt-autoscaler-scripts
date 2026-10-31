@@ -1,7 +1,7 @@
 #!/bin/sh
 ###################################################################################
 # @file        PerformDatastoreMount.sh
-# @brief       Automated S3 Datastore Creation and Workspace Initialization Driver.
+# @brief       Automated S3 Datastore Creation and Workspace Initialisation Driver.
 # @author      Peter Winter
 # @date        09/04/2021
 # @version     1.0
