@@ -30,7 +30,7 @@ then
 	BUILD_IDENTIFIER="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER'`"
 	REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
 
-	noprovisioned="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST} | /usr/bin/tr '\n' ' ' | /usr/bin/wc -w`"
+	noprovisioned="`${HOME}/services/server/GetServerPublicIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}" ${CLOUDHOST} | /usr/bin/tr '\n' ' ' | /usr/bin/wc -w`"
 	noactive="`${HOME}/autoscaler/GetDNSIPs.sh | /usr/bin/wc -w`"
 
 	if ( [ "${no_active}" = "" ] )
