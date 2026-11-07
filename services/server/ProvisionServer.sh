@@ -28,4 +28,4 @@ server_name="${2}"
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
-${HOME}/services/server/${CLOUDHOST}/${orchestration_tool}/CreateServer.sh "${server_size}" "${server_name}" 
+${HOME}/services/server/${CLOUDHOST}/${orchestration_tool}/ProvisionServer.sh "${server_size}" "${server_name}" 
