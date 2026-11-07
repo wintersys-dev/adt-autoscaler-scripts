@@ -87,8 +87,8 @@ exec 2>>${HOME}/logs/build_webserver/${err_file}
 /bin/echo "Initialising Cloud Init for webserver ${webserver_name}"
 ${HOME}/autoscaler/InitialiseCloudInit.sh
 
-#Actually create the webserver passing in the name we have set for it as well as what machine type/size it should be
-${HOME}/services/server/CreateServer.sh "${SIZE}" "${webserver_name}"
+#Actually provision the webserver passing in the name we have set for it as well as what machine type/size it should be
+${HOME}/services/server/ProvisionServer.sh "${SIZE}" "${webserver_name}"
 
 #Try a few times if something is unsuccessful, generally, it never should be
 count="0"
@@ -96,7 +96,7 @@ while ( [ "$?" != "0" ] && [ "${count}" -lt "10" ] )
 do
 	/bin/sleep 5
 	count="`/usr/bin/expr ${count} + 1`"
-	${HOME}/services/server/CreateServer.sh "${SIZE}" "${webserver_name}"
+	${HOME}/services/server/ProvisionServer.sh "${SIZE}" "${webserver_name}"
 done
 
 if ( [ "${count}" = "10" ] )
