@@ -124,7 +124,7 @@ while ( ( [ "${ip}" = "" ] || [ "${ip}" = "0.0.0.0" ] ) && [ "${count}" -lt "10"
 do
 	/bin/sleep 5
 	/bin/echo "${0} `/bin/date`: Attempting to get ip address of webserver ${webserver_name} " 
-	ip="`${HOME}/services/server/GetServerIPAddresses.sh ${webserver_name}`"
+	ip="`${HOME}/services/server/GetServerPublicIPAddresses.sh ${webserver_name}`"
 	private_ip="`${HOME}/services/server/GetServerPrivateIPAddresses.sh ${webserver_name}`"
 	count="`/usr/bin/expr ${count} + 1`"
 done
