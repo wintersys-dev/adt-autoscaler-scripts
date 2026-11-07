@@ -26,5 +26,5 @@ ip="${1}"
 CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
 
 orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
-${HOME}/services/server/${CLOUDHOST}/${orchestration_tool}/GetServerPublicIPAddressByIP.sh "${ip}" 
+${HOME}/services/server/${CLOUDHOST}/${orchestration_tool}/GetServerPublicIPAddressByPrivateIPAddress.sh "${ip}" 
 
