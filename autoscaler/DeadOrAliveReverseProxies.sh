@@ -83,7 +83,7 @@ then
                 fi
         done
 
-        ips="`${HOME}/services/server/GetServerPrivateIPAddresses.sh "rp-${REGION}-${BUILD_IDENTIFIER}"`"
+        ips="`${HOME}/services/server/GetServerPublicIPAddressByPrivateIPAddress.sh "rp-${REGION}-${BUILD_IDENTIFIER}"`"
 
         for ip in ${ips}
         do
