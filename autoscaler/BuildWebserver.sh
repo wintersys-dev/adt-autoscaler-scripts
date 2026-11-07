@@ -165,7 +165,7 @@ if ( [ "${count}" = "171" ] )
 then
 	/bin/echo "${0} `/bin/date`: A webserver has failed to build after being given a good go at succeeding" 
 	/bin/echo "${0} `/bin/date`: webserver with ip address: ${ip} is being destroyed" 
-	${HOME}/services/server/DestroyServer.sh ${ip} ${CLOUDHOST}
+	${HOME}/services/server/TerminateServer.sh ${ip} ${CLOUDHOST}
 	/usr/bin/kill -TERM $$
 fi
 
@@ -253,7 +253,7 @@ elif ( [ "${failedonlinecheck}" = "1" ] )
 then
 	/bin/echo "${0} `/bin/date`: webserver with ip address: ${ip} failed its online check" 
 	/bin/echo "${0} `/bin/date`: webserver with ip address: ${ip} is being destroyed" 
-	${HOME}/services/server/DestroyServer.sh ${ip} ${CLOUDHOST}
+	${HOME}/services/server/TerminateServer.sh ${ip} ${CLOUDHOST}
 fi
 
 #If we are here then we haven't stalled so we can clean that up also if we need to
