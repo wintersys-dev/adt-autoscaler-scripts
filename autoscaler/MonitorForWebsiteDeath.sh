@@ -20,7 +20,7 @@ check_if_webserver_online()
         if ( [ "${count}" != "0" ] && [ "`${HOME}/utilities/status/CheckWebsiteOnlineStatus.sh ${active_webserver_ip}/${headfile}`" = "failure" ] )
         then
                 
-                active_webserver_public_ip="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${active_webserver_ip}`"
+                active_webserver_public_ip="`${HOME}/services/server/GetServerPublicIPAddressByPrivateIPAddress.sh ${active_webserver_ip}`"
 
                 /bin/touch ${HOME}/runtime/scaling/active_scaled_webservers/termination_attempts.dat
                 
