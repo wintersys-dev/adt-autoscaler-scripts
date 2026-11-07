@@ -73,8 +73,8 @@ build_identifier="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFI
 zone="`/bin/echo ${dbaas} | /usr/bin/awk '{print $4}'`"
 database_name="`/bin/echo ${dbaas} | /usr/bin/awk '{print $6}'`"
 
-webserver_ips="`${HOME}/services/server/GetServerIPAddresses.sh "ws-${zone}-${build_identifier}"`"
-database_ips="`${HOME}/services/server/GetServerIPAddresses.sh "db-${zone}-${build_identifier}"`"
+webserver_ips="`${HOME}/services/server/GetServerPublicIPAddresses.sh "ws-${zone}-${build_identifier}"`"
+database_ips="`${HOME}/services/server/GetServerPublicIPAddresses.sh "db-${zone}-${build_identifier}"`"
 ipaddresses="${webserver_ips} ${database_ips} "
 ipaddresses="`/bin/echo ${ipaddresses} | /bin/sed 's/  / /g' | /bin/tr ' ' ',' | /bin/sed 's/,$//g'`"
 
