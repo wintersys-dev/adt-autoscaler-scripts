@@ -50,7 +50,7 @@ probe_by_curl()
                 probecount="`/usr/bin/expr ${probecount} + 1`"
         done
         
-        ip="`${HOME}/services/server/GetServerPublicIPAddressByIP.sh ${ip}`"
+        ip="`${HOME}/services/server/GetServerPublicIPAddressByPrivateIPAddress.sh ${ip}`"
         if ( [ "${status}" = "down" ] )
         then
                 /bin/echo "${0} `/bin/date`: ReverseProxy ${ip} was found to be offline because it couldn't be contacted using curl" 
