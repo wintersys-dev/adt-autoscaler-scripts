@@ -122,7 +122,7 @@ fi
 
 # Dispatch DELETE command to drop specified record mapping architecture cleanly
 set +e
-delete_response="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s -X DELETE "https://linode.com/${domain_id}/records/${record_id}")"
+delete_response="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s -X DELETE "https://api.linode.com/v4/domains/${domain_id}/records/${record_id}")"
 delete_exit_code="$?"
 set -e
 
