@@ -70,9 +70,15 @@ ip="${2}"
 
 # Extract authorized structural access keys safely
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
-
-# Export authentication credentials safely within bounded local environment execution tracks
 export LINODE_CLI_TOKEN="${TOKEN}"
+
+# Validate CLI execution dependencies before invoking structural deployment steps
+if [ ! -x /usr/local/bin/linode-cli ]
+then
+        status "Error: Linode CLI binary missing or not executable at /usr/local/bin/linode-cli"
+        unset LINODE_CLI_TOKEN
+        exit 1
+fi
 
 # Validate CLI execution dependencies before invoking structural deployment steps
 if [ ! -x /usr/local/bin/linode-cli ]
