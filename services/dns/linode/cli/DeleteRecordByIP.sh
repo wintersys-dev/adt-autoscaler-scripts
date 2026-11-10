@@ -149,6 +149,8 @@ then
         exit 1
 fi
 
+/bin/echo "Successfully deleted record with ip ${ip} for domain ${domain_url}"
+
 unset LINODE_CLI_CONFIG
 exit 0
 
