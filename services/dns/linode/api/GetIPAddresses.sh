@@ -77,7 +77,7 @@ fi
 
 # Fetch active domain zone layouts securely with manual intercept hooks to catch runtime exceptions
 set +e
-cli_domain_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://linode.com")"
+cli_domain_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains")"
 domain_exit_code="$?"
 set -e
 
@@ -100,7 +100,8 @@ fi
 
 # Query specific records associated with the matched domain ID
 set +e
-cli_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://linode.com/${domain_id}/records")"
+#cli_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://linode.com/${domain_id}/records")"
+cli_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains")"
 records_exit_code="$?"
 set -e
 
