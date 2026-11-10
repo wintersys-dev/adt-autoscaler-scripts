@@ -76,7 +76,7 @@ fi
 
 # Fetch active domain zone layouts securely with manual intercept hooks to catch runtime exceptions
 set +e
-api_domain_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://linode.com")"
+api_domain_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains")"
 domain_exit_code="$?"
 set -e
 
