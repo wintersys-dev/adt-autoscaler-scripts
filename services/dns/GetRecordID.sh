@@ -4,7 +4,7 @@
 # @brief       Routes DNS record ID retrieval requests using the standalone environment layout.
 # @author      Peter Winter
 # @date        10/11/2026
-# @version     2.0
+# @version     1.0
 #
 # @details     This script reads a localized base directory to resolve standalone utilities,
 #              evaluates website URLs, IP targets, and authority states, extracts active
