@@ -55,10 +55,6 @@ else
         exit 1
 fi
 
-/bin/echo () {
-        /bin/echo "LOG: ${1}" >&2
-}
-
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
         /bin/echo "Error: Two arguments are required."
