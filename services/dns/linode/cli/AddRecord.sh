@@ -69,7 +69,7 @@ domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 ip="${2}"
 
 # Extract authorized structural access keys safely
-TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
 # Export authentication credentials safely within bounded local environment execution tracks
 export LINODE_CLI_TOKEN="${TOKEN}"
