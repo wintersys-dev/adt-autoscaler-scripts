@@ -13,10 +13,10 @@
 #
 # @param       $1  [Required] The target website Fully Qualified Domain Name or URL string.
 #
-# @env         BUILD_HOME          Path to the toolkit core framework layout directory.
+# @env         HOME          Path to the toolkit core framework layout directory.
 #
 # @dependencies
-#              - /home/buildhome.dat configuration file tracking active framework layout.
+#              - /home/homedir.dat configuration file tracking active framework layout.
 #              - LogStatusMessages.sh utility logging centralized system events.
 #              - external dependencies: cat, echo, awk, cut, linode-cli, jq
 #
@@ -45,19 +45,14 @@
 ####################################################################################
 set -e
 
-# Resolve BUILD_HOME baseline layout securely
-if [ -r /home/buildhome.dat ]
+# Resolve HOME baseline layout securely
+if [ -r /home/homedir.dat ]
 then
-        BUILD_HOME="$(/bin/cat /home/buildhome.dat)"
+        HOME="$(/bin/cat /home/homedir.dat)"
 else
-        /bin/echo "Application framework configuration file missing at /home/buildhome.dat" >&2
+        /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
         exit 1
 fi
-
-status()
-{
-        "${BUILD_HOME}/helpers/services/LogStatusMessages.sh" "${1}"
-}
 
 # Input validation
 if [ -z "${1}" ]
@@ -71,22 +66,15 @@ fi
 sub_domain="$(/bin/echo "${1}" | /usr/bin/awk -F'.' '{print $1}')"
 domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 
-# Identify appropriate CLI profile file target layout locations path configurations
-linode_config_file="/root/.config/dns-linode-cli"
-        
-if [ -f /root/snap/linode-cli/current/.config/dns-linode-cli ]
-then
-        linode_config_file="/root/snap/linode-cli/current/.config/dns-linode-cli"
-fi
-                        
-# Export configuration properties cleanly inside localized framework bounds environment tracks
-export LINODE_CLI_CONFIG="${linode_config_file}"
+# Extract authorized structural access keys safely
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
+export LINODE_CLI_TOKEN="${TOKEN}"
 
 # Validate CLI execution dependencies before invoking structural deployment steps
 if [ ! -x /usr/local/bin/linode-cli ]
 then
         status "Error: Linode CLI binary missing or not executable at /usr/local/bin/linode-cli"
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -99,7 +87,7 @@ set -e
 if [ "${domain_exit_code}" -ne 0 ] || [ -z "${cli_domain_json}" ]
 then
         /bin/echo "DNS domain ID not successfully obtained" >&2
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -109,7 +97,7 @@ domain_id="$(/bin/echo "${cli_domain_json}" | /usr/bin/jq -r --arg dom "${domain
 if [ -z "${domain_id}" ]
 then
         /bin/echo "DNS domain ID not successfully obtained" >&2
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -122,7 +110,7 @@ set -e
 if [ "${records_exit_code}" -ne 0 ] || [ -z "${cli_records_json}" ]
 then
         /bin/echo "DNS ip addresses not successfully obtained" >&2
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -132,13 +120,13 @@ record_targets="$(/bin/echo "${cli_records_json}" | /usr/bin/jq -r --arg sub "${
 if [ -z "${record_targets}" ]
 then
         /bin/echo "DNS ip addresses not successfully obtained" >&2
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
 # Print target record tracking output cleanly to standard stdout channel interface
 /bin/echo "${record_targets}"
-unset LINODE_CLI_CONFIG
+unset LINODE_CLI_TOKEN
 
 exit 0
 
