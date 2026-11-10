@@ -133,5 +133,7 @@ then
         exit 1
 fi
 
+/bin/echo "DNS record with IP ${ip} successfully deleted from zone ${domain_url}."
+
 unset TOKEN
 exit 0
