@@ -14,10 +14,10 @@
 # @param       $1  [Required] The target Fully Qualified Domain Name (e.g., "://domain.com").
 # @param       $2  [Required] The target IPv4 address destination tracking node.
 #
-# @env         BUILD_HOME          Path to the toolkit core framework layout directory.
+# @env         HOME          Path to the toolkit core framework layout directory.
 #
 # @dependencies
-#              - /home/buildhome.dat configuration file tracking active framework layout.
+#              - /home/homedir.dat configuration file tracking active framework layout.
 #              - LogStatusMessages.sh utility logging centralized system events.
 #              - config files: /root/.config/dns-linode-cli or snap equivalent alternative.
 #              - external dependencies: cat, echo, awk, cut, linode-cli, jq
@@ -71,11 +71,15 @@ domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 ip="${2}"
 
 
+# Extract authorized structural access keys safely
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
+export LINODE_CLI_TOKEN="${TOKEN}"
+
 # Validate CLI execution dependencies before invoking structural deployment steps
 if [ ! -x /usr/local/bin/linode-cli ]
 then
-        /bin/echo "Error: Linode CLI binary missing or not executable at /usr/local/bin/linode-cli"
-        unset LINODE_CLI_CONFIG
+        status "Error: Linode CLI binary missing or not executable at /usr/local/bin/linode-cli"
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -88,7 +92,7 @@ set -e
 if [ "${domain_exit_code}" -ne 0 ] || [ -z "${cli_domain_json}" ]
 then
         /bin/echo "DNS domain ID not successfully obtained due to CLI catalog query error"
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -98,7 +102,7 @@ domain_id="$(/bin/echo "${cli_domain_json}" | /usr/bin/jq -r --arg dom "${domain
 if [ -z "${domain_id}" ]
 then
         /bin/echo "Domain ID not found via CLI matching zone track string pattern: ${domain_url}"
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -111,7 +115,7 @@ set -e
 if [ "${records_exit_code}" -ne 0 ] || [ -z "${cli_records_json}" ]
 then
         /bin/echo "DNS record id could not be listed due to CLI query failure"
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
@@ -121,13 +125,13 @@ record_id="$(/bin/echo "${cli_records_json}" | /usr/bin/jq -r --arg target_ip "$
 if [ -z "${record_id}" ]
 then
         /bin/echo "DNS record ID could not be identified matching target node IP address: ${ip}"
-        unset LINODE_CLI_CONFIG
+        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
 # Print target record tracking output cleanly to standard stdout channel interface
 /bin/echo "${record_id}"
-unset LINODE_CLI_CONFIG
+unset LINODE_CLI_TOKEN
 
 exit 0
 
