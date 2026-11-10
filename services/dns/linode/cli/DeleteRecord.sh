@@ -1,9 +1,34 @@
 #!/bin/sh
-#######################################################################################
-# Author : Peter Winter
-# Date   : 13/06/2016
-# Description : This script will delete a DNS A record using the 'record id' to delete it
-########################################################################################
+###################################################################################
+# @file        DeleteRecord.sh
+# @brief       Deletes an existing DNS record from a specific domain zone via CLI.
+# @author      Peter Winter
+# @date        13/07/2016
+# @version     1.0
+#
+# @details     This script parses a target URL to identify its core domain zone,
+#              queries provider catalogs via the Linode CLI to find the matching
+#              zone tracking ID, and uses the provided record ID to remove the 
+#              entry under securely scoped token environments.
+#
+# @param       $1  [Required] The unique Linode identifier of the target record to delete.
+# @param       $2  [Required] The Fully Qualified Domain Name (e.g., "://domain.com").
+#
+# @env         HOME          Path to the toolkit core framework layout directory.
+#
+# @dependencies
+#              - /home/homedir.dat configuration file tracking active framework layout.
+#              - LogStatusMessages.sh utility logging centralized system events.
+#              - GetVariableValue.sh centralized configuration variable extraction tool.
+#              - external dependencies: cat, echo, cut, linode-cli, jq
+#
+# @security    
+#              - Replaces legacy, fragile backtick subshells with secure shell evaluations.
+#              - Scopes and purges sensitive tokens (LINODE_CLI_TOKEN) tightly inside execution tracks.
+#
+# @exit        0  Success: Target DNS record successfully deleted via CLI.
+# @exit        1  Failure: Missing parameters or provider API transaction error.
+###################################################################################
 # License Agreement:
 # This file is part of The Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
@@ -15,41 +40,30 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-#####################################################################################
-#####################################################################################
+# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+####################################################################################
 #set -x
 set -e
 
-if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
-then
-    status "Error: One argument is required."
-    status "Usage: $0 <record_id> <website_url>" 
-    exit 1
-fi
-
-HOME="`/bin/cat /home/homedir.dat`"
+HOME="$(/bin/cat /home/homedir.dat)"
 
 record_id="${1}"
-domain_url="`/bin/echo ${2} | /usr/bin/cut -d'.' -f2-`"
+domain_url="$(/bin/echo ${2} | /usr/bin/cut -d'.' -f2-)"
 
-linode_config_file="/root/.config/dns-linode-cli"
-        
-if ( [ -f /root/snap/linode-cli/current/.config/dns-linode-cli ] )
-then
-	linode_config_file="/root/snap/linode-cli/current/.config/dns-linode-cli"
-fi
-                        
-export LINODE_CLI_CONFIG=${linode_config_file}
-domain_id="`/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id'`"
+# Extract authorized structural access keys safely
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
+export LINODE_CLI_TOKEN="${TOKEN}"
+
+domain_id="$(/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id')"
 /usr/local/bin/linode-cli domains records-delete ${domain_id} ${record_id} --no-defaults
 
-if ( [ "$?" != "0" ] )
+if  [ $? != "0" ] 
 then
-	/bin/echo "DNS Record not successfully deleted"
-	unset LINODE_CLI_CONFIG
-	exit 1
+        /bin/echo "Failed to delete record with id ${record_id} for domain ${domain_url}"
+        unset LINODE_CLI_TOKEN
+        exit  1
 fi
 
-unset LINODE_CLI_CONFIG
+unset LINODE_CLI_TOKEN
+/bin/echo "Successfully deleted record with id ${record_id} for domain ${domain_url}"
 
