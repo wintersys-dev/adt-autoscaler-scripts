@@ -100,8 +100,7 @@ fi
 
 # Query specific records associated with the matched domain ID
 set +e
-#api_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://linode.com/${domain_id}/records")"
-api_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains")"
+api_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains/${domain_id}/records")"
 records_exit_code="$?"
 set -e
 
