@@ -54,6 +54,14 @@ domain_url="$(/bin/echo ${2} | /usr/bin/cut -d'.' -f2-)"
 TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 export LINODE_CLI_TOKEN="${TOKEN}"
 
+# Validate CLI execution dependencies before invoking structural deployment steps
+if [ ! -x /usr/local/bin/linode-cli ]
+then
+        status "Error: Linode CLI binary missing or not executable at /usr/local/bin/linode-cli"
+        unset LINODE_CLI_TOKEN
+        exit 1
+fi
+
 domain_id="$(/usr/local/bin/linode-cli domains list --no-defaults --json | /usr/bin/jq -r '.[] | select (.domain | contains("'${domain_url}'")).id')"
 /usr/local/bin/linode-cli domains records-delete ${domain_id} ${record_id} --no-defaults
 
