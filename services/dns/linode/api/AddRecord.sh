@@ -71,7 +71,7 @@ domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 ip="${2}"
 
 # Extract authorized structural access keys safely
-TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
+TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
 # Fetch active domain zone layouts securely with manual intercept hooks to catch runtime exceptions
 set +e
