@@ -54,15 +54,11 @@ else
         exit 1
 fi
 
-status () {
-        /bin/echo "LOG: ${1}" >&2
-}
-
 # Input validation
 if [ -z "${1}" ]
 then
-        status "Error: One argument is required."
-        status "Usage: $0 <website_url>" 
+        /bin/echo "Error: One argument is required."
+        /bin/echo "Usage: $0 <website_url>" 
         exit 1
 fi
 
