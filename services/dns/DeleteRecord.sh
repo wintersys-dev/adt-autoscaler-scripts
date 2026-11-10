@@ -58,16 +58,15 @@ else
         exit 1
 fi
 
-if [ -z "${1}" ] || [ -z "${2}" ] || [ -z "${3}" ]
+if [ -z "${1}" ] || [ -z "${2}" ] 
 then
-        /bin/echo "Error: 3 arguments are required."
-        /bin/echo "Usage: $0 <record_id> <website_url> <auth>"
+        /bin/echo "Error: 2 arguments are required."
+        /bin/echo "Usage: $0 <record_id> <website_url>"
         exit 1
 fi
 
 record_id="${1}"
 website_url="${2}"
-auth="${3}"
 
 DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 
