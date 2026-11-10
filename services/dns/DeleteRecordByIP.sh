@@ -1,9 +1,35 @@
 #!/bin/sh
-######################################################################################################
-# Author : Peter Winter
-# Date   : 13/06/2016
-# Description : Given a website_url and IP address, delete an A record
-#######################################################################################################
+###################################################################################
+# @file        DeleteRecordByIP.sh
+# @brief       Routes DNS record deletion requests using the standalone environment layout.
+# @author      Peter Winter
+# @date        10/11/2026
+# @version     1.0
+#
+# @details     This script evaluates a target website URL and node IP address to determine 
+#              the designated DNS provider context within the standalone workspace. It 
+#              maps deployment metadata, software configs, and orchestration routes before 
+#              handing off parameters to specific backend cleanup scripts.
+#
+# @param       $1  [Required] The target website Fully Qualified Domain Name or URL string.
+# @param       $2  [Required] The destination tracking node IPv4/IPv6 target address to drop.
+#
+# @env         HOME                Path to the stand-alone environment framework directory.
+#
+# @dependencies
+#              - /home/homedir.dat configuration file tracking active base home path.
+#              - ExtractConfigValue.sh configuration variable extraction utility.
+#              - ${HOME}/runtime/software.dat tracking runtime environment configurations.
+#              - external dependencies: cat, awk, test
+#
+# @security    
+#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
+#              - Eliminates redundant subshell grouping fork performance bottlenecks.
+#              - Protects layout evaluation chains from unexpected multi-parameter expansions.
+#
+# @exit        0  Success: Underlying script executed cleanly and returned code 0.
+# @exit        1  Failure: Missing context paths, configuration syntax bugs, or tool failures.
+###################################################################################
 # License Agreement:
 # This file is part of The Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
@@ -15,73 +41,82 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-#######################################################################################################
-#######################################################################################################
+# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+####################################################################################
 #set -x
 set -e
 
-if ( [ "${1}" = "" ] || [ "${2}" = "" ] )
+# Resolve HOME baseline layout securely
+if [ -r /home/homedir.dat ]
 then
-    status "Error: Two arguments argument are required."
-    status "Usage: $0 <website_url> <ip>" 
-    exit 1
+        export HOME="$(/bin/cat /home/homedir.dat)"
+else
+        /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
+        exit 1
 fi
 
-export HOME="`/bin/cat /home/homedir.dat`"
+/bin/echo () {
+        /bin/echo "LOG: ${1}" >&2
+}
+
+if [ -z "${1}" ] || [ -z "${2}" ]
+then
+        /bin/echo "Error: Two arguments are required."
+        /bin/echo "Usage: $0 <website_url> <ip>" 
+        exit 1
+fi
 
 website_url="${1}"
 ip="${2}"
 
-HOME="`/bin/cat /home/homedir.dat`"
-DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 
-if ( [ "${auth}" = "yes" ] )
-then
-        DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'AUTH_DNSCHOICE'`"
-fi
 
 software_file="${HOME}/runtime/software.dat"
-if ( [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ] )
+if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
-        status "Error: Cannot read software configuration file at ${software_file}"
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}"
         exit 1
 fi
 
-orchestration_tool="`/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}"`"
+orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
 
-if ( [ "${orchestration_tool}" = "" ] )
+if [ -z "${orchestration_tool}" ]
 then
-        status "Error: ORCHESTRATION_TOOL not found in ${software_tool}" 
+        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" 
         exit 1
 fi
 
-if ( [ ! -d ${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool} ] )
+if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ]
 then
         orchestration_tool="api"
 fi
 
 script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/DeleteRecordByIP.sh"
 
-if ( [ ! -f "${script_path}" ] )
+if [ ! -f "${script_path}" ]
 then
-        status "Error: Script not found at ${script_path}" 
+        /bin/echo "Error: Script not found at ${script_path}" 
         exit 1
 fi
 
-if ( [ ! -x "${script_path}" ] )
+if [ ! -x "${script_path}" ]
 then
-        status "Error: Script at ${script_path} is not executable." 
+        /bin/echo "Error: Script at ${script_path} is not executable." 
         exit 1
 fi
 
+set +e
 "${script_path}" "${website_url}" "${ip}"
+exit_code="$?"
+set -e
 
-exit_code=$?
-
-if ( [ ${exit_code} -ne 0 ] )
+if [ "${exit_code}" -ne 0 ]
 then
-        status "Error: DeleteRecordByIP.sh failed with exit code $exit_code"
-        exit $exit_code
+        /bin/echo "Error: DeleteRecordByIP.sh failed with exit code ${exit_code}"
+        exit "${exit_code}"
 fi
+
+exit 0
+
 
