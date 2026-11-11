@@ -67,7 +67,7 @@ server_ip="${1}"
 
 set +e
 TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
-REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TREGION')"
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 set -e
 
 software_file="${BUILD_HOME}/configuration/software.dat"
@@ -87,8 +87,7 @@ fi
 
 # Temporary disable set -e to evaluate curl transaction pipeline failures manually
 set +e
-#response="$(/bin/echo "Authorization: Bearer ${TOKEN}" | curl -H @- -f -s -H 'X-Filter: {"region": "'${REGION}'"}' "https://api.linode.com/v4/linode/instances")"
-response="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_instances.sh "${REGION}")"
+response="$(${HOME}/services/server/linode/${orchestration_tool}/list_instances.sh "${REGION}")"
 curl_status="$?"
 set -e
 
