@@ -1,9 +1,33 @@
 #!/bin/sh
-######################################################################################
-# Author : Peter Winter
-# Date   : 13/06/2016
-# Description : This script will get the operating system version
-######################################################################################
+###################################################################################
+# @file        GetOSVersion.sh
+# @brief       Resolves and formats the target operating system image string.
+# @author      Peter Winter
+# @date        13/06/2016
+# @version     2.0
+#
+# @details     This script retrieves the configured operating system type, version,
+#              and cloud provider metadata from the environment configuration, then
+#              outputs the standardized OS image identifier required by the active
+#              cloud host API.
+#
+# @param       None
+#
+# @env         HOME  [Required] Base directory containing configuration utilities
+#                    and cloud provider marker files.
+#
+# @dependencies
+#              - ${HOME}/utilities/config/ExtractConfigValue.sh to retrieve configuration keys.
+#              - ${HOME}/utilities/software/GetOSName.sh to resolve Debian release codenames.
+#
+# @security    
+#              - Relies on system-owned executable paths (/bin, /usr/bin) to circumvent malicious search path injection.
+#              - Enforces strict input and execution permission checks before invoking downstream utilities.
+#
+# @exit        0  Success: Operating system image string resolved and printed cleanly.
+# @exit        1  Failure: Missing configuration values, unreadable or non-executable utilities,
+#                 or unsupported OS/provider combination encountered.
+###################################################################################
 # License Agreement:
 # This file is part of The Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
@@ -15,71 +39,129 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-###################################################################################
-###################################################################################
+# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+#########################################################################################
 #set -x
+set -e
 
-BUILDOS="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDOS'`"
-BUILDOS_VERSION="`${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDOSVERSION'`"
-CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
-
-
-if ( [ -f ${HOME}/DROPLET ] || [ "${CLOUDHOST}" = "digitalocean" ] )
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
 then
-	BUILDOS_VERSION="`/bin/echo ${BUILDOS_VERSION} | /bin/sed 's/\./-/g'`"
-	if ( [ "${BUILDOS}" = "ubuntu" ] )
-	then
-		/bin/echo "ubuntu-${BUILDOS_VERSION}-x64"
-	elif ( [ "${BUILDOS}" = "debian" ] )
-	then
-		/bin/echo "debian-${BUILDOS_VERSION}-x64"
-	fi
+    /bin/echo "Error: HOME environment variable is unset or invalid." >&2
+    exit 1
 fi
 
-if ( [ -f ${HOME}/EXOSCALE ] || [ "${CLOUDHOST}" = "exoscale" ] )
+extract_script="${HOME}/utilities/config/ExtractConfigValue.sh"
+if [ ! -f "${extract_script}" ] || [ ! -x "${extract_script}" ]
 then
-	if ( [ "${BUILDOS}" = "ubuntu" ] )
-	then
-		/bin/echo "Linux Ubuntu ${BUILDOS_VERSION} LTS 64-bit"
-	elif ( [ "${BUILDOS}" = "debian" ] )
-	then
-		os_name="`${HOME}/utilities/software/GetOSName.sh | /bin/sed -e "s/\b\(.\)/\u\1/g"`"
-		#At the current time (2025) 14 and 15 are here for futureproofing, not for use
-   		if ( [ "${BUILDOS_VERSION}" = "12" ] )
-   		then
-			/bin/echo "Linux Debian ${BUILDOS_VERSION} (${os_name}) 64-bit"
-		elif ( [ "${BUILDOS_VERSION}" = "13" ] )
-		then
-  			/bin/echo "Linux Debian ${BUILDOS_VERSION} (${os_name}) 64-bit"
-		elif ( [ "${BUILDOS_VERSION}" = "14" ] )
-		then
-  			/bin/echo "Linux Debian ${BUILDOS_VERSION} (${os_name}) 64-bit"		
-		elif ( [ "${BUILDOS_VERSION}" = "15" ] )
-		then
-  			/bin/echo "Linux Debian ${BUILDOS_VERSION} (${os_name}) 64-bit"
-		fi
-	fi
+    /bin/echo "Error: Configuration utility missing or not executable at ${extract_script}" >&2
+    exit 1
 fi
 
-if ( [ -f ${HOME}/LINODE ] || [ "${CLOUDHOST}" = "linode" ] )
+set +e
+BUILDOS="$("${extract_script}" 'BUILDOS')"
+exit_code=$?
+set -e
+if [ ${exit_code} -ne 0 ] || [ -z "${BUILDOS}" ]
 then
-	if ( [ "${BUILDOS}" = "ubuntu" ] )
-	then
-		/bin/echo "linode/ubuntu${BUILDOS_VERSION}"
-	elif ( [ "${BUILDOS}" = "debian" ] )
-	then
-		/bin/echo "linode/debian${BUILDOS_VERSION}"
-	fi
+    /bin/echo "Error: Failed to retrieve BUILDOS configuration value." >&2
+    exit 1
 fi
 
-if ( [ -f ${HOME}/VULTR ] || [ "${CLOUDHOST}" = "vultr" ] )
+set +e
+BUILDOS_VERSION="$("${extract_script}" 'BUILDOSVERSION')"
+exit_code=$?
+set -e
+if [ ${exit_code} -ne 0 ] || [ -z "${BUILDOS_VERSION}" ]
 then
-	if ( [ "${BUILDOS}" = "ubuntu" ] )
-	then
-		/bin/echo "Ubuntu ${BUILDOS_VERSION} LTS x64"
-	elif ( [ "${BUILDOS}" = "debian" ] )
-	then
-		/bin/echo "Debian ${BUILDOS_VERSION} x64"
-	fi
+    /bin/echo "Error: Failed to retrieve BUILDOSVERSION configuration value." >&2
+    exit 1
 fi
+
+set +e
+CLOUDHOST="$("${extract_script}" 'CLOUDHOST')"
+exit_code=$?
+set -e
+if [ ${exit_code} -ne 0 ] || [ -z "${CLOUDHOST}" ]
+then
+    /bin/echo "Error: Failed to retrieve CLOUDHOST configuration value." >&2
+    exit 1
+fi
+
+if [ -f "${HOME}/DROPLET" ] || [ "${CLOUDHOST}" = "digitalocean" ]
+then
+    BUILDOS_VERSION="$(/bin/echo "${BUILDOS_VERSION}" | /bin/sed 's/\./-/g')"
+    if [ "${BUILDOS}" = "ubuntu" ]
+    then
+        /bin/echo "ubuntu-${BUILDOS_VERSION}-x64"
+        exit 0
+    elif [ "${BUILDOS}" = "debian" ]
+    then
+        /bin/echo "debian-${BUILDOS_VERSION}-x64"
+        exit 0
+    fi
+fi
+
+if [ -f "${HOME}/EXOSCALE" ] || [ "${CLOUDHOST}" = "exoscale" ]
+then
+    if [ "${BUILDOS}" = "ubuntu" ]
+    then
+        /bin/echo "Linux Ubuntu ${BUILDOS_VERSION} LTS 64-bit"
+        exit 0
+    elif [ "${BUILDOS}" = "debian" ]
+    then
+        os_name_script="${HOME}/utilities/software/GetOSName.sh"
+        if [ ! -f "${os_name_script}" ] || [ ! -x "${os_name_script}" ]
+        then
+            /bin/echo "Error: OS name utility missing or not executable at ${os_name_script}" >&2
+            exit 1
+        fi
+
+        set +e
+        os_name="$("${os_name_script}" | /bin/sed -e "s/\b\(.\)/\u\1/g")"
+        exit_code=$?
+        set -e
+        if [ ${exit_code} -ne 0 ] || [ -z "${os_name}" ]
+        then
+            /bin/echo "Error: Failed to resolve Debian OS codename." >&2
+            exit 1
+        fi
+
+        # At the current time (2025) 14 and 15 are here for futureproofing, not for use
+        case "${BUILDOS_VERSION}" in
+            12|13|14|15)
+                /bin/echo "Linux Debian ${BUILDOS_VERSION} (${os_name}) 64-bit"
+                exit 0
+                ;;
+        esac
+    fi
+fi
+
+if [ -f "${HOME}/LINODE" ] || [ "${CLOUDHOST}" = "linode" ]
+then
+    if [ "${BUILDOS}" = "ubuntu" ]
+    then
+        /bin/echo "linode/ubuntu${BUILDOS_VERSION}"
+        exit 0
+    elif [ "${BUILDOS}" = "debian" ]
+    then
+        /bin/echo "linode/debian${BUILDOS_VERSION}"
+        exit 0
+    fi
+fi
+
+if [ -f "${HOME}/VULTR" ] || [ "${CLOUDHOST}" = "vultr" ]
+then
+    if [ "${BUILDOS}" = "ubuntu" ]
+    then
+        /bin/echo "Ubuntu ${BUILDOS_VERSION} LTS x64"
+        exit 0
+    elif [ "${BUILDOS}" = "debian" ]
+    then
+        /bin/echo "Debian ${BUILDOS_VERSION} x64"
+        exit 0
+    fi
+fi
+
+/bin/echo "Error: Unsupported CLOUDHOST (${CLOUDHOST}), BUILDOS (${BUILDOS}), or BUILDOSVERSION (${BUILDOS_VERSION})." >&2
+exit 1
+
