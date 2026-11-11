@@ -18,7 +18,7 @@
 # @env         REGION              The region that the servers are running in.
 #
 # @dependencies
-#              - /home/omedir.dat configuration file tracking the active framework layout.
+#              - /home/homedir.dat configuration file tracking the active framework layout.
 #              - external dependencies: curl, jq, cat, mkdir, dirname, date, echo
 #
 # @security    
