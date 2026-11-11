@@ -90,15 +90,12 @@ set +e
 WEBSITE_URL="$(${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL')"
 ACTIVE_FIREWALLS="$(${HOME}/utilities/config/ExtractConfigValue.sh 'ACTIVEFIREWALLS')"
 BUILD_FROM_SNAPSHOT="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDFROMSNAPSHOT')"
+OS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'OSCHOICE')"
 set -e
 
 machine_category="$(/bin/echo "${machine_type}" | /bin/sed 's|adt-||')"
 
-set +e
-"${BUILD_HOME}/initialisation/cloud-init/InitialiseCloudConfig.sh" "${machine_category}" "${server_name}" 2>/dev/null
-set -e
-
-yaml_path="${BUILD_HOME}/runtime/${CLOUDHOST}/${BUILD_IDENTIFIER}/cloud-init/${machine_category}.yaml"
+yaml_path="${HOME}/runtime/cloud-init/webserver.yaml"
 if [ -f "${yaml_path}" ]
 then
         user_data="${yaml_path}" 
@@ -107,16 +104,20 @@ else
         exit 1
 fi
 
-snapshot_id=""
-if [ "${BUILD_FROM_SNAPSHOT}" = "1" ]
+/bin/sed -i "s/XXXXWEBSERVER_HOSTNAMEXXXX/${server_name}/g" ${user_data}
+
+SNAPSHOT_ID=""
+if ( [ "${BUILD_FROM_SNAPSHOT}" = "1" ] )
 then
-        snapshot_file="${BUILD_HOME}/runtime/wholemachinesnapshots/${WEBSITE_URL}/snapshots/snapshot_ids.dat"
-        if [ -f "${snapshot_file}" ]
-        then
-                snapshot_id="$(/bin/grep "${machine_category}" "${snapshot_file}" 2>/dev/null | /usr/bin/awk -F':' '{print $NF}')"
-                /bin/echo "Deploying ${machine_category} machine from snapshot with ID ${snapshot_id}"
-        fi
+        SNAPSHOT_ID="`${HOME}/utilities/config/ExtractConfigValue.sh 'SNAPSHOTID'`"
 fi
+
+image="${OS_CHOICE}"
+if ( [ "${BUILD_FROM_SNAPSHOT}" = "1" ] && [ "${SNAPSHOT_ID}" != "" ] )
+then
+        image="${SNAPSHOT_ID}"
+fi
+
 
 firewall_id=""
 if [ "${ACTIVE_FIREWALLS}" = "2" ] || [ "${ACTIVE_FIREWALLS}" = "3" ]
@@ -129,12 +130,6 @@ fi
 if [ -z "${firewall_id}" ]
 then
         firewall_id="-1"
-fi
-
-image="${OS_CHOICE}" 
-if [ "${BUILD_FROM_SNAPSHOT}" = "1" ] && [ -n "${snapshot_id}" ]
-then
-        image="${snapshot_id}"
 fi
 
 
