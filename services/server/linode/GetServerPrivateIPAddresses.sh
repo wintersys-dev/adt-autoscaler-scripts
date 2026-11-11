@@ -88,7 +88,7 @@ fi
 server_ids="$("${HOME}/services/server/linode/ListServerIDs.sh" "${server_type}")"
 
 set +e
-response="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_instances.sh "${REGION}")"
+response="$(${HOME}/services/server/linode/${orchestration_tool}/list_instances.sh "${REGION}")"
 curl_status="$?"
 set -e
 
@@ -98,7 +98,7 @@ then
         do
                 # Temporary disable set -e for sub-calls inside the iteration loop
                 set +e
-                response1="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/get_instance_ips.sh "${id}")"
+                response1="$(${HOME}/services/server/linode/${orchestration_tool}/get_instance_ips.sh "${id}")"
                 curl_sub_status="$?"
                 set -e
 
