@@ -14,7 +14,6 @@
 # @param       $1  [Required] The server type/name substring used to resolve server IDs.
 #
 # @env         HOME                Path to the framework root directory (read from file).
-# @env         TOKEN               Linode API bearer authorization token.
 # @env         REGION              The region that the servers are running in.
 #
 # @dependencies
@@ -67,7 +66,7 @@ fi
 server_type="${1}"
 
 set +e
-TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+#TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 set -e
 
@@ -89,7 +88,7 @@ fi
 server_ids="$("${HOME}/services/server/linode/ListServerIDs.sh" "${server_type}")"
 
 set +e
-response="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_instances.sh "${TOKEN}" "${REGION}")"
+response="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_instances.sh "${REGION}")"
 curl_status="$?"
 set -e
 
