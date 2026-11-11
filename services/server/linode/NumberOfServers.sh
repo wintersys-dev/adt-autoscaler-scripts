@@ -80,8 +80,9 @@ then
     exit 1
 fi
 
-# Secure framework configuration value extraction
-REGION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" REGION)"
+set +e
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
+set -e
 
 # Temporary disable set -e to evaluate curl transaction pipeline failures manually
 set +e
