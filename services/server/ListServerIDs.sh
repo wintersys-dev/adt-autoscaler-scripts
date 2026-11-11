@@ -64,7 +64,7 @@ set +e
 CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
 set -e
 
-script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/ListServerIDs.sh"
+script_path="${HOME}/services/server/${CLOUDHOST}/ListServerIDs.sh"
 
 if [ ! -f "${script_path}" ]
 then
