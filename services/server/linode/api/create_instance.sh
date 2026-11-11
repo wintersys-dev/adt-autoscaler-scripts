@@ -114,11 +114,6 @@ then
                 exit 1
         fi
         emergency_password="$(/bin/cat "${password_file}")"
-else
-        # Safely generate an alphanumeric random password sequence
-        emergency_password="$(/usr/bin/openssl rand -base64 32 2>/dev/null | /bin/tr -d '\n' | /bin/tr -cd 'a-zA-Z0-9' | /usr/bin/cut -c 1-16)"
-        /bin/echo "${emergency_password}" > "${password_file}"
-        /bin/chmod 600 "${password_file}"
 fi
 
 if [ -z "${emergency_password}" ]
