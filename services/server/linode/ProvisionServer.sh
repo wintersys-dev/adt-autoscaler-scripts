@@ -86,11 +86,11 @@ then
         image="${snapshot_id}"
 fi
 
-# Secure framework configuration value extraction
-VPC_IP_RANGE="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" VPC_IP_RANGE)"
-VPC_NAME="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" VPC_NAME)"
-REGION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" REGION)"
-
+set +e
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
+VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
+VPC_NAME="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCNAME')"
+set -e
 
 software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
