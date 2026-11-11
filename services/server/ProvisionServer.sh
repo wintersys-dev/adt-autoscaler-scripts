@@ -14,7 +14,6 @@
 #
 # @param       $1  [Required] The targeted server hardware size plan / tier.
 # @param       $2  [Required] The human-readable label/hostname assigned to the server.
-# @param       $3  [Required] The structural type or architecture category of the machine.
 #
 # @env         None explicitly sourced from top-level environment registers.
 #
