@@ -1,10 +1,10 @@
 #!/bin/sh
 ###################################################################################
-# @file        GetOSVersion.sh
+# @file        GetOperatingSystemVersion.sh
 # @brief       Resolves and formats the target operating system image string.
 # @author      Peter Winter
-# @date        13/06/2016
-# @version     2.0
+# @date        13/06/2026
+# @version     1.0
 #
 # @details     This script retrieves the configured operating system type, version,
 #              and cloud provider metadata from the environment configuration, then
@@ -44,11 +44,14 @@
 #set -x
 set -e
 
-if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
+if [ -r /home/homedir.dat ]
 then
-    /bin/echo "Error: HOME environment variable is unset or invalid." >&2
-    exit 1
+        HOME="$(/bin/cat /home/homedir.dat)"
+else
+        /bin/echo "Application root configuration file missing at /home/homedir.dat" >&2
+        exit 1
 fi
+
 
 extract_script="${HOME}/utilities/config/ExtractConfigValue.sh"
 if [ ! -f "${extract_script}" ] || [ ! -x "${extract_script}" ]
@@ -126,7 +129,7 @@ then
             exit 1
         fi
 
-        # At the current time (2025) 14 and 15 are here for futureproofing, not for use
+        # At the current time (2026) 14 and 15 are here for futureproofing, not for use
         case "${BUILDOS_VERSION}" in
             12|13|14|15)
                 /bin/echo "Linux Debian ${BUILDOS_VERSION} (${os_name}) 64-bit"
