@@ -68,6 +68,7 @@ server_name="$2"
 
 set +e
 CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 WEBSITE_URL="$(${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL')"
 ACTIVE_FIREWALLS="$(${HOME}/utilities/config/ExtractConfigValue.sh 'ACTIVEFIREWALLS')"
 BUILD_FROM_SNAPSHOT="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDFROMSNAPSHOT')"
