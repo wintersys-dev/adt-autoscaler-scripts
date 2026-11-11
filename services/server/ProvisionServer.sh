@@ -75,6 +75,7 @@ BUILD_FROM_SNAPSHOT="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDFROM
 OS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'OSCHOICE')"
 set -e
 
+${HOME}/autoscaler/InitialiseCloudInit.sh
 
 yaml_path="${HOME}/runtime/cloud-init/webserver.yaml"
 if [ -f "${yaml_path}" ]
