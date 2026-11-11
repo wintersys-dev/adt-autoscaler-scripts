@@ -20,11 +20,10 @@
 #
 # @dependencies
 #              - /home/homedir.dat configuration file tracking the active application root path.
-#              - ${BUILD_HOME}/helpers/services/LogStatusMessages.sh utility to capture build updates.
-#              - ${BUILD_HOME}/helpers/services/GetVariableValue.sh framework configuration mapping layer.
-#              - ${BUILD_HOME}/services/server/GetOperatingSystemVersion.sh distribution matching software.
-#              - ${BUILD_HOME}/initialisation/cloud-init/InitialiseCloudConfig.sh initialization driver.
-#              - ${BUILD_HOME}/services/security/firewall/ConfigureNativeFirewall.sh framework security orchestrator.
+#              - ${HOME}/utilities/config/ExtractConfigValue.sh 
+#              - ${HOME}/services/server/GetOperatingSystemVersion.sh distribution matching software.
+#              - ${HOME}/initialisation/cloud-init/InitialiseCloudConfig.sh initialization driver.
+#              - ${HOME}/services/security/firewall/ConfigureNativeFirewall.sh framework security orchestrator.
 #
 # @security    
 #              - Suppresses downstream standard error channels (`2>/dev/null`) to block credential exposure.
@@ -88,13 +87,10 @@ CLOUDHOST="$(/bin/cat "${cloudhost_file}")"
 BUILD_IDENTIFIER="$(/bin/cat "${build_id_file}")"
 
 set +e
-REGION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" REGION 2>/dev/null)"
-WEBSITE_URL="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" WEBSITE_URL 2>/dev/null)"
-ACTIVE_FIREWALLS="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" ACTIVE_FIREWALLS 2>/dev/null)"
-BUILDOS="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" BUILDOS 2>/dev/null)"
-BUILDOS_VERSION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" BUILDOS_VERSION 2>/dev/null)"
-BUILD_FROM_SNAPSHOT="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" BUILD_FROM_SNAPSHOT 2>/dev/null)"
-OS_CHOICE="$("${BUILD_HOME}/services/server/GetOperatingSystemVersion.sh" 2>/dev/null | /bin/sed "s/'//g")"
+
+WEBSITE_URL="$(${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL')"
+ACTIVE_FIREWALLS="$(${HOME}/utilities/config/ExtractConfigValue.sh 'ACTIVEFIREWALLS')"
+BUILD_FROM_SNAPSHOT="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDFROMSNAPSHOT')"
 set -e
 
 machine_category="$(/bin/echo "${machine_type}" | /bin/sed 's|adt-||')"
