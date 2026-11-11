@@ -3,7 +3,7 @@
 # @file        GetServerPrivateIPAddresses.sh
 # @brief       Retrieves the private VPC IPv4 addresses for a given server type.
 # @author      Peter Winter
-# @date        13/07/2021
+# @date        13/07/2026
 # @version     1.0
 #
 # @details     This script queries the local toolkit environment to identify target 
@@ -66,8 +66,10 @@ fi
 
 server_type="${1}"
 
-TOKEN="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" TOKEN)"
-REGION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" REGION)"
+set +e
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
+set -e
 
 software_file="${BUILD_HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
