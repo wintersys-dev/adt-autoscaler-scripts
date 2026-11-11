@@ -60,8 +60,8 @@ fi
 # Input validation
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Fully Qualified Domain Name and target IP parameters are required."
-        /bin/echo "Usage: $0 <fqdn> <target_ip>"
+        /bin/echo "Error: Fully Qualified Domain Name and target IP parameters are required." >&2
+        /bin/echo "Usage: $0 <fqdn> <target_ip>" >&2
         exit 1
 fi
 
@@ -81,7 +81,7 @@ set -e
 
 if [ "${exit_code}" -ne 0 ] || [ -z "${api_domain_json}" ]
 then
-        /bin/echo "Failed to query cluster domain management catalog or network timeout occurred."
+        /bin/echo "Failed to query cluster domain management catalog or network timeout occurred." >&2
         exit 1
 fi
 
@@ -89,7 +89,7 @@ fi
 if /bin/echo "${api_domain_json}" | /usr/bin/jq -e '.errors' >/dev/null 2>&1
 then
         api_err_msg="$(/bin/echo "${api_domain_json}" | /usr/bin/jq -r '.errors[0].reason // "Unknown API error parameters."')"
-        /bin/echo "Failed to retrieve domains list. Cloud Provider Reason: ${api_err_msg}"
+        /bin/echo "Failed to retrieve domains list. Cloud Provider Reason: ${api_err_msg}" >&2
         exit 1
 fi
 
@@ -98,7 +98,7 @@ domain_id="$(/bin/echo "${api_domain_json}" | /usr/bin/jq -r --arg dom "${domain
 
 if [ -z "${domain_id}" ]
 then
-        /bin/echo "Domain ID not found matching zone track string pattern: ${domain_url}"
+        /bin/echo "Domain ID not found matching zone track string pattern: ${domain_url}" >&2
         exit 1
 fi
 
@@ -121,7 +121,7 @@ set -e
 
 if [ "${record_exit_code}" -ne 0 ] 
 then
-        /bin/echo "Failed to add record to DNS system (Network/Curl infrastructure execution error)."
+        /bin/echo "Failed to add record to DNS system (Network/Curl infrastructure execution error)." >&2
         exit 1
 fi
 
@@ -129,7 +129,7 @@ fi
 if /bin/echo "${api_record_response}" | /usr/bin/jq -e '.errors' >/dev/null 2>&1
 then
         record_err_msg="$(/bin/echo "${api_record_response}" | /usr/bin/jq -r '.errors[0].reason // "Unknown DNS payload entry validation error."')"
-        /bin/echo "Failed to add record to DNS system. Cloud Provider Reason: ${record_err_msg}"
+        /bin/echo "Failed to add record to DNS system. Cloud Provider Reason: ${record_err_msg}" >&2
         exit 1
 fi
 
