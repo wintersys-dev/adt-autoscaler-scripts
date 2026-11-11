@@ -83,7 +83,7 @@ RESPONSE_BODY=$(/bin/echo "$RESPONSE" | /usr/bin/sed '/HTTP_STATUS:/d')
 case "${HTTP_CODE}" in
     200)
         # This streams the pure JSON (empty dictionary {} on success) back to the caller's stdout
-        /bin/echo "${RESPONSE_BODY}"  >&2
+        /bin/echo "${RESPONSE_BODY}" 
         exit 0
         ;;
     400)
