@@ -57,43 +57,24 @@ else
 fi
 
 # 1. Check for all 3 arguments safely
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]
+if [ -z "$1" ] || [ -z "$2" ]
 then
-        /bin/echo "Error: 3 Server arguments are required."
-        /bin/echo "Usage: $0 <server_size> <server_name> <machine_type>"
+        /bin/echo "Error: 2 Server arguments are required."
+        /bin/echo "Usage: $0 <server_size> <server_name>"
         exit 1
 fi
 
 server_size="$1"
 server_name="$2"
-machine_type="$3"
-
-cloudhost_file="${BUILD_HOME}/runtime/ACTIVE_CLOUDHOST"
-if [ ! -f "${cloudhost_file}" ] || [ ! -r "${cloudhost_file}" ]
-then
-        /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}" >&2
-        exit 1
-fi
-
-build_id_file="${BUILD_HOME}/runtime/ACTIVE_BUILD_IDENTIFIER"
-if [ ! -f "${build_id_file}" ] || [ ! -r "${build_id_file}" ]
-then
-        /bin/echo "Error: Cannot read active build identifier file at ${build_id_file}" >&2
-        exit 1
-fi
-
-CLOUDHOST="$(/bin/cat "${cloudhost_file}")"
-BUILD_IDENTIFIER="$(/bin/cat "${build_id_file}")"
 
 set +e
-
+CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
 WEBSITE_URL="$(${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL')"
 ACTIVE_FIREWALLS="$(${HOME}/utilities/config/ExtractConfigValue.sh 'ACTIVEFIREWALLS')"
 BUILD_FROM_SNAPSHOT="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDFROMSNAPSHOT')"
 OS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'OSCHOICE')"
 set -e
 
-machine_category="$(/bin/echo "${machine_type}" | /bin/sed 's|adt-||')"
 
 yaml_path="${HOME}/runtime/cloud-init/webserver.yaml"
 if [ -f "${yaml_path}" ]
@@ -123,7 +104,7 @@ firewall_id=""
 if [ "${ACTIVE_FIREWALLS}" = "2" ] || [ "${ACTIVE_FIREWALLS}" = "3" ]
 then
         set +e
-        firewall_id="$("${BUILD_HOME}/services/security/firewall/ConfigureNativeFirewall.sh" "${machine_type}" 2>/dev/null | /bin/grep 'ADT_FIREWALL_ID:' | /usr/bin/awk -F':' '{print $NF}')"
+        firewall_id="$("${BUILD_HOME}/services/security/firewall/ConfigureNativeFirewall.sh" "adt-webserver" 2>/dev/null | /bin/grep 'ADT_FIREWALL_ID:' | /usr/bin/awk -F':' '{print $NF}')"
         set -e
 fi
 
@@ -131,7 +112,6 @@ if [ -z "${firewall_id}" ]
 then
         firewall_id="-1"
 fi
-
 
 script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/ProvisionServer.sh"
 
