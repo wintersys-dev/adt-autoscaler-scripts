@@ -60,8 +60,8 @@ fi
 # Input validation
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Record ID and Fully Qualified Domain Name parameters are required."
-        /bin/echo "Usage: $0 <record_id> <fqdn>"
+        /bin/echo "Error: Record ID and Fully Qualified Domain Name parameters are required." >&2
+        /bin/echo "Usage: $0 <record_id> <fqdn>" >&2
         exit 1
 fi
 
@@ -79,7 +79,7 @@ set -e
 
 if [ "${exit_code}" -ne 0 ] || [ -z "${api_domain_json}" ]
 then
-        /bin/echo "Failed to query domain management catalog or network timeout occurred."
+        /bin/echo "Failed to query domain management catalog or network timeout occurred." >&2
         exit 1
 fi
 
@@ -87,7 +87,7 @@ fi
 if /bin/echo "${api_domain_json}" | /usr/bin/jq -e '.errors' >/dev/null 2>&1
 then
         api_err_msg="$(/bin/echo "${api_domain_json}" | /usr/bin/jq -r '.errors.reason // "Unknown API error parameters."')"
-        /bin/echo "Failed to retrieve domains list. Cloud Provider Reason: ${api_err_msg}"
+        /bin/echo "Failed to retrieve domains list. Cloud Provider Reason: ${api_err_msg}" >&2
         exit 1
 fi
 
@@ -96,7 +96,7 @@ domain_id="$(/bin/echo "${api_domain_json}" | /usr/bin/jq -r --arg dom "${domain
 
 if [ -z "${domain_id}" ]
 then
-        /bin/echo "Domain ID not found matching zone track string pattern: ${domain_url}"
+        /bin/echo "Domain ID not found matching zone track string pattern: ${domain_url}" >&2
         exit 1
 fi
 
@@ -108,7 +108,7 @@ set -e
 
 if [ "${delete_exit_code}" -ne 0 ] 
 then
-        /bin/echo "Failed to delete record from DNS system (Network/Curl infrastructure execution error)."
+        /bin/echo "Failed to delete record from DNS system (Network/Curl infrastructure execution error)." >&2
         exit 1
 fi
 
@@ -117,7 +117,7 @@ fi
 if [ -n "${api_delete_response}" ] && /bin/echo "${api_delete_response}" | /usr/bin/jq -e '.errors' >/dev/null 2>&1
 then
         delete_err_msg="$(/bin/echo "${api_delete_response}" | /usr/bin/jq -r '.errors.reason // "Unknown DNS payload entry validation error."')"
-        /bin/echo "Failed to delete record from DNS system. Cloud Provider Reason: ${delete_err_msg}"
+        /bin/echo "Failed to delete record from DNS system. Cloud Provider Reason: ${delete_err_msg}" >&2
         exit 1
 fi
 
