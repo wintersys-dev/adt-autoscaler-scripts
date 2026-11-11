@@ -14,7 +14,6 @@
 # @param       $1  [Required] The server type/name substring to search for in instance labels.
 #
 # @env         HOME                Path to the framework root directory (read from file).
-# @env         TOKEN               Linode API bearer authorization token.
 # @env         REGION              The region that the servers are running in.
 #
 # @dependencies
