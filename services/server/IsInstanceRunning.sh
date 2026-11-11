@@ -16,7 +16,7 @@
 # @env         None explicitly sourced from top-level environment registers.
 #
 # @dependencies
-#              - /home/buildhome.dat configuration file tracking the active application root path.
+#              - /home/homedir.dat configuration file tracking the active application root path.
 #
 # @security    
 #              - Relies on system-owned executable paths (/bin, /usr/bin) to circumvent malicious search path injection.
@@ -63,7 +63,7 @@ set +e
 CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
 set -e
 
-script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/IsInstanceRunning.sh"
+script_path="${HOME}/services/server/${CLOUDHOST}/IsInstanceRunning.sh"
 
 if [ ! -f "${script_path}" ]
 then
