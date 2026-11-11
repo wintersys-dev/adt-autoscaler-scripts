@@ -3,7 +3,7 @@
 # @file        GetServerName.sh
 # @brief       Retrieves the Linode server label associated with a specific IP address.
 # @author      Peter Winter
-# @date        13/07/2021
+# @date        13/07/2026
 # @version     1.0
 #
 # @details     This script connects to the Linode v4 API, fetches the active instance 
@@ -65,10 +65,9 @@ fi
 
 server_ip="${1}"
 
-# Secure framework configuration value extraction
 set +e
-TOKEN="$(${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN)"
-REGION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" REGION)"
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TREGION')"
 set -e
 
 software_file="${BUILD_HOME}/configuration/software.dat"
