@@ -26,7 +26,6 @@
 #              - ${HOME}/services/security/firewall/ConfigureNativeFirewall.sh framework security orchestrator.
 #
 # @security    
-#              - Suppresses downstream standard error channels (`2>/dev/null`) to block credential exposure.
 #              - Relies on system-owned executable paths (/bin, /usr/bin) to circumvent malicious search path injection.
 #
 # @exit        0  Success: Runtime options consolidated and server provisioner launched successfully.
