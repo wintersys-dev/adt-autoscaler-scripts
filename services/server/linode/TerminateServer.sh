@@ -66,7 +66,6 @@ fi
 
 server_ip="${1}"
 
-
 software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
@@ -88,7 +87,7 @@ if [ -n "${server_name}" ]
 then
         server_id="$("${HOME}/services/server/linode/ListServerIDs.sh" "${server_name}")"
         
-        /bin/echo "Initiating graceful shutdown for instance '${server_name}' (ID: ${server_id}, IP: ${server_ip})..." >&2
+        /bin/echo "Initiating graceful shutdown for instance '${server_name}' (ID: ${server_id}, IP: ${server_ip})..." 
         
         # Dispatch shutdown request securely
         ${HOME}/services/server/linode/${orchestration_tool}/shutdown_instance.sh "${server_id}"
