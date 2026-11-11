@@ -65,9 +65,10 @@ fi
 
 server_type="${1}"
 
-# Secure framework configuration value extraction
-TOKEN="$(${BUILD_HOME}/helpers/services/GetVariableValue.sh TOKEN)"
-REGION="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" REGION)"
+set +e
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
+set -e
 
 software_file="${BUILD_HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
