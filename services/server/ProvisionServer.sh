@@ -105,7 +105,7 @@ firewall_id=""
 if [ "${ACTIVE_FIREWALLS}" = "2" ] || [ "${ACTIVE_FIREWALLS}" = "3" ]
 then
         set +e
-        firewall_id="$("${BUILD_HOME}/services/security/firewall/ConfigureNativeFirewall.sh" "adt-webserver" 2>/dev/null | /bin/grep 'ADT_FIREWALL_ID:' | /usr/bin/awk -F':' '{print $NF}')"
+        firewall_id="$("${HOME}/services/security/firewall/ConfigureNativeFirewall.sh" "adt-webserver" 2>/dev/null | /bin/grep 'ADT_FIREWALL_ID:' | /usr/bin/awk -F':' '{print $NF}')"
         set -e
 fi
 
@@ -114,7 +114,7 @@ then
         firewall_id="-1"
 fi
 
-script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/ProvisionServer.sh"
+script_path="${HOME}/services/server/${CLOUDHOST}/ProvisionServer.sh"
 
 if [ ! -f "${script_path}" ]
 then
