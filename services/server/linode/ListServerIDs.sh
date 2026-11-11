@@ -3,7 +3,7 @@
 # @file        ListServerIDs.sh
 # @brief       Lists all Linode instance IDs that match a given server type keyword.
 # @author      Peter Winter
-# @date        13/07/2021
+# @date        13/07/2026
 # @version     1.0
 #
 # @details     This script contacts the Linode v4 API, retrieves the list of active 
@@ -49,7 +49,7 @@ set -e
 
 if [ -r /home/homedir.dat ]
 then
-        BUILD_HOME="$(/bin/cat /home/homedir.dat)"
+        HOME="$(/bin/cat /home/homedir.dat)"
 else
         /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
         exit 1
@@ -70,7 +70,7 @@ TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 set -e
 
-software_file="${BUILD_HOME}/runtime/software.dat"
+software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
     status "Error: Cannot read software configuration file at ${software_file}" 
