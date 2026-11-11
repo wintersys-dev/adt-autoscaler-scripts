@@ -72,7 +72,7 @@ CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
 WEBSITE_URL="$(${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL')"
 ACTIVE_FIREWALLS="$(${HOME}/utilities/config/ExtractConfigValue.sh 'ACTIVEFIREWALLS')"
 BUILD_FROM_SNAPSHOT="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDFROMSNAPSHOT')"
-OS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'OSCHOICE')"
+OS_CHOICE="$("${HOME}/services/server/GetOperatingSystemVersion.sh" 2>/dev/null | /bin/sed "s/'//g")"
 set -e
 
 ${HOME}/autoscaler/InitialiseCloudInit.sh
