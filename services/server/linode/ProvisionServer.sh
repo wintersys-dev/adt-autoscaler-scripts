@@ -87,7 +87,7 @@ then
 fi
 
 set +e
-REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
+#REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
 VPC_NAME="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCNAME')"
 set -e
@@ -127,10 +127,10 @@ then
         /bin/echo "VPC network not found. Initiating dynamic deployment schema..." >&2
         if [ "${orchestration_tool}" = "api" ]
         then
-                vpc_payload="$(/usr/bin/jq -n --arg lbl "${VPC_NAME}" --arg reg "${REGION}" --arg ip "${VPC_IP_RANGE}" '{label: $lbl, region: $reg, subnets: [{label: "adt-subnet", ipv4: $ip}]}')"
+                vpc_payload="$(/usr/bin/jq -n --arg lbl "${VPC_NAME}" --arg reg "${region}" --arg ip "${VPC_IP_RANGE}" '{label: $lbl, region: $reg, subnets: [{label: "adt-subnet", ipv4: $ip}]}')"
         elif [ "${orchestration_tool}" = "cli" ]
         then
-                vpc_payload='--label "'${VPC_NAME}'" --region "'${REGION}'" --subnets.label "'adt-subnet'" --subnets.ipv4 "'${VPC_IP_RANGE}'"'
+                vpc_payload='--label "'${VPC_NAME}'" --region "'${region}'" --subnets.label "'adt-subnet'" --subnets.ipv4 "'${VPC_IP_RANGE}'"'
         fi
         # Temporary disable set -e to evaluate curl transaction pipeline failures manually
         set +e
@@ -147,7 +147,7 @@ then
                 if [ -z "${vpc_id}" ] || [ "${vpc_id}" = "null" ]
                 then
                         set +e
-                        response_vpc_refresh="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_vpcs.sh "${REGION}")"
+                        response_vpc_refresh="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_vpcs.sh "${region}")"
                         curl_status="$?"
                         set -e
 
