@@ -66,9 +66,9 @@ set +e
 TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 set -e
 
-if [ -z "${TOKEN}" ]
+if  [ -z "${TOKEN}" ]
 then
-        /bin/echo "Error: Failed to fetch required context variables (CLOUDHOST, BUILD_IDENTIFIER, or TOKEN)."  >&2
+        /bin/echo "Error: Failed to fetch required context variables (TOKEN)."  >&2
         exit 1
 fi
 
