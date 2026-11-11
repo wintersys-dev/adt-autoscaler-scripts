@@ -13,7 +13,7 @@
 #
 # @param       $1  [Required] The target private VPC IPv4 address to translate.
 #
-# @env         BUILD_HOME          Path to the framework root directory (read from file).
+# @env         HOME                Path to the framework root directory (read from file).
 # @env         TOKEN               Linode API bearer authorization token.
 # @env         REGION              The region that the servers are running in.
 #
