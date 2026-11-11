@@ -66,7 +66,7 @@ set -e
 
 if  [ -z "${TOKEN}" ]
 then
-        status "Error: Failed to fetch required context variables (TOKEN)."
+        /bin/echo "Error: Failed to fetch required context variables (TOKEN)." >&2
         exit 1
 fi
 
