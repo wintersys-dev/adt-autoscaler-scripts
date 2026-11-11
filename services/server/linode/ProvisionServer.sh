@@ -197,7 +197,7 @@ set -e
 
 if [ "${curl_status}" -eq 0 ] && [ -n "${response_instance}" ]
 then
-        /bin/echo "Success: Compute instance '${server_name}' successfully provisioned." >&2
+        /bin/echo "Success: Compute instance '${server_name}' successfully provisioned."
         exit 0
 else
         /bin/echo "Network request failed. Check your API token or URL." >&2
