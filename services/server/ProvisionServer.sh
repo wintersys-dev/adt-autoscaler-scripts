@@ -79,7 +79,7 @@ set -e
 yaml_path="${HOME}/runtime/cloud-init/webserver.yaml"
 if [ -f "${yaml_path}" ]
 then
-        user_data="${yaml_path}" 
+        user_data_path="${yaml_path}" 
 else
         /bin/echo "Cloud config file not found" >&2
         exit 1
@@ -130,7 +130,7 @@ fi
 #export EMERGENCY_PASSWORD="${emergency_password}"
 
 set +e
-"${script_path}" "${REGION}" "${image}" "${server_size}" "${server_name}" "${user_data}" "${firewall_id}" "${snapshot_id}"
+"${script_path}" "${REGION}" "${image}" "${server_size}" "${server_name}" "${user_data_path}" "${firewall_id}" "${snapshot_id}"
 exit_code=$?
 set -e
 
