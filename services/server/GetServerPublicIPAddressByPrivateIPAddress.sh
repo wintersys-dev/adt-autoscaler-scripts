@@ -63,7 +63,7 @@ set +e
 CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
 set -e
 
-script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/GetServerPublicIPAddressByPrivateIPAddress.sh"
+script_path="${HOME}/services/server/${CLOUDHOST}/GetServerPublicIPAddressByPrivateIPAddress.sh"
 
 if [ ! -f "${script_path}" ]
 then
