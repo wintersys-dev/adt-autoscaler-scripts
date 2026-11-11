@@ -88,7 +88,7 @@ fi
 
 set +e
 #REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
-VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
+#VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
 VPC_NAME="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCNAME')"
 set -e
 
@@ -190,7 +190,7 @@ parameter_payload="${EMERGENCY_PASSWORD} ${region} ${image} ${server_size} ${ser
 
 set +e
 
-response_instance=$(/bin/echo "${parameter_payload}" | ${BUILD_HOME}/services/server/linode/${orchestration_tool}/create_instance.sh)
+response_instance=$(/bin/echo "${parameter_payload}" | ${HOME}/services/server/linode/${orchestration_tool}/create_instance.sh)
 
 curl_status="$?"
 set -e
