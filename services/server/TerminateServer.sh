@@ -53,14 +53,14 @@ fi
 # 1. Check for the required argument safely
 if [ -z "$1" ]
 then
-    /bin/echo "Error: Server IP address argument is required." 
-    /bin/echo "Usage: $0 <server_ip>" 
+    /bin/echo "Error: Server IP address argument is required." >&2
+    /bin/echo "Usage: $0 <server_ip>" >&2
     exit 1
 fi
 
 server_ip="$1"
 
-cloudhost_file="${BUILD_HOME}/runtime/ACTIVE_CLOUDHOST"
+cloudhost_file="${HOME}/runtime/ACTIVE_CLOUDHOST"
 if [ ! -f "${cloudhost_file}" ] || [ ! -r "${cloudhost_file}" ]
 then
     /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}" 
@@ -79,13 +79,13 @@ script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/TerminateServer.sh"
 
 if [ ! -f "${script_path}" ]
 then
-    /bin/echo "Error: Script not found at ${script_path}" 
+    /bin/echo "Error: Script not found at ${script_path}" >&2
     exit 1
 fi
 
 if [ ! -x "${script_path}" ]
 then
-    /bin/echo "Error: Script at ${script_path} is not executable." 
+    /bin/echo "Error: Script at ${script_path} is not executable." >&2
     exit 1
 fi
 
@@ -96,7 +96,7 @@ set -e
 
 if [ ${exit_code} -ne 0 ]
 then
-    /bin/echo "Error: TerminateServer.sh failed with exit code $exit_code"
+    /bin/echo "Error: TerminateServer.sh failed with exit code $exit_code" >&2
     exit $exit_code
 fi
 
