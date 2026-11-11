@@ -71,14 +71,14 @@ machine_type="$3"
 cloudhost_file="${BUILD_HOME}/runtime/ACTIVE_CLOUDHOST"
 if [ ! -f "${cloudhost_file}" ] || [ ! -r "${cloudhost_file}" ]
 then
-        /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}"
+        /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}" >&2
         exit 1
 fi
 
 build_id_file="${BUILD_HOME}/runtime/ACTIVE_BUILD_IDENTIFIER"
 if [ ! -f "${build_id_file}" ] || [ ! -r "${build_id_file}" ]
 then
-        /bin/echo "Error: Cannot read active build identifier file at ${build_id_file}"
+        /bin/echo "Error: Cannot read active build identifier file at ${build_id_file}" >&2
         exit 1
 fi
 
@@ -103,7 +103,7 @@ if [ -f "${yaml_path}" ]
 then
         user_data="${yaml_path}" 
 else
-        /bin/echo "Cloud config file not found"
+        /bin/echo "Cloud config file not found" >&2
         exit 1
 fi
 
@@ -142,13 +142,13 @@ script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/ProvisionServer.sh"
 
 if [ ! -f "${script_path}" ]
 then
-        /bin/echo "Error: Script not found at ${script_path}" 
+        /bin/echo "Error: Script not found at ${script_path}" >&2
         exit 1
 fi
 
 if [ ! -x "${script_path}" ]
 then
-        /bin/echo "Error: Script at ${script_path} is not executable."
+        /bin/echo "Error: Script at ${script_path} is not executable." >&2
         exit 1
 fi
 
@@ -161,7 +161,7 @@ set -e
 
 if [ ${exit_code} -ne 0 ]
 then
-        /bin/echo "Error: ProvisionServer.sh failed with exit code $exit_code"
+        /bin/echo "Error: ProvisionServer.sh failed with exit code $exit_code" >&2
         exit $exit_code
 fi
 
