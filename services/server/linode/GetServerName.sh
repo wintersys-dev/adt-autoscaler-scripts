@@ -70,7 +70,7 @@ TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 set -e
 
-software_file="${BUILD_HOME}/runtime/software.dat"
+software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
     /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
