@@ -18,7 +18,6 @@
 #
 # @dependencies
 #              - /home/homedir.dat configuration file tracking the active application root path.
-#              - ${HOME}/helpers/services/LogStatusMessages.sh utility to capture build updates.
 #
 # @security    
 #              - Suppresses downstream standard error channels (`2>/dev/null`) to block credential exposure.
