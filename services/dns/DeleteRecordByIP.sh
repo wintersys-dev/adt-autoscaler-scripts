@@ -57,8 +57,8 @@ fi
 
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Two arguments are required."
-        /bin/echo "Usage: $0 <website_url> <ip>" 
+        /bin/echo "Error: Two arguments are required." >&2
+        /bin/echo "Usage: $0 <website_url> <ip>" >&2
         exit 1
 fi
 
@@ -71,7 +71,7 @@ DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
-        /bin/echo "Error: Cannot read software configuration file at ${software_file}"
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
         exit 1
 fi
 
@@ -79,7 +79,7 @@ orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "$
 
 if [ -z "${orchestration_tool}" ]
 then
-        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" 
+        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
         exit 1
 fi
 
@@ -92,13 +92,13 @@ script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/DeleteReco
 
 if [ ! -f "${script_path}" ]
 then
-        /bin/echo "Error: Script not found at ${script_path}" 
+        /bin/echo "Error: Script not found at ${script_path}" >&2
         exit 1
 fi
 
 if [ ! -x "${script_path}" ]
 then
-        /bin/echo "Error: Script at ${script_path} is not executable." 
+        /bin/echo "Error: Script at ${script_path} is not executable." >&2
         exit 1
 fi
 
@@ -109,7 +109,7 @@ set -e
 
 if [ "${exit_code}" -ne 0 ]
 then
-        /bin/echo "Error: DeleteRecordByIP.sh failed with exit code ${exit_code}"
+        /bin/echo "Error: DeleteRecordByIP.sh failed with exit code ${exit_code}" >&2
         exit "${exit_code}"
 fi
 
