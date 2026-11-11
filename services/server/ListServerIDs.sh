@@ -60,20 +60,9 @@ fi
 
 server_type="$1"
 
-cloudhost_file="${BUILD_HOME}/runtime/ACTIVE_CLOUDHOST"
-if [ ! -f "${cloudhost_file}" ] || [ ! -r "${cloudhost_file}" ]
-then
-    /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}" >&2
-    exit 1
-fi
-
-CLOUDHOST="$(/bin/cat "${cloudhost_file}")"
-
-if [ -z "${CLOUDHOST}" ]
-then
-    /bin/echo "Error: CLOUDHOST variable is empty." >&2
-    exit 1
-fi
+set +e
+CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
+set -e
 
 script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/ListServerIDs.sh"
 
