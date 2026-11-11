@@ -152,7 +152,7 @@ then
         exit 1
 fi
 
-export EMERGENCY_PASSWORD="${emergency_password}"
+#export EMERGENCY_PASSWORD="${emergency_password}"
 
 set +e
 "${script_path}" "${REGION}" "${image}" "${server_size}" "${server_name}" "${user_data}" "${firewall_id}" "${snapshot_id}"
