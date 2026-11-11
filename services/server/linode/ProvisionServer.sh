@@ -87,8 +87,8 @@ then
 fi
 
 set +e
-#REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
-#VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
+REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
+VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
 VPC_NAME="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCNAME')"
 set -e
 
@@ -168,7 +168,7 @@ fi
 # Fetch subnets for the established VPC
 # Temporary disable set -e to evaluate curl transaction pipeline failures manually
 set +e
-response_subnet="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/list_subnets.sh "${vpc_id}")"
+response_subnet="$(${HOME}/services/server/linode/${orchestration_tool}/list_subnets.sh "${vpc_id}")"
 curl_status="$?"
 set -e
 
