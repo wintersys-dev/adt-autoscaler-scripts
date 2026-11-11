@@ -105,13 +105,6 @@ then
         exit 1
 fi
 
-# Set up and isolate runtime host state tracking hierarchy
-runtime_dir="${HOME}/runtime/${CLOUDHOST}/${BUILD_IDENTIFIER}"
-if [ ! -d "${runtime_dir}" ]
-then
-        /bin/mkdir -p "${runtime_dir}"
-fi
-
 password_file="${HOME}/.ssh/EMERGENCY_PASSWORD"
 if [ -f "${password_file}" ]
 then    
