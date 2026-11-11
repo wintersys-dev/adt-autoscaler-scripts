@@ -9,7 +9,7 @@
 # @details     This script parses a target Fully Qualified Domain Name (FQDN) into 
 #              isolated sub-domain and zone apex properties, queries provider catalogs
 #              via the Linode API using bounded token scopes, and extracts the explicit
-#              record tracking ID associated with the matched node.
+#              record tracking ID associated with the matched node and IP address.
 #
 # @param       $1  [Required] The target Fully Qualified Domain Name (e.g., "://domain.com").
 # @param       $2  [Required] The target IPv4 address destination tracking node.
@@ -44,6 +44,7 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+#set -x
 set -e
 
 # Resolve HOME baseline layout securely
@@ -79,11 +80,11 @@ fi
 
 # Fetch active domain zone layouts securely with manual intercept hooks to catch runtime exceptions
 set +e
-cli_domain_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains")"
+api_domain_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains")"
 domain_exit_code="$?"
 set -e
 
-if [ "${domain_exit_code}" -ne 0 ] || [ -z "${cli_domain_json}" ]
+if [ "${domain_exit_code}" -ne 0 ] || [ -z "${api_domain_json}" ]
 then
         /bin/echo "DNS domain ID not successfully obtained due to API query failure" >&2
         unset TOKEN
@@ -91,7 +92,7 @@ then
 fi
 
 # Extract the matching unique domain layout tracking zone ID cleanly
-domain_id="$(/bin/echo "${cli_domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.data[] | select(.domain | contains($dom)) | .id // empty')"
+domain_id="$(/bin/echo "${api_domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.data[] | select(.domain | contains($dom)) | .id // empty')"
 
 if [ -z "${domain_id}" ]
 then
@@ -102,23 +103,23 @@ fi
 
 # Query specific records associated with the matched domain ID
 set +e
-cli_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains/${domain_id}/records")"
+api_records_json="$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/domains/${domain_id}/records")"
 records_exit_code="$?"
 set -e
 
-if [ "${records_exit_code}" -ne 0 ] || [ -z "${cli_records_json}" ]
+if [ "${records_exit_code}" -ne 0 ] || [ -z "${api_records_json}" ]
 then
         /bin/echo "DNS record could not be listed due to API query failure" >&2
         unset TOKEN
         exit 1
 fi
 
-# Isolate target host tracking identifier matching the provided sub-domain structure
-record_id="$(/bin/echo "${cli_records_json}" | /usr/bin/jq --arg sub "${sub_domain}" -r '.data[] | select(.name == $sub) | .id // empty')"
+# Isolate target host tracking identifier matching both the sub-domain and target IP address
+record_id="$(/bin/echo "${api_records_json}" | /usr/bin/jq --arg sub "${sub_domain}" --arg ip "${ip}" -r '.data[] | select(.name == $sub and .target == $ip) | .id // empty')"
 
 if [ -z "${record_id}" ]
 then
-        /bin/echo "DNS record ID could not be identified for sub-domain: ${sub_domain}" >&2
+        /bin/echo "DNS record ID could not be identified for sub-domain: ${sub_domain} with IP: ${ip}" >&2
         unset TOKEN
         exit 1
 fi
