@@ -42,9 +42,9 @@
 #set -x
 set -e
 
-if [ -r /home/omedir.dat ]
+if [ -r /home/homedir.dat ]
 then
-        HOME="$(/bin/cat /home/omedir.dat)"
+        HOME="$(/bin/cat /home/homedir.dat)"
 else
         /bin/echo "Application root configuration file missing at /home/omedir.dat" >&2
         exit 1
