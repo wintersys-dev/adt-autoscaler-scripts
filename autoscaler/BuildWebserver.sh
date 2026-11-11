@@ -84,8 +84,8 @@ exec 1>>${HOME}/logs/build_webserver/${log_file}
 exec 2>>${HOME}/logs/build_webserver/${err_file}
 
 #Make the cloud-init script for building the webserver live and primed
-/bin/echo "Initialising Cloud Init for webserver ${webserver_name}"
-${HOME}/autoscaler/InitialiseCloudInit.sh
+#/bin/echo "Initialising Cloud Init for webserver ${webserver_name}"
+#${HOME}/autoscaler/InitialiseCloudInit.sh
 
 #Actually provision the webserver passing in the name we have set for it as well as what machine type/size it should be
 ${HOME}/services/server/ProvisionServer.sh "${SIZE}" "${webserver_name}"
