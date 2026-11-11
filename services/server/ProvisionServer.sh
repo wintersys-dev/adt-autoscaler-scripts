@@ -86,7 +86,7 @@ else
         exit 1
 fi
 
-/bin/sed -i "s/XXXXWEBSERVER_HOSTNAMEXXXX/${server_name}/g" ${user_data}
+/bin/sed -i "s/XXXXWEBSERVER_HOSTNAMEXXXX/${server_name}/g" ${user_data_path}
 
 SNAPSHOT_ID=""
 if ( [ "${BUILD_FROM_SNAPSHOT}" = "1" ] )
