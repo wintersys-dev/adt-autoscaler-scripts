@@ -96,12 +96,14 @@ then
 
         if [ -z "${output}" ]
         then
+                /bin/echo "not running"
                 /bin/echo "Error: No matching server instance found for server type ${server_type}." >&2
                 exit 1
         else
                 /bin/echo "${output}"
         fi
 else
+        /bin/echo "not running"
         /bin/echo "Network request failed. Check your API token or URL." >&2
         exit 1
 fi
