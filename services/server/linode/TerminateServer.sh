@@ -95,7 +95,7 @@ then
         while true
         do
                 # Fetch target runtime instance environment state tracking flags safely
-                current_status="$(${BUILD_HOME}/services/server/linode/${orchestration_tool}/get_instance_status.sh  "${server_id}")"  
+                current_status="$(${HOME}/services/server/linode/${orchestration_tool}/get_instance_status.sh  "${server_id}")"  
                 if [ "${current_status}" = "offline" ] || [ "${count}" -ge 21 ]
                 then
                         break
