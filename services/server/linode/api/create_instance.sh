@@ -112,7 +112,7 @@ then
         /bin/mkdir -p "${runtime_dir}"
 fi
 
-password_file="${runtime_dir}/EMERGENCY_PASSWORD"
+password_file="${HOME}/.ssh/EMERGENCY_PASSWORD"
 if [ -f "${password_file}" ]
 then    
         if [ ! -r "${password_file}" ]
