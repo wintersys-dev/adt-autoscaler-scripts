@@ -57,8 +57,8 @@ fi
 # Input validation
 if [ -z "${1}" ]
 then
-        /bin/echo "Error: One argument is required."
-        /bin/echo "Usage: $0 <website_url>" 
+        /bin/echo "Error: One argument is required." >&2
+        /bin/echo "Usage: $0 <website_url>" >&2
         exit 1
 fi
 
