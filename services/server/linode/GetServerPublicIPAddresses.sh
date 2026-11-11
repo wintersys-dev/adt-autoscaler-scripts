@@ -14,7 +14,6 @@
 # @param       $1  [Required] The server type/name substring to match within instance labels.
 #
 # @env         HOME                Path to the framework root directory (read from file).
-# @env         TOKEN               Linode API bearer authorization token.
 # @env         REGION              The region that the servers are running in.
 #
 # @dependencies
@@ -66,7 +65,7 @@ fi
 server_type="${1}"
 
 set +e
-TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+#TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
 set -e
 
