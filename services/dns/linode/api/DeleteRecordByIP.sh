@@ -56,8 +56,8 @@ fi
 # Input validation
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Two arguments are required."
-        /bin/echo "Usage: $0 <website_url> <ip>" 
+        /bin/echo "Error: Two arguments are required." >&2
+        /bin/echo "Usage: $0 <website_url> <ip>"  >&2
         exit 1
 fi
 
