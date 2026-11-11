@@ -19,7 +19,6 @@
 #              - /home/buildhome.dat configuration file tracking the active application root path.
 #
 # @security    
-#              - Suppresses downstream standard error channels (`2>/dev/null`) to block credential exposure.
 #              - Relies on system-owned executable paths (/bin, /usr/bin) to circumvent malicious search path injection.
 #
 # @exit        0  Success: The instance status query ran successfully (Note: downstream script returns status binary or code).
