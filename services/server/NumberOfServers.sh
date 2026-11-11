@@ -53,8 +53,8 @@ fi
 # 1. Check for the required argument safely
 if [ -z "$1" ]
 then
-    /bin/echo "Error: Server type argument is required." 
-    /bin/echo "Usage: $0 <server_type>" 
+    /bin/echo "Error: Server type argument is required." >&2
+    /bin/echo "Usage: $0 <server_type>" >&2
     exit 1
 fi
 
@@ -63,7 +63,7 @@ server_type="$1"
 cloudhost_file="${BUILD_HOME}/runtime/ACTIVE_CLOUDHOST"
 if [ ! -f "${cloudhost_file}" ] || [ ! -r "${cloudhost_file}" ]
 then
-    /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}" 
+    /bin/echo "Error: Cannot read active cloud host file at ${cloudhost_file}" >&2
     exit 1
 fi
 
@@ -71,7 +71,7 @@ CLOUDHOST="$(/bin/cat "${cloudhost_file}")"
 
 if [ -z "${CLOUDHOST}" ]
 then
-    /bin/echo "Error: CLOUDHOST variable is empty." 
+    /bin/echo "Error: CLOUDHOST variable is empty." >&2
     exit 1
 fi
 
@@ -79,13 +79,13 @@ script_path="${BUILD_HOME}/services/server/${CLOUDHOST}/NumberOfServers.sh"
 
 if [ ! -f "${script_path}" ]
 then
-    /bin/echo "Error: Script not found at ${script_path}" 
+    /bin/echo "Error: Script not found at ${script_path}" >&2
     exit 1
 fi
 
 if [ ! -x "${script_path}" ]
 then
-    /bin/echo "Error: Script at ${script_path} is not executable." 
+    /bin/echo "Error: Script at ${script_path} is not executable." >&2
     exit 1
 fi
 
@@ -96,7 +96,7 @@ set -e
 
 if [ ${exit_code} -ne 0 ]
 then
-    /bin/echo "Error: NumberOfServers.sh failed with exit code $exit_code"
+    /bin/echo "Error: NumberOfServers.sh failed with exit code $exit_code" >&2
     exit $exit_code
 fi
 
