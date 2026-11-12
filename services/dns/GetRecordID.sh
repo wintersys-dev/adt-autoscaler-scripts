@@ -88,7 +88,7 @@ then
         orchestration_tool="api"
 fi
 
-script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/GetRecordID.sh"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_record_id.sh"
 
 if [ ! -f "${script_path}" ]
 then
