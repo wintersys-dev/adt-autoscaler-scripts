@@ -11,15 +11,6 @@ else
         exit 1
 fi
 
-if [ -z "${1}" ]
-then
-        /bin/echo "Error: Database label argument is required." >&2
-        /bin/echo "Usage: $0  <label>" >&2
-        exit 1
-fi
-
-label="${1}"
-
 set +e
 TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 set -e
