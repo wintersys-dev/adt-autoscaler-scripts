@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 #set -x
@@ -12,9 +11,9 @@ else
         exit 1
 fi
 
-if [ -z "${1}" ]  
+if [ -z "${1}" ]
 then
-        /bin/echo "Error: label is required." >&2
+        /bin/echo "Error: Database label argument is required." >&2
         /bin/echo "Usage: $0  <label>" >&2
         exit 1
 fi
@@ -25,27 +24,27 @@ set +e
 TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
 set -e
 
-if  [ -z "${TOKEN}" ]
+if [ -z "${TOKEN}" ]
 then
-        /bin/echo "Error: Failed to fetch required context variables (TOKEN)."  >&2
+        /bin/echo "Error: Failed to fetch required context variables (TOKEN)." >&2
         exit 1
 fi
 
 export LINODE_CLI_TOKEN="${TOKEN}"
 
 set +e
-/usr/local/bin/linode-cli databases mysql-list --no-defaults --json | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id'
+/usr/local/bin/linode-cli databases mysql-list --no-defaults --json
 exit_code="$?"
 set -e
 
 unset LINODE_CLI_TOKEN
 
-if [ "${exit_code}" -ne 0 ]
+if [ "${exit_code}" -ne 0 ] || [ -z "${raw_mysql_list}" ]
 then
         /bin/echo "Error: linode-cli databases mysql-list failed with exit code ${exit_code}." >&2
-        exit "${exit_code}"
+        exit 1
 fi
 
-/bin/echo "Success: Linode Database MySQL List ${database_id} obtained correctly."
 exit 0
+
 
