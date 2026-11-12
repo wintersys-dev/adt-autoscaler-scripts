@@ -29,6 +29,16 @@ MULTI_REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'MULTIREGION'`"
 PRIMARY_REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'PRIMARYREGION'`"
 WEBSITE_URL="`${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL'`"
 VPC_IP_RANGE="`${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE'`"
+DATABASE_DBAAS_INSTALLATION_TYPE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASE_DBAAS_INSTALLATION_TYPE'`"
+
+
+database_engine="mysql"
+if ( [ "`/bin/echo ${DATABASE_DBAAS_INSTALLATION_TYPE} | /bin/grep 'Postgres'`" != "" ] )
+then
+        database_engine="postgres"
+fi
+
+
 
 multi_region_ips=""
 
@@ -99,14 +109,8 @@ done
 
 allow_list="${allow_list} --allow_list ${VPC_IP_RANGE}"
 
-if ( [ "`/bin/echo ${dbaas} | /bin/grep 'mysql'`" != "" ] )
-then
-  /usr/local/bin/linode-cli databases mysql-update ${database_id} ${allow_list} --no-defaults
-fi
 
-if ( [ "`/bin/echo ${dbaas} | /bin/grep 'postgresql'`" != "" ] )
-then        
-  /usr/local/bin/linode-cli databases postgresql-update ${database_id} ${allow_list} --no-defaults 
-fi
+${HOME}/services/dbaas/${CLOUDHOST}/cli/${database_engine}/AdjustDBaaSFirewall.sh
+
 
 /bin/echo "${ipaddresses}" > ${HOME}/runtime/dbaas_allowed_ips/ip_list.dat
