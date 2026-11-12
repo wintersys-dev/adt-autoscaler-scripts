@@ -98,7 +98,7 @@ fi
 
 set +e
 # Safely route authorized PUT actions via curl stdin config (-K -) to prevent token exposure in process trees
-RESPONSE=$(/usr/bin/printf 'header = "Authorization: Bearer %s"\n' "${TOKEN}" | /usr/bin/curl -K - -s -X PUT -H "Content-Type: application/json" -d "${JSON_PAYLOAD}" "api.linode.com/v4/databases/mysql/instances/${database_id}" -w "\nHTTP_STATUS:%{http_code}")
+RESPONSE=$(/usr/bin/printf 'header = "Authorization: Bearer %s"\n' "${TOKEN}" | /usr/bin/curl -K - -s -X PUT -H "Content-Type: application/json" -d "${JSON_PAYLOAD}" "https://api.linode.com/v4/databases/mysql/instances/${database_id}" -w "\nHTTP_STATUS:%{http_code}")
 set -e
 
 unset TOKEN
