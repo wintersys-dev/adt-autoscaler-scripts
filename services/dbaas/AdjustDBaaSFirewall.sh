@@ -157,6 +157,9 @@ database_id=""
 
 if [ "${database_engine}" = "mysql" ]
 then
+        database_id="$(/bin/echo "${raw_mysql_list}" | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id' | /usr/bin/head -n 1)"
+
+
   database_id="$(/usr/local/bin/linode-cli databases mysql-list --no-defaults --json | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id')"
 elif [ "${database_engine}" = "postgres" ]
 then
