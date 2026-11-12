@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        AddRecord.sh
+# @file        add_record.sh
 # @brief       Routes DNS record creation requests using the standalone environment layout.
 # @author      Peter Winter
 # @date        10/11/2026
