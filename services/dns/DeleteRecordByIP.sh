@@ -88,7 +88,7 @@ then
         orchestration_tool="api"
 fi
 
-script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/DeleteRecordByIP.sh"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/delete_record_by_ip.sh"
 
 if [ ! -f "${script_path}" ]
 then
