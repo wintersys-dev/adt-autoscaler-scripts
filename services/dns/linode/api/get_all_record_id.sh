@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        GetRecordID.sh
+# @file        get_all_record_id.sh
 # @brief       Retrieves a unique DNS record ID matching a given sub-domain and IP.
 # @author      Peter Winter
 # @date        10/11/2026
