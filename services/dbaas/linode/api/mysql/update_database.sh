@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        AdjustDBaaSFirewall.sh
+# @file        update_database.sh
 # @brief       Updates the allow list configuration for a managed Linode MySQL database via REST API.
 # @author      Peter Winter
 # @date        12/11/2026
