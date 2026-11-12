@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        GetIPAddresses.sh
+# @file        get_ip_addresses.sh
 # @brief       Retrieves active target IP addresses associated with a given DNS sub-domain.
 # @author      Peter Winter
 # @date        10/11/2026
