@@ -194,7 +194,7 @@ done
 
 allow_list="${allow_list} --allow_list ${VPC_IP_RANGE}"
 
-adjust_script="${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/AdjustDBaaSFirewall.sh"
+adjust_script="${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/update_database_firewall.sh"
 
 if [ ! -x "${adjust_script}" ]
 then
