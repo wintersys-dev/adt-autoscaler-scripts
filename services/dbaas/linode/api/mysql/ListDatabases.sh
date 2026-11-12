@@ -90,11 +90,11 @@ case "${HTTP_CODE}" in
         exit 401
         ;;
     403)
-        /bin/echo "Error 403: Forbidden. Token lacks permissions to list managed PostgreSQL databases." >&2
+        /bin/echo "Error 403: Forbidden. Token lacks permissions to list managed MySQL databases." >&2
         exit 403
         ;;
     404)
-        /bin/echo "Error 404: Not Found. Managed PostgreSQL database endpoint unavailable." >&2
+        /bin/echo "Error 404: Not Found. Managed MySQL database endpoint unavailable." >&2
         exit 404
         ;;
     429)
