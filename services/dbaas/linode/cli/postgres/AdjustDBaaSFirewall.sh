@@ -12,7 +12,7 @@ else
 fi
 
 
-if [ -z "${1}" ] || [ -z "${1}" ] 
+if [ -z "${1}" ] || [ -z "${2}" ] 
 then
         /bin/echo "Error: database_id and allow_list are required" >&2
         /bin/echo "Usage: $0 <database_id> <allow_list>" >&2
