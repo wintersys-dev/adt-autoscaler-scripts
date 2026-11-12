@@ -63,9 +63,29 @@ fi
 database_id="${1}"
 allow_list="${2}"
 
+set -- "${database_id}"
+
+OLD_IFS="${IFS}"
+IFS=' '
+for ip in ${allow_list} 
+do
+        [ -z "${ip}" ] && continue
+
+        case "${ip}" in
+                */*) cidr="${ip}" ;;
+                *)   cidr="${ip}/32" ;;
+        esac
+
+        set -- "$@" --allow_list "${cidr}"
+done
+IFS="${OLD_IFS}"
+
 set +e
 TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
 set -e
+
+set -- "$@" --allow_list "${VPC_IP_RANGE}"
 
 if  [ -z "${TOKEN}" ]
 then
@@ -75,12 +95,13 @@ fi
 
 export LINODE_CLI_TOKEN="${TOKEN}"
 
+set -- "$@" --allow_list "${VPC_IP_RANGE}"
+
 set +e
-/usr/local/bin/linode-cli --no-defaults databases postgresql-update "${database_id}" "${allow_list}"
+/usr/local/bin/linode-cli --no-defaults databases postgresql-update "$@"
 exit_code="$?"
 set -e
 
-# Unset token instantly to maintain high security-isolation states
 unset LINODE_CLI_TOKEN
 
 if [ "${exit_code}" -ne 0 ]
