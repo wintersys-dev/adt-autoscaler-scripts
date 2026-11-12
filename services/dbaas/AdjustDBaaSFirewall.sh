@@ -106,7 +106,7 @@ fi
 if [ "${MULTI_REGION}" = "1" ] && [ "${PRIMARY_REGION}" != "1" ]
 then
         multi_region_bucket="$(/bin/echo "${WEBSITE_URL}" | /bin/sed 's/\./-/g')-multi-region"
-        
+
         set +e
         multi_region_ips="$(${HOME}/services/datastore/operations/ListFromDatastore.sh "multi-region" "dbaas_ips/*" | /usr/bin/awk -F'/' '{print $NF}')"
         set -e
@@ -156,7 +156,6 @@ set +e
 database_id="$(${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/list_database.sh | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id' | /usr/bin/head -n 1)"
 set -e
 
-# Unset token instantly to maintain high security-isolation states
 unset LINODE_CLI_TOKEN
 
 if [ -z "${database_id}" ]
@@ -170,29 +169,15 @@ webserver_ips="$(${HOME}/services/server/GetServerPublicIPAddresses.sh "ws-${REG
 database_ips="$(${HOME}/services/server/GetServerPublicIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}")"
 set -e
 
-ipaddresses="${webserver_ips} ${database_ips}"
+ip_addresses="${webserver_ips} ${database_ips}"
 
 if [ -n "${multi_region_ips}" ]
 then
         for ip in ${multi_region_ips}
         do
-                ipaddresses="${ipaddresses} ${ip}"
+                ip_addresses="${ip_addresses} ${ip}"
         done
 fi
-
-ipaddresses="$(/bin/echo "${ipaddresses}" | /usr/bin/tr ' ' '\n' | /bin/grep -v '^$' | /usr/bin/sort -u)"
-
-allow_list=""
-for ipaddress in ${ipaddresses}
-do
-        if [ -n "${ip_to_delete}" ] && [ "${ipaddress}" = "${ip_to_delete}" ]
-        then
-                continue
-        fi
-        allow_list="${allow_list} --allow_list ${ipaddress}/32"
-done
-
-allow_list="${allow_list} --allow_list ${VPC_IP_RANGE}"
 
 adjust_script="${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/update_database_firewall.sh"
 
@@ -203,7 +188,7 @@ then
 fi
 
 set +e
-"${adjust_script}" "${database_id}" "${allow_list}"
+"${adjust_script}" "${database_id}" "${ip_addresses}"
 exit_code="$?"
 set -e
 
