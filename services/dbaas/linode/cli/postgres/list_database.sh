@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        ListDatabases.sh
+# @file        list_database.sh
 # @brief       Lists all managed Linode PostgreSQL database instances in JSON format.
 # @author      Peter Winter
 # @date        12/11/2026
