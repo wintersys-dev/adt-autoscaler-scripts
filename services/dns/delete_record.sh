@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        DeleteRecord.sh
+# @file        delete_record.sh
 # @brief       Routes DNS record deletion requests to specialized backend scripts.
 # @author      Peter Winter
 # @date        10/11/2026
