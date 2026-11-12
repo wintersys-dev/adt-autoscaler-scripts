@@ -62,7 +62,7 @@ fi
 
 set +e
 # Safely route authorized GET actions via standard stream piping to prevent exposure in process trees
-RESPONSE=$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://linode.com" -w "\nHTTP_STATUS:%{http_code}")
+RESPONSE=$(/bin/echo "Authorization: Bearer ${TOKEN}" | /usr/bin/curl -H @- -s "https://api.linode.com/v4/databases/mysql/instances" -w "\nHTTP_STATUS:%{http_code}")
 set -e
 
 unset TOKEN
