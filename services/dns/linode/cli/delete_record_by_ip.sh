@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        DeleteRecordByIP.sh
+# @file        delete_record_by_ip.sh
 # @brief       Deletes a specific DNS A record matching a given domain and IP address using Linode CLI.
 # @author      Peter Winter
 # @date        10/11/2026
