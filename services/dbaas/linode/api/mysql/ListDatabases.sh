@@ -1,14 +1,14 @@
 #!/bin/sh
 ###################################################################################
 # @file        ListDatabases.sh
-# @brief       Lists all managed Linode PostgreSQL database instances via REST API.
+# @brief       Lists all managed Linode MySQL database instances via REST API.
 # @author      Peter Winter
 # @date        12/11/2026
 # @version     1.0
 #
 # @details     This script extracts infrastructure authentication tokens via secure standard
 #              input piping and executes an authenticated curl GET request under a strict
-#              status monitoring block to retrieve the full inventory of managed PostgreSQL
+#              status monitoring block to retrieve the full inventory of managed MySQL
 #              databases in JSON format.
 #
 # @env         HOME          Path to the toolkit core framework layout directory.
@@ -23,7 +23,7 @@
 #              - Routes Bearer tokens via standard stream piping (-H @-) to prevent exposure in ps.
 #              - Quotes variable interpolations thoroughly to trap space-injection hazards.
 #
-# @exit        0  Success: Managed PostgreSQL database inventory retrieved cleanly.
+# @exit        0  Success: Managed MySQL database inventory retrieved cleanly.
 # @exit        *  Failure: Layout faults, missing authentication token, or a non-2xx status 
 #                 code thrown back by the remote endpoint.
 ##################################################################################
@@ -76,7 +76,7 @@ RESPONSE_BODY=$(/bin/echo "$RESPONSE" | /usr/bin/sed '/HTTP_STATUS:/d')
 # Evaluate the API response code using strict POSIX structural matching
 case "${HTTP_CODE}" in
     200)
-        # Streams the verified PostgreSQL database JSON inventory back to stdout
+        # Streams the verified MySQL database JSON inventory back to stdout
         /bin/echo "${RESPONSE_BODY}"
         exit 0
         ;;
