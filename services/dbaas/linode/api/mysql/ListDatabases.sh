@@ -77,7 +77,7 @@ RESPONSE_BODY=$(/bin/echo "$RESPONSE" | /usr/bin/sed '/HTTP_STATUS:/d')
 case "${HTTP_CODE}" in
     200)
         # Streams the verified MySQL database JSON inventory back to stdout
-        /bin/echo "${RESPONSE_BODY}"
+        /bin/echo "${RESPONSE_BODY}"  | /usr/bin/jq '.data'
         exit 0
         ;;
     400)
