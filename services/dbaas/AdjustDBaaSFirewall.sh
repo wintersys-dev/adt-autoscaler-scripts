@@ -153,7 +153,7 @@ fi
 export LINODE_CLI_TOKEN="${TOKEN}"
 
 set +e
-database_id="$(${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/ListDatabases.sh | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id' | /usr/bin/head -n 1)"
+database_id="$(${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/list_database.sh | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id' | /usr/bin/head -n 1)"
 set -e
 
 # Unset token instantly to maintain high security-isolation states
