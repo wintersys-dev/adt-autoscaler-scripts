@@ -86,7 +86,7 @@ then
         orchestration_tool="api"
 fi
 
-script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/GetIPAddresses.sh"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_ip_addresses.sh"
 
 if [ ! -f "${script_path}" ]
 then
