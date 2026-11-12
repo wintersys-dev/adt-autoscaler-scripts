@@ -38,7 +38,7 @@ then
         database_engine="postgres"
 fi
 
-
+orchestration_tool="`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`"
 
 multi_region_ips=""
 
@@ -110,7 +110,7 @@ done
 allow_list="${allow_list} --allow_list ${VPC_IP_RANGE}"
 
 
-${HOME}/services/dbaas/${CLOUDHOST}/cli/${database_engine}/AdjustDBaaSFirewall.sh
+${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/AdjustDBaaSFirewall.sh
 
 
 /bin/echo "${ipaddresses}" > ${HOME}/runtime/dbaas_allowed_ips/ip_list.dat
