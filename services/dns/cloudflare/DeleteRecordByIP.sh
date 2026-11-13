@@ -10,13 +10,13 @@ fi
 
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Record ID and website_url parameters are required." >&2
-        /bin/echo "Usage: $0 <record_id> <website_url>" >&2
+        /bin/echo "Error: website_url and ip parameters are required." >&2
+        /bin/echo "Usage: $0 <website_url> <ip>" >&2
         exit 1
 fi
 
-record_id="${1}"
-website_url="${2}"
+website_url="${1}"
+ip="${2}"
 
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
@@ -43,13 +43,13 @@ then
 fi
 
 set +e
-${HOME}/services/dns/linode/${orchestration_tool}/delete_record_by_ip.sh "${record_id}" "${website_url}" 
+${HOME}/services/dns/linode/${orchestration_tool}/delete_record_by_ip.sh "${website_url}" "${ip}"
 exit_code="$?"
 set -e
 
 if [ "${exit_code}" -ne 0 ] 
 then
-        /bin/echo "Failed to delete record ${record_id} domain ${website_url}" >&2
+        /bin/echo "Failed to delete record ${record_id} domain ${website_url} for ip address ${ip}" >&2
         exit 1
 fi
 
