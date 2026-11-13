@@ -34,7 +34,7 @@ DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKE
 zone_name="`/bin/echo ${website_url} | /usr/bin/cut -d'.' -f2-`"
 zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
 
-if ( [ "$?" ! = "0" ] )
+if ( [ "$?" != "0" ] )
 then
         /bin/echo "Failed to get zone_id from DNS system"
         exit 1
@@ -48,7 +48,7 @@ else
         /bin/echo "X-Auth-Key: ${DNS_SECURITY_KEY}" | curl -H @- -s -X GET "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?type=A&name=${website_url}&content=${ip}" -H "X-Auth-Email: ${DNS_USERNAME}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'
 fi
 
-if ( [ "$?" ! = "0" ] )
+if ( [ "$?" != "0" ] )
 then
         /bin/echo "Failed to get record id from DNS system"
         exit 1
