@@ -65,12 +65,12 @@ domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 target_ip="${2}"
 
 set +e
-DNS_CHOICE="$("${HOME}/helpers/services/GetVariableValue.sh" DNS_CHOICE)"
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
 if [ -z "${DNS_CHOICE}" ]
 then
-        /bin/echo "Error: Failed to fetch required context variable (DNS_CHOICE)."
+        /bin/echo "Error: Failed to fetch required context variable (DNS_CHOICE)." >&2
         exit 1
 fi
 
