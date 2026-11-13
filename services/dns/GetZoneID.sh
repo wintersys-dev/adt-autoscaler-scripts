@@ -63,7 +63,7 @@ set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
-script_path="${HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh ${zone_name}"
 
 if [ ! -f "${script_path}" ]
 then
