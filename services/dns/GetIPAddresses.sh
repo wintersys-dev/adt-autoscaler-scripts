@@ -61,7 +61,9 @@ fi
 
 website_url="${1}"
 
+set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
+set -e
 
 script_path="${HOME}/services/dns/${DNS_CHOICE}/GetIPAddresses.sh"
 
