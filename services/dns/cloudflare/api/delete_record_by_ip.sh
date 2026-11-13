@@ -32,7 +32,7 @@ DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKE
 zone_name="`/bin/echo ${website_url} | /usr/bin/cut -d'.' -f2-`"
 zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
 
-if ( [ "$?" ! = "0" ] )
+if ( [ "$?" != "0" ] )
 then
         /bin/echo "Failed to get zone_id from DNS system"
         exit 1
