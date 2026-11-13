@@ -73,11 +73,13 @@ done <<EOF
 $(/bin/echo "${json_payload}" | /usr/bin/jq -r 'to_entries[] | select(.value != null and .value != "") | "--\(.key)", (.value | tostring)')
 EOF
 
-TOKEN="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" TOKEN)"
+set +e
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+set -e
 
 if [ -z "${TOKEN}" ]
 then
-        /bin/echo  "Error: Failed to fetch required context variables (TOKEN)." >&2
+        /bin/echo "Error: Failed to fetch required context variables (TOKEN)." >&2
         exit 1
 fi
 
