@@ -72,7 +72,7 @@ set -e
 software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
-        status "Error: Cannot read software configuration file at ${software_file}"
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
         exit 1
 fi
 
