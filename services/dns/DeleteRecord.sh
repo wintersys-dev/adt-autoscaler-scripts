@@ -18,7 +18,6 @@
 #
 # @dependencies
 #              - /home/homedir.dat configuration file tracking active framework layout.
-#              - ${HOME}/runtime/software.dat static asset properties.
 #              - external dependencies: cat, awk, test
 #
 # @security    
@@ -72,19 +71,6 @@ if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
         /bin/echo  "Error: Cannot read software configuration file at ${software_file}"  >&2
         exit 1
-fi
-
-orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
-
-if [ -z "${orchestration_tool}" ]
-then
-        /bin/echo  "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
-        exit 1
-fi
-
-if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ]
-then
-        orchestration_tool="api"
 fi
 
 script_path="${HOME}/services/dns/${DNS_CHOICE}/DeleteRecord.sh"
