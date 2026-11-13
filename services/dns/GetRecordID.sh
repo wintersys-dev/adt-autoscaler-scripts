@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        GetRecordIDLegacyRouter.sh
+# @file        GetRecordID.sh
 # @brief       Routes DNS record ID retrieval requests using the standalone environment layout.
 # @author      Peter Winter
 # @date        10/11/2026
@@ -18,13 +18,10 @@
 # @dependencies
 #              - /home/homedir.dat configuration file tracking active base home path.
 #              - ExtractConfigValue.sh configuration variable extraction utility.
-#              - ${HOME}/runtime/software.dat tracking runtime environment configurations.
 #              - external dependencies: cat, echo, awk, tee, test
 #
 # @security    
 #              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Replaces legacy, fragile backtick subshells with secure shell evaluations.
-#              - Eliminates redundant subshell grouping fork performance bottlenecks.
 #              - Protects layout evaluation chains from unexpected multi-parameter expansions.
 #
 # @exit        0  Success: Underlying script executed cleanly and returned code 0.
@@ -66,28 +63,7 @@ ip="${2}"
 
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 
-
-software_file="${HOME}/runtime/software.dat"
-if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
-then
-        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
-        exit 1
-fi
-
-orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
-
-if [ -z "${orchestration_tool}" ]
-then
-        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
-        exit 1
-fi
-
-if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ]
-then
-        orchestration_tool="api"
-fi
-
-script_path="${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_record_id.sh"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/GetRecordID.sh"
 
 if [ ! -f "${script_path}" ]
 then
