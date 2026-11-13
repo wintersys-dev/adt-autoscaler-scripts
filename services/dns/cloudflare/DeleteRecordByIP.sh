@@ -43,7 +43,7 @@ then
 fi
 
 set +e
-${HOME}/services/dns/linode/${orchestration_tool}/delete_record.sh "${record_id}" "${website_url}" 
+${HOME}/services/dns/linode/${orchestration_tool}/delete_record_by_ip.sh "${record_id}" "${website_url}" 
 exit_code="$?"
 set -e
 
