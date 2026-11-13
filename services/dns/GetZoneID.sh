@@ -59,7 +59,9 @@ fi
 
 zone_name="${1}"
 
-DNS_CHOICE="$(${HOME}/helpers/services/GetVariableValue.sh DNS_CHOICE)"
+set +e
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
+set -e
 
 script_path="${HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh"
 
