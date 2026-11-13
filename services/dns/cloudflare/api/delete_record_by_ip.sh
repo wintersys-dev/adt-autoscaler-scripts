@@ -25,7 +25,7 @@ set -e
 website_url="${1}"
 ip="${2}"
 
-HOME="`/bin/cat /home/honedir.dat`"
+HOME="`/bin/cat /home/homedir.dat`"
 DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
 DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
