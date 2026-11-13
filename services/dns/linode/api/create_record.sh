@@ -73,7 +73,9 @@ else
         endpoint="${api_host}/${api_path}/${domain_id}/records"
 fi
 
-TOKEN="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" TOKEN)"
+set +e
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+set -e
 
 if [ -z "${TOKEN}" ]
 then
