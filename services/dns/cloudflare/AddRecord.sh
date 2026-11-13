@@ -25,7 +25,7 @@ set -e
 software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
-        status "Error: Cannot read software configuration file at ${software_file}"
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}"
         exit 1
 fi
 
@@ -43,15 +43,15 @@ then
 fi
 
 set +e
-domain_json="$(${HOME}/services/dns/linode/${orchestration_tool}/get_domains.sh)"
+${HOME}/services/dns/linode/${orchestration_tool}/add_record.sh "${website_url}" "${ip}"
 exit_code="$?"
 set -e
 
-if [ "${exit_code}" -ne 0 ] || [ -z "${domain_json}" ]
+if [ "${exit_code}" -ne 0 ] 
 then
-        /bin/echo "Failed to query cluster domain management catalog or network timeout occurred." >&2
+        /bin/echo "Failed to add record to domain ${website_url}" >&2
         exit 1
 fi
 
-/bin/echo "DNS record successfully added: ${sub_domain}.${domain_url} -> ${ip} [TTL: 60s]"
+/bin/echo "DNS record successfully added: ${website_url} -> ${ip} [TTL: 60s]"
 exit 0
