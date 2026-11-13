@@ -1,17 +1,55 @@
+set -e
+
+if [ -r /home/homedir.dat ]
+then
+        HOME="$(/bin/cat /home/homedir.dat)"
+else
+        /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
+        exit 1
+fi
+
+if [ -z "${1}" ] || [ -z "${2}" ]
+then
+        /bin/echo "Error: Zone Name is required" >&2
+        /bin/echo "Usage: $0 <zone_name>" >&2
+        exit 1
+fi
+
 zone_name="${1}"
 
-HOME="`/bin/cat /home/homedir.dat`"
+set +e
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
+set -e
 
-DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
-DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
-
-
-if ( [ "`/bin/echo ${DNS_SECURITY_KEY} | /bin/grep ':::'`" != "" ] )
+software_file="${HOME}/runtime/software.dat"
+if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
-        api_token="`/bin/echo ${DNS_SECURITY_KEY} | /usr/bin/awk -F':::' '{print $2}'`"
-        curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${zone_name}"  -H "Authorization: Bearer ${api_token}" -H "Content-Type: application/json" | /usr/bin/jq -r '.result[].id'
-else
-        auth_key="${DNS_SECURITY_KEY}"
-        curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${zone_name}" -H "X-Auth-Email: ${DNS_USERNAME}"  -H "X-Auth-Key: ${auth_key}"  -H "Content-Type: application/json" | /usr/bin/jq -r '.result[]? | .id'
-
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}"
+        exit 1
 fi
+
+orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
+
+if [ -z "${orchestration_tool}" ] 
+then
+        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
+        exit 1
+fi
+
+if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ] 
+then
+        orchestration_tool="api"
+fi
+
+set +e
+${HOME}/services/dns/linode/${orchestration_tool}/get_zone_id.sh "${zone_name}"
+exit_code="$?"
+set -e
+
+if [ "${exit_code}" -ne 0 ] 
+then
+        /bin/echo "Failed to get zone id is for zone name ${zone_name}" >&2
+        exit 1
+fi
+
+exit 0
