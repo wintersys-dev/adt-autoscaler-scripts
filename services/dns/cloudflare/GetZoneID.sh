@@ -42,7 +42,7 @@ then
 fi
 
 set +e
-${HOME}/services/dns/linode/${orchestration_tool}/get_zone_id.sh "${zone_name}"
+${HOME}/services/dns/cloudflare/${orchestration_tool}/get_zone_id.sh "${zone_name}"
 exit_code="$?"
 set -e
 
