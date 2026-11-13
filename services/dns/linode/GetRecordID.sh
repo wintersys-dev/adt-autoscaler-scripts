@@ -113,9 +113,7 @@ then
         exit 1
 fi
 
-set +e
-domain_id="$("${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_domain_id.sh" "${domain_json}" "${domain_url}")"
-set -e
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
@@ -124,7 +122,7 @@ then
 fi
 
 set +e
-records_json="$("${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_record_ids.sh" "${domain_id}")"
+records_json="$("${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_record_ids.sh" "${domain_id}")"
 records_exit_code="$?"
 set -e
 
