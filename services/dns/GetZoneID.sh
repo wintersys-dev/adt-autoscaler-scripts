@@ -59,29 +59,31 @@ fi
 
 zone_name="${1}"
 
-DNS_CHOICE="$(${BUILD_HOME}/helpers/services/GetVariableValue.sh DNS_CHOICE)"
+DNS_CHOICE="$(${HOME}/helpers/services/GetVariableValue.sh DNS_CHOICE)"
 
-script_path="${BUILD_HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh"
 
-if [ -f "${script_path}" ]
+if [ ! -f "${script_path}" ]
 then
-        if [ ! -x "${script_path}" ]
-        then
-                /bin/echo "Error: Script at ${script_path} is not executable." >&2
-                exit 1
-        fi
+        /bin/echo "Error: Script not found at ${script_path}" >&2
+        exit 1
+fi
 
+if [ ! -x "${script_path}" ]
+then
+        /bin/echo "Error: Script at ${script_path} is not executable." >&2
+        exit 1
+fi
 
-        set +e
-        "${script_path}" "${zone_name}"
-        exit_code="$?"
-        set -e
+set +e
+"${script_path}" "${website_url}" "${ip}"
+exit_code="$?"
+set -e
 
-        if [ "${exit_code}" -ne 0 ] 
-        then
-                /bin/echo "Error: GetZoneID.sh failed with exit code ${exit_code}" >&2
-                exit "${exit_code}"
-        fi
+if [ "${exit_code}" -ne 0 ]
+then
+        /bin/echo "Error: GetZoneID.sh failed with exit code ${exit_code}" >&2
+        exit "${exit_code}"
 fi
 
 exit 0
