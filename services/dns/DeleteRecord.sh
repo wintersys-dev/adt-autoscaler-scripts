@@ -13,7 +13,6 @@
 #
 # @param       $1  [Required] The unique platform identifier of the target DNS record.
 # @param       $2  [Required] The target website Fully Qualified Domain Name or URL string.
-# @param       $3  [Required] Authority flag validation parameter ("yes" / "no").
 #
 # @env         HOME          Path to the toolkit core framework layout directory.
 #
