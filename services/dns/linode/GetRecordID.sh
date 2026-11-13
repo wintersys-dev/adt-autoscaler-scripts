@@ -55,8 +55,8 @@ fi
 
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        status "Error: Fully Qualified Domain Name and target IP parameters are required." >&2
-        status "Usage: $0 <fqdn> <target_ip>" >&2
+        /bin/echo "Error: Fully Qualified Domain Name and target IP parameters are required." >&2
+        /bin/echo "Usage: $0 <fqdn> <target_ip>" >&2
         exit 1
 fi
 
