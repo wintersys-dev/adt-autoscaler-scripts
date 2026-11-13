@@ -1,6 +1,6 @@
 #!/bin/sh
 ###################################################################################
-# @file        DeleteRecord.sh
+# @file        DeleteRecordByIP.sh
 # @brief       Deletes DNS record(s) matching a target FQDN and IP address.
 # @author      Peter Winter
 # @date        13/11/2026
@@ -71,9 +71,9 @@ DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
 
-if [ -z "${TOKEN}" ] || [ -z "${DNS_CHOICE}" ]
+if [ -z "${DNS_CHOICE}" ]
 then
-        /bin/echo "Error: Failed to fetch required context variables (TOKEN or DNS_CHOICE)." >&2
+        /bin/echo "Error: Failed to fetch required context variables (DNS_CHOICE)." >&2
         exit 1
 fi
 
@@ -92,14 +92,13 @@ then
         exit 1
 fi
 
-if [ ! -d "${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ]
+if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ]
 then
         orchestration_tool="api"
 fi
 
-# 1. Fetch domains list and resolve domain_id
 set +e
-domain_json="$("${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_domains.sh")"
+domain_json="$("${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_domains.sh")"
 exit_code="$?"
 set -e
 
@@ -117,19 +116,16 @@ then
         exit 1
 fi
 
-set +e
-domain_id="$("${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_domain_id.sh" "${domain_json}" "${domain_url}")"
-set -e
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
-        /bin/echo "Domain ID not found matching zone pattern: ${domain_url}" >&2
+        /bin/echo "Domain ID not found matching zone track string pattern: ${domain_url}" >&2
         exit 1
 fi
 
-# 2. Fetch all DNS records for the target domain
 set +e
-records_json="$("${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_record_ids.sh" "${domain_id}")"
+records_json="$("${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/get_record_ids.sh" "${domain_id}")"
 records_exit_code="$?"
 set -e
 
@@ -147,7 +143,6 @@ then
         exit 1
 fi
 
-# 3. Filter matching record IDs by both subdomain name and target IP (supports both API .data[] and CLI .[] shapes)
 matching_record_ids="$(/bin/echo "${records_json}" | /usr/bin/jq -r --arg sub "${sub_domain}" --arg ip "${target_ip}" '(if type == "object" and has("data") then .data else . end)[] | select(.name == $sub and .target == $ip) | .id // empty')"
 
 if [ -z "${matching_record_ids}" ]
@@ -156,11 +151,10 @@ then
         exit 0
 fi
 
-# 4. Delete each matching record ID cleanly
 for record_id in ${matching_record_ids}
 do
         set +e
-        "${BUILD_HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/delete_record.sh" "${domain_id}" "${record_id}"
+        "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/delete_record.sh" "${domain_id}" "${record_id}"
         del_exit_code="$?"
         set -e
 
