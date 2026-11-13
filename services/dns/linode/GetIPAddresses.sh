@@ -109,21 +109,19 @@ then
         exit 1
 fi
 
-# Isolate matching records inside target zone architecture mappings trackers
 set +e
-cli_records_json="$("/usr/local/bin/linode-cli" domains records-list "${domain_id}" --json 2>/dev/null)"
+records_json="$(${HOME}/services/dns/linode/${orchestration_tool}cli/get_record_ids.sh)"
 records_exit_code="$?"
 set -e
 
-if [ "${records_exit_code}" -ne 0 ] || [ -z "${cli_records_json}" ]
+if [ "${exit_code}" -ne 0 ] || [ -z "${records_json}" ]
 then
-        /bin/echo "DNS ip addresses not successfully obtained" >&2
-        unset LINODE_CLI_TOKEN
+        /bin/echo "Failed to query domain records management catalog or network timeout occurred." >&2
         exit 1
 fi
 
 # Extract dynamic record configuration target indicators safely
-record_targets="$(/bin/echo "${cli_records_json}" | /usr/bin/jq -r --arg sub "${sub_domain}" '.[] | select(.name == $sub) | .target // empty')"
+record_targets="$(/bin/echo "${records_json}" | /usr/bin/jq -r --arg sub "${sub_domain}" '.[] | select(.name == $sub) | .target // empty')"
 
 if [ -z "${record_targets}" ]
 then
