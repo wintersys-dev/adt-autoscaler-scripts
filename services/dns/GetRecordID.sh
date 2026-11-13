@@ -12,7 +12,6 @@
 #
 # @param       $1  [Required] The target website Fully Qualified Domain Name or URL string.
 # @param       $2  [Required] The destination tracking node IPv4/IPv6 target address.
-# @param       $3  [Required] Authority flag validation parameter ("yes" / "no").
 #
 # @env         HOME                Path to the stand-alone environment framework directory.
 #
