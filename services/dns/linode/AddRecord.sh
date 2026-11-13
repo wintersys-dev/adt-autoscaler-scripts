@@ -100,14 +100,7 @@ then
         exit 1
 fi
 
-if /bin/echo "${domain_json}" | /usr/bin/jq -e '.errors' >/dev/null 2>&1
-then
-        err_msg="$(/bin/echo "${domain_json}" | /usr/bin/jq -r '.errors[0].reason // "Unknown API error parameters."')"
-        /bin/echo "Failed to retrieve domains list. Cloud Provider Reason: ${err_msg}" >&2
-        exit 1
-fi
-
-domain_id="$(${HOME}/services/dns/linode/${orchestration_tool}/get_domain_id.sh "${domain_json}" "${domain_url}" )"
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
