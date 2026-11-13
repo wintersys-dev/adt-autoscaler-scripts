@@ -42,7 +42,7 @@ then
 fi
 
 set +e
-${HOME}/services/dns/linode/${orchestration_tool}/get_ip_addresses.sh "${website_url}"
+${HOME}/services/dns/cloudflare/${orchestration_tool}/get_ip_addresses.sh "${website_url}"
 exit_code="$?"
 set -e
 
