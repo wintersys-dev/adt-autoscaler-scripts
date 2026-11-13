@@ -30,7 +30,6 @@ HOME="`/bin/cat /home/homedir.dat`"
 
 DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
 DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
-DNS_CHOICE="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE'`"
 
 zone_name="`/bin/echo ${website_url} | /usr/bin/cut -d'.' -f2-`"
 zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
