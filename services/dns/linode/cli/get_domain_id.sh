@@ -62,11 +62,13 @@ fi
 
 domain_url="${2}"
 
-TOKEN="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" TOKEN)"
+set +e
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+set -e
 
 if [ -z "${TOKEN}" ]
 then
-        status "Error: Failed to fetch required context variables (TOKEN)."
+        /bin/echo "Error: Failed to fetch required context variables (TOKEN)." >&2
         exit 1
 fi
 
