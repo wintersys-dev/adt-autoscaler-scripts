@@ -54,12 +54,12 @@ fi
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
         /bin/echo "Error: 2 arguments are required." >&2
-        /bin/echo "Usage: $0 <record_id> <website_url>" >&2
+        /bin/echo "Usage: $0 <website_url> <target_ip>" >&2
         exit 1
 fi
 
-record_id="${1}"
-website_url="${2}"
+website_url="${1}"
+target_ip="${2}"
 
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
@@ -80,7 +80,7 @@ then
 fi
 
 set +e
-"${script_path}" "${record_id}" "${website_url}"
+"${script_path}" "${website_url}" "${target_ip}"
 exit_code="$?"
 set -e
 
