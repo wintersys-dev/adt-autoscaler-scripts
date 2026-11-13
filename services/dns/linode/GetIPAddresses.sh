@@ -66,26 +66,46 @@ fi
 sub_domain="$(/bin/echo "${1}" | /usr/bin/awk -F'.' '{print $1}')"
 domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 
-# Fetch active domain zone layouts securely with manual intercept hooks to catch runtime exceptions
 set +e
-cli_domain_json="$("/usr/local/bin/linode-cli" domains list --no-defaults --json 2>/dev/null)"
-domain_exit_code="$?"
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
-if [ "${domain_exit_code}" -ne 0 ] || [ -z "${cli_domain_json}" ]
+software_file="${HOME}/runtime/software.dat"
+if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
 then
-        /bin/echo "DNS domain ID not successfully obtained" >&2
-        unset LINODE_CLI_TOKEN
+        status "Error: Cannot read software configuration file at ${software_file}"
         exit 1
 fi
 
-# Extract the matching unique domain layout tracking zone ID cleanly
-domain_id="$(/bin/echo "${cli_domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty')"
+orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
+
+if [ -z "${orchestration_tool}" ] 
+then
+        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
+        exit 1
+fi
+
+if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ] 
+then
+        orchestration_tool="api"
+fi
+
+set +e
+domain_json="$(${HOME}/services/dns/linode/${orchestration_tool}/get_domains.sh)"
+exit_code="$?"
+set -e
+
+if [ "${exit_code}" -ne 0 ] || [ -z "${domain_json}" ]
+then
+        /bin/echo "Failed to query cluster domain management catalog or network timeout occurred." >&2
+        exit 1
+fi
+
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
-        /bin/echo "DNS domain ID not successfully obtained" >&2
-        unset LINODE_CLI_TOKEN
+        /bin/echo "Domain ID not found matching zone track string pattern: ${domain_url}" >&2
         exit 1
 fi
 
