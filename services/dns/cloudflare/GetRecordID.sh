@@ -10,12 +10,13 @@ fi
 
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Fully Qualified Domain Name is required." >&2
-        /bin/echo "Usage: $0 <fqdn> " >&2
+        /bin/echo "Error: Fully Qualified Domain Name and ip address are required" >&2
+        /bin/echo "Usage: $0 <fqdn> <ip_address>" >&2
         exit 1
 fi
 
 website_url="${1}"
+ip="${2}"
 
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
@@ -42,13 +43,13 @@ then
 fi
 
 set +e
-${HOME}/services/dns/linode/${orchestration_tool}/get_ip_addresses.sh "${website_url}"
+${HOME}/services/dns/linode/${orchestration_tool}/get_record_id.sh "${website_url}" "${ip}"
 exit_code="$?"
 set -e
 
 if [ "${exit_code}" -ne 0 ] 
 then
-        /bin/echo "Failed to get ip addresses for domain ${website_url}" >&2
+        /bin/echo "Failed to get record is for ${website_url} and ip address ${ip}" >&2
         exit 1
 fi
 
