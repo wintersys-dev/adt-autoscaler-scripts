@@ -39,7 +39,7 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
-#set -x
+set -x
 set -e
 
 if [ -r /home/homedir.dat ]
@@ -63,7 +63,7 @@ set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
-script_path="${HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh ${zone_name}"
+script_path="${HOME}/services/dns/${DNS_CHOICE}/GetZoneID.sh"
 
 if [ ! -f "${script_path}" ]
 then
@@ -78,7 +78,7 @@ then
 fi
 
 set +e
-"${script_path}" "${website_url}" "${ip}"
+"${script_path}" "${zone_name}"
 exit_code="$?"
 set -e
 
