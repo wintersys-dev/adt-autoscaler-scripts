@@ -64,7 +64,10 @@ fi
 website_url="${1}"
 ip="${2}"
 
-DNS_CHOICE="$(${HOME}/helpers/services/GetVariableValue.sh DNS_CHOICE)"
+
+set +e
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
+set -e
 
 software_file="${HOME}/runtime/software.dat"
 if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ] 
