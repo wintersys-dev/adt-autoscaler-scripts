@@ -54,7 +54,6 @@ else
         exit 1
 fi
 
-# Input validation
 if [ -z "${1}" ]
 then
         status "Error: One argument is required."
@@ -62,7 +61,6 @@ then
         exit 1
 fi
 
-# Parse localized networking components safely using modern subshells
 sub_domain="$(/bin/echo "${1}" | /usr/bin/awk -F'.' '{print $1}')"
 domain_url="$(/bin/echo "${1}" | /usr/bin/cut -d'.' -f2-)"
 
@@ -126,12 +124,10 @@ record_targets="$(/bin/echo "${records_json}" | /usr/bin/jq -r --arg sub "${sub_
 if [ -z "${record_targets}" ]
 then
         /bin/echo "DNS ip addresses not successfully obtained" >&2
-        unset LINODE_CLI_TOKEN
         exit 1
 fi
 
 # Print target record tracking output cleanly to standard stdout channel interface
 /bin/echo "${record_targets}"
-unset LINODE_CLI_TOKEN
 
 exit 0
