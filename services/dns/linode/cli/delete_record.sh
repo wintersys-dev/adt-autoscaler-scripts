@@ -63,7 +63,9 @@ fi
 domain_id="${1}"
 record_id="${2}"
 
-TOKEN="$("${BUILD_HOME}/helpers/services/GetVariableValue.sh" TOKEN)"
+set +e
+TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
+set -e
 
 if [ -z "${TOKEN}" ]
 then
