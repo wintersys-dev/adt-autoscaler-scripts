@@ -63,7 +63,9 @@ fi
 record_id="${1}"
 website_url="${2}"
 
-DNS_CHOICE="$(${BUILD_HOME}/helpers/services/GetVariableValue.sh DNS_CHOICE)"
+set +e
+DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
+set -e
 
 
 software_file="${HOME}/runtime/software.dat"
