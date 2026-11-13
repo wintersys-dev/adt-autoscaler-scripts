@@ -45,7 +45,6 @@
 ####################################################################################
 set -e
 
-# Resolve HOME baseline layout securely
 if [ -r /home/homedir.dat ]
 then
         HOME="$(/bin/cat /home/homedir.dat)"
@@ -108,7 +107,7 @@ then
 fi
 
 set +e
-records_json="$(${HOME}/services/dns/linode/${orchestration_tool}cli/get_record_ids.sh)"
+records_json="$(${HOME}/services/dns/linode/${orchestration_tool}/get_record_ids.sh ${domain_id})"
 records_exit_code="$?"
 set -e
 
@@ -118,7 +117,6 @@ then
         exit 1
 fi
 
-# Extract dynamic record configuration target indicators safely
 record_targets="$(/bin/echo "${records_json}" | /usr/bin/jq -r --arg sub "${sub_domain}" '.[] | select(.name == $sub) | .target // empty')"
 
 if [ -z "${record_targets}" ]
@@ -127,7 +125,5 @@ then
         exit 1
 fi
 
-# Print target record tracking output cleanly to standard stdout channel interface
 /bin/echo "${record_targets}"
-
 exit 0
