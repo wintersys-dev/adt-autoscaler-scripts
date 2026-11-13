@@ -8,7 +8,7 @@ else
         exit 1
 fi
 
-if [ -z "${1}" ] || [ -z "${2}" ]
+if [ -z "${1}" ] 
 then
         /bin/echo "Error: Zone Name is required" >&2
         /bin/echo "Usage: $0 <zone_name>" >&2
