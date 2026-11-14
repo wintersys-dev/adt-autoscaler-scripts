@@ -46,7 +46,7 @@ then
         exit 1
 fi
 
-API_URL="https://cloudflare.com{zone_id}/dns_records?type=A&name=${website_url}"
+API_URL="https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?type=A&name=${website_url}"
 
 # Build authentication headers and execute request
 set +e
