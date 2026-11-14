@@ -1,54 +1,98 @@
 #!/bin/sh
-######################################################################################
-# Author : Peter Winter
-# Date   : 13/07/2016
-# Description : Delete a record from the DNS system given its id and its url
-######################################################################################
-# License Agreement:
-# This file is part of The Agile Deployment Toolkit.
-# The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# The Agile Deployment Toolkit is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-#######################################################################################
-#######################################################################################
 #set -x
-
 set -e
 
-record_id="${1}"
-website_url="${2}"
+if [ -r /home/homedir.dat ]
+then
+        HOME="$(/bin/cat /home/homedir.dat)"
+else
+        /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
+        exit 1
+fi
 
-HOME="`/bin/cat /home/homedir.dat`"
+# Input validation
+if [ -z "${1}" ] || [ -z "${2}" ]
+then
+        /bin/echo "Error: zone_id and record_id parameters are required." >&2
+        /bin/echo "Usage: $0 <zone_id> <record_id>" >&2
+        exit 1
+fi
+
+# Strip any accidental whitespace/newlines from parameters to prevent curl exit code 3
+zone_id="$(/bin/echo "${1}" | /usr/bin/tr -d '[:space:]')"
+record_id="$(/bin/echo "${2}" | /usr/bin/tr -d '[:space:]')"
+
+if [ -z "${zone_id}" ] || [ -z "${record_id}" ]
+then
+        /bin/echo "Error: zone_id or record_id is empty after whitespace removal." >&2
+        exit 1
+fi
+
 DNS_USERNAME="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSUSERNAME'`"
 DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
 
-zone_name="`/bin/echo ${website_url} | /usr/bin/cut -d'.' -f2-`"
-zone_id="`${HOME}/services/dns/GetZoneID.sh "${zone_name}"`"
+API_URL="https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}"
 
-if ( [ "$?" != "0" ] )
+# Build authentication headers and execute request
+set +e
+if /bin/echo "${DNS_SECURITY_KEY}" | /bin/grep -q ':::'
 then
-        /bin/echo "Failed to get zone_id from DNS system"
-        exit 1
-fi
-
-if ( [ "`/bin/echo ${DNS_SECURITY_KEY} | /bin/grep ':::'`" != "" ] )
-then
-        api_token="`/bin/echo ${DNS_SECURITY_KEY} | /usr/bin/awk -F':::' '{print $2}'`"
-        /bin/echo "Authorization: Bearer ${api_token}" | curl -H @- -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" -H "Content-Type: application/json"
+        api_token="$(/bin/echo "${DNS_SECURITY_KEY}" | /usr/bin/awk -F':::' '{print $2}')"
+        RESPONSE="$(/bin/echo "Authorization: Bearer ${api_token}" | /usr/bin/curl -H @- -sS -w "\nHTTP_STATUS:%{http_code}" -X DELETE "${API_URL}" -H "Content-Type: application/json" 2>&1)"
 else
-        /bin/echo "X-Auth-Key: ${DNS_SECURITY_KEY}" | curl -H @- -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${record_id}" -H "X-Auth-Email: ${DNS_USERNAME}" -H "Content-Type: application/json"
+        RESPONSE="$(/bin/echo "X-Auth-Key: ${DNS_SECURITY_KEY}" | /usr/bin/curl -H @- -sS -w "\nHTTP_STATUS:%{http_code}" -X DELETE "${API_URL}" -H "X-Auth-Email: ${DNS_USERNAME}" -H "Content-Type: application/json" 2>&1)"
 fi
+CURL_EXIT=$?
+set -e
 
-if ( [ "$?" != "0" ] )
+if [ "${CURL_EXIT}" -ne 0 ]
 then
-        status "Failed to delete record from DNS system with id: ${record_id} and url: ${website_url}"
+        /bin/echo "Error: curl failed with exit code ${CURL_EXIT} while deleting record ${record_id}." >&2
+        /bin/echo "Detail: ${RESPONSE}" >&2
         exit 1
 fi
+
+# Extract HTTP status code and response body using strict POSIX filtering
+HTTP_CODE="$(/bin/echo "${RESPONSE}" | /usr/bin/grep '^HTTP_STATUS:' | /usr/bin/cut -d':' -f2)"
+RESPONSE_BODY="$(/bin/echo "${RESPONSE}" | /usr/bin/sed '/^HTTP_STATUS:/d')"
+
+# Evaluate the API response code
+case "${HTTP_CODE}" in
+        200|201)
+                /bin/echo "${RESPONSE_BODY}"
+                exit 0
+                ;;
+        400)
+                /bin/echo "Error 400: Bad Request. Check zone_id (${zone_id}) or record_id (${record_id}) format." >&2
+                /bin/echo "API Detail: ${RESPONSE_BODY}"
+                exit 1
+                ;;
+        401)
+                /bin/echo "Error 401: Unauthorized. Your Cloudflare API token or credentials are invalid." >&2
+                exit 1
+                ;;
+        403)
+                /bin/echo "Error 403: Forbidden. Credentials lack permission to delete DNS records for this zone." >&2
+                exit 1
+                ;;
+        404)
+                /bin/echo "Error 404: Not Found. Verify that zone_id (${zone_id}) and record_id (${record_id}) exist." >&2
+                /bin/echo "API Detail: ${RESPONSE_BODY}"
+                exit 1
+                ;;
+        429)
+                /bin/echo "Error 429: Rate Limit Exceeded. Back off request frequency." >&2
+                exit 1
+                ;;
+        5*)
+                /bin/echo "Error ${HTTP_CODE}: Cloudflare API or Upstream Server Exception." >&2
+                /bin/echo "API Detail: ${RESPONSE_BODY}" >&2
+                exit 1
+                ;;
+        *)
+                /bin/echo "Error ${HTTP_CODE:-UNKNOWN}: Unexpected response from Cloudflare API." >&2
+                /bin/echo "API Detail: ${RESPONSE_BODY}" >&2
+                exit 1
+                ;;
+esac
 
