@@ -42,6 +42,9 @@ then
         orchestration_tool="api"
 fi
 
+zone_id="$(${HOME}/services/dns/cloudflare/GetZoneID.sh "${zone_name}")"
+
+
 set +e
 record_id="$(${HOME}/services/dns/cloudflare/${orchestration_tool}/get_record_id.sh "${website_url}" "${ip}")"
 exit_code="$?"
