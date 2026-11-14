@@ -59,7 +59,7 @@ then
 fi
 
 set +e
-${HOME}/services/dns/cloudflare/${orchestration_tool}/delete_record_by_id.sh "${zone_id}" "${record_id}"
+${HOME}/services/dns/cloudflare/${orchestration_tool}/delete_record.sh "${zone_id}" "${record_id}"
 exit_code="$?"
 set -e
 
