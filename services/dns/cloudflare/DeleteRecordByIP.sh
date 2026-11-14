@@ -42,10 +42,8 @@ then
         orchestration_tool="api"
 fi
 
-zonename="`/bin/echo ${website_url} | /usr/bin/awk -F'.' '{$1=""}1' | /bin/sed 's/^ //g' | /bin/sed 's/ /./g'`"
-
+zone_name="$(/bin/echo "${website_url}" | /usr/bin/cut -d'.' -f2-)"
 zone_id="$(${HOME}/services/dns/cloudflare/GetZoneID.sh "${zone_name}")"
-
 
 set +e
 record_id="$(${HOME}/services/dns/cloudflare/${orchestration_tool}/get_record_id.sh "${website_ur}" "${ip}")"
