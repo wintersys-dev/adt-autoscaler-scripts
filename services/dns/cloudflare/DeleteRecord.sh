@@ -42,8 +42,11 @@ then
         orchestration_tool="api"
 fi
 
+zone_name="$(/bin/echo "${website_url}" | /usr/bin/cut -d'.' -f2-)"
+zone_id="$(${HOME}/services/dns/cloudflare/GetZoneID.sh "${zone_name}")"
+
 set +e
-${HOME}/services/dns/cloudflare/${orchestration_tool}/delete_record.sh "${record_id}" "${website_url}" 
+${HOME}/services/dns/cloudflare/${orchestration_tool}/delete_record.sh "${zone_id}" "${record_id}" 
 exit_code="$?"
 set -e
 
