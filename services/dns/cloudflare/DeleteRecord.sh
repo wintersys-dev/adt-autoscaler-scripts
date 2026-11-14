@@ -1,3 +1,4 @@
+#set -x
 set -e
 
 if [ -r /home/homedir.dat ]
