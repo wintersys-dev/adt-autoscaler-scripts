@@ -1,50 +1,5 @@
 #!/bin/sh
-###################################################################################
-# @file        add_record.sh
-# @brief       Provisions a new authoritative A-record within the Cloudflare DNS architecture.
-# @author      Peter Winter
-# @date        05/11/2026
-# @version     1.0
-#
-# @details     This script extracts DNS configuration keys, resolves or instantiates 
-#              the target zone envelope using secondary toolkit dependencies, evaluates
-#              the authentication layout to determine API parsing protocols (Bearer token
-#              vs. X-Auth credentials), and issues an authenticated POST transaction payload.
-#
-# @param       $1  [Required] The target Fully Qualified Domain Name (e.g., "www.domain.com").
-# @param       $2  [Required] The target IPv4 address destination tracking node.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - GetZoneID.sh / CreateZone.sh local domain infrastructure sub-tools.
-#              - external dependencies: cat, echo, cut, grep, awk, curl, jq
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Replaces legacy, fragile backtick subshells with secure shell evaluations.
-#              - Eliminates redundant subshell grouping fork performance bottlenecks.
-#              - Masks API interactions securely via stream piping using the @- syntax.
-#              - Safely validates variable constraints under explicit character boundaries.
-#
-# @exit        0  Success: Cloudflare DNS record entry successfully provisioned and verified.
-# @exit        1  Failure: Missing context paths, input parameter errors, or API communication failures.
-###################################################################################
-# License Agreement:
-# This file is part of The Agile Deployment Toolkit.
-# The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# The Agile Deployment Toolkit is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
-####################################################################################
-set -x
+#set -x
 set -e
 
 if [ -r /home/homedir.dat ]
