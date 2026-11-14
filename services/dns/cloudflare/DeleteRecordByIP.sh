@@ -43,7 +43,18 @@ then
 fi
 
 set +e
-${HOME}/services/dns/cloudflare/${orchestration_tool}/delete_record_by_ip.sh "${website_url}" "${ip}"
+record_id="$(${HOME}/services/dns/cloudflare/${orchestration_tool}/get_record_id.sh "${website_url}" "${ip}")"
+exit_code="$?"
+set -e
+
+if [ "${exit_code}" -ne 0 ] || [ "${record_id}" = "" ] 
+then
+        /bin/echo "Failed to get record is for ${website_url} and ip address ${ip}" >&2
+        exit 1
+fi
+
+set +e
+${HOME}/services/dns/cloudflare/${orchestration_tool}/delete_record_by_ip.sh "${record_id}"
 exit_code="$?"
 set -e
 
