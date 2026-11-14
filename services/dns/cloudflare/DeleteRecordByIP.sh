@@ -46,7 +46,7 @@ zone_name="$(/bin/echo "${website_url}" | /usr/bin/cut -d'.' -f2-)"
 zone_id="$(${HOME}/services/dns/cloudflare/GetZoneID.sh "${zone_name}")"
 
 set +e
-record_id="$(${HOME}/services/dns/cloudflare/${orchestration_tool}/get_record_id.sh "${website_ur}" "${ip}")"
+record_id="$(${HOME}/services/dns/cloudflare/${orchestration_tool}/get_record_id.sh "${website_url}" "${ip}")"
 exit_code="$?"
 set -e
 
