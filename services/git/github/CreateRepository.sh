@@ -17,7 +17,6 @@
 #:   REPOSITORY_TOKEN Personal access token with repo creation permissions
 #:
 #: Dependencies:
-#:   - /home/homedir.dat
 #:   - External binaries: cat, echo, grep, cut, sed, jq, curl
 #:
 #: Exit Codes:
