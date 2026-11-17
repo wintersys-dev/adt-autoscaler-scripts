@@ -1,21 +1,27 @@
 #!/bin/sh
-##################################################################################
-# SCRIPT      : provider_endpoint.sh (Example)
-# AUTHOR      : Peter Winter
-# DATE        : 25/10/2026
-# VERSION     : 1.0.0
-# DESCRIPTION : This one-liner script simply outputs the base domain identifier 
-#               string for the default Git provider hosting platform.
-#
-# INTERFACE   : $0
-#
-# PARAMETERS  : None
-#
-# CONFIGURATION DEPENDENCIES: None
-#
-#######################################################################################
+#: Name:       GetProviderURL.sh
+#: Purpose:     Outputs the base domain identifier string for the GitHub hosting platform.
+#: Author:      Peter Winter
+#: Date:        17/11/2026
+#: Version:     1.0
+#:
+#: Usage:       GetProviderURL.sh
+#:              GetProviderURL.sh [-h|--help]
+#:
+#: Parameters:
+#:   None
+#:
+#: Environment:
+#:   None
+#:
+#: Dependencies:
+#:   - External binaries: echo, grep, cut
+#:
+#: Exit Codes:
+#:   0          Base provider domain emitted successfully on stdout
+###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -25,10 +31,22 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-#####################################################################################
-#####################################################################################
+# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
 
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
+# Emit the canonical domain identifier for GitHub
 /bin/echo "github.com"
+
+exit 0
+
