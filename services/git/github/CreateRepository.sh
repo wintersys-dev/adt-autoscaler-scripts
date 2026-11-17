@@ -13,7 +13,6 @@
 #:   $2         [Required] Target repository name to create
 #:
 #: Environment:
-#:   HOME       Resolved automatically from /home/homedir.dat
 #:   REPOSITORY_TOKEN Personal access token with repo creation permissions
 #:
 #: Dependencies:
@@ -45,15 +44,6 @@ if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
 then
         /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
         exit 0
-fi
-
-# Resolve the toolkit root directory from the system tracking file
-if [ -r /home/homedir.dat ]
-then
-        HOME="$(/bin/cat /home/homedir.dat)"
-else
-        /bin/echo "Application root configuration file missing at /home/homedir.dat" >&2
-        exit 1
 fi
 
 
