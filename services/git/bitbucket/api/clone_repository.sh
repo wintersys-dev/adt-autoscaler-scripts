@@ -84,7 +84,7 @@ trap cleanup EXIT INT TERM
 target_ref="${branch}"
 case "${branch}" in
         */*)
-                branch_api="https://bitbucket.org/${repository_ownername}/${repository_name}/refs/branches/${branch}"
+                branch_api="https://api.bitbucket.org/2.0/repositories/${repository_ownername}/${repository_name}/refs/branches/${branch}"
                 set +e
                 REPOSITORY_TOKEN="$("${HOME}/utilities/config/ExtractConfigValue.sh" 'APPLICATIONREPOSITORYTOKEN' 2>/dev/null)"
                 ATLASSIAN_EMAIL="$("${HOME}/utilities/config/ExtractConfigValue.sh" 'APPLICATIONREPOSITORYEMAIL' 2>/dev/null)"
