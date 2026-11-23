@@ -30,4 +30,4 @@ dns="${6}"
 
 	/usr/local/bin/doctl compute domain records list ${domainurl} --config /root/.config/doctl/dns-do-config.yaml -o json | /usr/bin/jq -r '.[] | select (.type == "A") | select (.name == "'${subdomain}'") | select (.data == "'${ip}'").id'
 
-fi
+
