@@ -98,29 +98,14 @@ TOKEN="$(/bin/echo "${SERVER_USER}" | /usr/bin/fold -w 4 | /usr/bin/head -n 1 | 
 
 url_hyphenated="$(/bin/echo "${WEBSITE_URL}" | /bin/sed 's/\./-/g')"
 
-active_bucket=""
-
-case "${bucket_type}" in
-   #     "config-sync")
-   #             specifier_sanitized="$(/bin/echo "${additional_specifier}" | /bin/sed 's:/:-:g')"
-   #             active_bucket="${url_hyphenated}-config-sync-tunnel${specifier_sanitized}"
-   #             ;;
-        "config")
-                active_bucket="$(/bin/echo "${WEBSITE_URL}-config" | /bin/sed 's/\./-/g')-${TOKEN}"
-                ;;
-        "snap")
-                active_bucket="${url_hyphenated}-${DNS_CHOICE}-snap"
-                ;;
-        "ad-hoc")
-                active_bucket="${additional_specifier}"
-                ;;
-esac
-
-if [ -z "${active_bucket}" ]
+resolver_script="${HOME}/services/datastore/operations/ResolveBucketName.sh"
+if [ ! -f "${resolver_script}" ] || [ ! -x "${resolver_script}" ]
 then
-        log_error "Invalid bucket type specified or failed to build naming topology."
+        status "Error: Bucket resolver script missing or not executable at ${resolver_script}"
         exit 1
 fi
+
+active_bucket="$("${resolver_script}" "${bucket_type}" "${additional_specifier}")"
 
 DATASTORE_TOOL="$("${HOME}/utilities/config/ExtractBuildStyleValues.sh" "DATASTORETOOL" | /usr/bin/awk -F':' '{print $2}')"
 S3_ACCESS_KEY="$("${HOME}/utilities/config/ExtractConfigValue.sh" 'S3ACCESSKEY')"
