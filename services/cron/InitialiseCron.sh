@@ -90,6 +90,13 @@ MULTI_REGION="$("${config_extractor}" 'MULTIREGION')"
 SERVER_TIMEZONE_CONTINENT="$("${config_extractor}" 'SERVERTIMEZONECONTINENT')"
 SERVER_TIMEZONE_CITY="$("${config_extractor}" 'SERVERTIMEZONECITY')"
 
+if ( [ ! -d ${HOME}/runtime/logs/crontab ] )
+then
+        /bin/mkdir -p ${HOME}/runtime/logs/crontab 
+fi
+
+logging=" >${HOME}/runtime/logs/crontab/log.out 2>${HOME}/runtime/logs/crontab/err.out "
+
 # Write global cron environment headers
 {
         /bin/echo "MAILTO=''"
@@ -102,25 +109,25 @@ SERVER_TIMEZONE_CITY="$("${config_extractor}" 'SERVERTIMEZONECITY')"
 
 # Every minute tasks
 {
-        /bin/echo "*/1 * * * * ${HOME}/utilities/security/AuditSSHConnections.sh"
-        /bin/echo "*/1 * * * * /bin/sleep 30 && ${HOME}/utilities/processing/UpdateIPs.sh"
-        /bin/echo "*/1 * * * * ${HOME}/services/cron/SetupFirewallFromCron.sh"
-        /bin/echo "*/1 * * * * ${HOME}/utilities/housekeeping/RemoveExpiredLocks.sh"
-        /bin/echo "*/1 * * * * ${HOME}/utilities/status/MonitorForOverload.sh"
-        /bin/echo "*/1 * * * * ${HOME}/utilities/status/CheckNetworkManagerStatus.sh"
-        /bin/echo "*/1 * * * * ${HOME}/services/cron/PerformEmergencyRestorationFromCron.sh"
+        /bin/echo "*/1 * * * * ${HOME}/utilities/security/AuditSSHConnections.sh ${logging}"
+        /bin/echo "*/1 * * * * /bin/sleep 30 && ${HOME}/utilities/processing/UpdateIPs.sh ${logging}"
+        /bin/echo "*/1 * * * * ${HOME}/services/cron/SetupFirewallFromCron.sh ${logging}"
+        /bin/echo "*/1 * * * * ${HOME}/utilities/housekeeping/RemoveExpiredLocks.sh ${logging}"
+        /bin/echo "*/1 * * * * ${HOME}/utilities/status/MonitorForOverload.sh ${logging}"
+        /bin/echo "*/1 * * * * ${HOME}/utilities/status/CheckNetworkManagerStatus.sh ${logging}"
+        /bin/echo "*/1 * * * * ${HOME}/services/cron/PerformEmergencyRestorationFromCron.sh ${logging}"
 } >> "${tmp_cron}"
 
 if [ "${MULTI_REGION}" = "1" ]
 then
-        /bin/echo "*/1 * * * * ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh" >> "${tmp_cron}"
+        /bin/echo "*/1 * * * * ${HOME}/services/dbaas/AdjustDBaaSFirewall.sh ${logging}" >> "${tmp_cron}"
 fi
 
 # Every 2 minutes tasks
 {
         #/bin/echo "*/2 * * * * ${HOME}/services/cron/PerformScalingFromCron.sh"
-        /bin/echo "*/2 * * * * ${HOME}/services/cron/ProcessScalingEventsFromCron.sh"
-        /bin/echo "*/2 * * * * ${HOME}/services/cron/MonitorForWebsiteDeathFromCron.sh"
+        /bin/echo "*/2 * * * * ${HOME}/services/cron/ProcessScalingEventsFromCron.sh ${logging}"
+        /bin/echo "*/2 * * * * ${HOME}/services/cron/MonitorForWebsiteDeathFromCron.sh ${logging}"
 } >> "${tmp_cron}"
 
 # Every 3 minutes tasks
@@ -130,40 +137,40 @@ fi
 
 # Every 5 minutes tasks
 {
-        /bin/echo "*/5 * * * * /bin/sleep 23 && ${HOME}/services/security/firewall/MonitorFirewall.sh"
-        /bin/echo "*/5 * * * * ${HOME}/autoscaler/RecordNumberOfWebserversRunning.sh"
+        /bin/echo "*/5 * * * * /bin/sleep 23 && ${HOME}/services/security/firewall/MonitorFirewall.sh ${logging}"
+        /bin/echo "*/5 * * * * ${HOME}/autoscaler/RecordNumberOfWebserversRunning.sh ${logging}"
 } >> "${tmp_cron}"
 
 # Every 10 minutes tasks
 {
-        /bin/echo "*/10 * * * * ${HOME}/utilities/security/EnforcePermissions.sh"
-        /bin/echo "*/10 * * * * ${HOME}/utilities/status/MonitorCron.sh"
+        /bin/echo "*/10 * * * * ${HOME}/utilities/security/EnforcePermissions.sh ${logging}"
+        /bin/echo "*/10 * * * * ${HOME}/utilities/status/MonitorCron.sh ${logging}"
 } >> "${tmp_cron}"
 
 # Hourly, daily, and maintenance tasks
 {
-        /bin/echo "@hourly ${HOME}/utilities/status/LoadMonitoring.sh"
-        /bin/echo "30 3 * * * ${HOME}/utilities/housekeeping/RemoveExpiredLogs.sh"
-        /bin/echo "22 4 * * * ${HOME}/utilities/software/UpdateSoftware.sh"
-        /bin/echo "44 4 * * * ${HOME}/installation/UpdateAndUpgrade.sh"
-        /bin/echo "@daily ${HOME}/utilities/housekeeping/ArchiveErrorLogs.sh"
+        /bin/echo "@hourly ${HOME}/utilities/status/LoadMonitoring.sh ${logging}"
+        /bin/echo "30 3 * * * ${HOME}/utilities/housekeeping/RemoveExpiredLogs.sh ${logging}"
+        /bin/echo "22 4 * * * ${HOME}/utilities/software/UpdateSoftware.sh ${logging}"
+        /bin/echo "44 4 * * * ${HOME}/installation/UpdateAndUpgrade.sh ${logging}"
+        /bin/echo "@daily ${HOME}/utilities/housekeeping/ArchiveErrorLogs.sh ${logging}"
 } >> "${tmp_cron}"
 
 # Reboot tasks
 {
-        /bin/echo "@reboot ${HOME}/utilities/housekeeping/RemoveExpiredLocks.sh reboot"
-        /bin/echo "@reboot ${HOME}/utilities/status/LoadMonitoring.sh 'reboot'"
-        /bin/echo "@reboot ${HOME}/utilities/status/CheckNetworkManagerStatus.sh"
-        /bin/echo "@reboot ${HOME}/services/datastore/config/ActivateConfigDatastore.sh"
+        /bin/echo "@reboot ${HOME}/utilities/housekeeping/RemoveExpiredLocks.sh reboot ${logging}"
+        /bin/echo "@reboot ${HOME}/utilities/status/LoadMonitoring.sh 'reboot' ${logging}"
+        /bin/echo "@reboot ${HOME}/utilities/status/CheckNetworkManagerStatus.sh ${logging}"
+        /bin/echo "@reboot ${HOME}/services/datastore/config/ActivateConfigDatastore.sh ${logging}"
 } >> "${tmp_cron}"
 
 datastore_style="$("${style_extractor}" "DATASTORECONFIGSTYLE" | /usr/bin/awk -F':' '{print $NF}')"
 case "${datastore_style}" in
         lightweight)
-                /bin/echo "@reboot ${HOME}/services/datastore/config/ActivateConfigDatastoreLightweight.sh" >> "${tmp_cron}"
+                /bin/echo "@reboot ${HOME}/services/datastore/config/ActivateConfigDatastoreLightweight.sh ${logging}" >> "${tmp_cron}"
                 ;;
         heavyweight)
-                /bin/echo "@reboot ${HOME}/services/datastore/config/ActivateConfigDatastoreHeavyweight.sh" >> "${tmp_cron}"
+                /bin/echo "@reboot ${HOME}/services/datastore/config/ActivateConfigDatastoreHeavyweight.sh ${logging}" >> "${tmp_cron}"
                 ;;
 esac
 
@@ -173,7 +180,7 @@ then
         periodicity="$("${style_extractor}" 'VIRUSSCANNER' | /usr/bin/awk -F':' '{print $NF}')"
         case "${periodicity}" in
                 daily|weekly|monthly)
-                        /bin/echo "@${periodicity} /bin/sleep \$(/usr/bin/shuf -i1-1000 -n1) && /usr/bin/nice -n 15 ${HOME}/utilities/security/VirusScan.sh" >> "${tmp_cron}"
+                        /bin/echo "@${periodicity} /bin/sleep \$(/usr/bin/shuf -i1-1000 -n1) && /usr/bin/nice -n 15 ${HOME}/utilities/security/VirusScan.sh ${logging}" >> "${tmp_cron}"
                         ;;
         esac
 fi
