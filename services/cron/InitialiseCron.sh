@@ -95,7 +95,7 @@ then
         /bin/mkdir -p ${HOME}/runtime/logs/crontab 
 fi
 
-logging=" >${HOME}/runtime/logs/crontab/log.out 2>${HOME}/runtime/logs/crontab/err.out "
+logging=" >>${HOME}/runtime/logs/crontab/log.out 2>>${HOME}/runtime/logs/crontab/err.out "
 
 # Write global cron environment headers
 {
