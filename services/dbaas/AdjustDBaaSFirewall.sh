@@ -1,43 +1,36 @@
 #!/bin/sh
+#: Name:        AdjustDBaaSFirewall.sh
+#: Purpose:     Tightens the DBaaS managed database firewall allow list to active fleet and multi-region IPs.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       AdjustDBaaSFirewall.sh [ip_to_delete]
+#:              AdjustDBaaSFirewall.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Optional] IPv4 address queued for removal from the allow list during node teardown
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat and exported
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/utilities/config/ExtractConfigValues.sh
+#:   - ${HOME}/utilities/config/ExtractBuildStyleValues.sh
+#:   - ${HOME}/services/datastore/operations/ListFromDatastore.sh
+#:   - ${HOME}/services/server/GetServerPublicIPAddresses.sh
+#:   - ${HOME}/services/dbaas/<cloudhost>/<tool>/<engine>/list_database.sh
+#:   - ${HOME}/services/dbaas/<cloudhost>/<tool>/<engine>/update_database_firewall.sh
+#:   - External binaries: cat, echo, printf, mkdir, touch, grep, sed, awk, tr, sort, jq
+#:
+#: Exit Codes:
+#:   0          DBaaS firewall allow list evaluated and updated cleanly (or no changes required)
+#:   1          Missing /home/homedir.dat, missing context variables, unresolved DB ID, or driver failure
 ###################################################################################
-# @file        AdjustDBaaSFirewall.sh
-# @brief       Tightens the Linode DBaaS firewall allow list to trusted fleet IPs.
-# @author      Peter Winter
-# @date        12/11/2026
-# @version     1.0
-#
-# @details     This script resolves deployment context variables, queries active
-#              webserver, database, and multi-region IP addresses, identifies the
-#              target Linode MySQL or PostgreSQL managed database ID, constructs a
-#              restricted allow-list payload, and delegates the firewall adjustment
-#              to the active orchestration provider script.
-#
-# @param       $1  [Optional] IP address queued for deletion (if invoked during teardown).
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking the active framework layout.
-#              - ${HOME}/utilities/config/ExtractConfigValue.sh
-#              - ${HOME}/utilities/config/ExtractConfigValues.sh
-#              - ${HOME}/utilities/config/ExtractBuildStyleValues.sh
-#              - ${HOME}/services/datastore/operations/ListFromDatastore.sh
-#              - ${HOME}/services/server/GetServerPublicIPAddresses.sh
-#              - ${HOME}/services/dbaas/<cloudhost>/<tool>/<engine>/AdjustDBaaSFirewall.sh
-#              - external dependencies: cat, echo, mkdir, touch, grep, sed, awk, tr, sort, jq, linode-cli
-#
-# @security    
-#              - Hardens system-owned paths (/bin, /usr/bin, /usr/local/bin) to eliminate hijack vectors.
-#              - Replaces legacy backticks with modern POSIX command substitutions.
-#              - Uses jq --arg parameterization to safely match database labels without injection.
-#              - Quotes variable interpolations thoroughly and unsets tokens post-execution.
-#
-# @exit        0  Success: DBaaS firewall allow list evaluated and updated cleanly.
-# @exit        *  Failure: Missing configuration files, missing required context values,
-#                 unresolved database ID, or cascading exit failures from toolkit helpers.
-##################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -49,29 +42,50 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
 
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
+# Resolve the server toolkit root directory from /home/homedir.dat
 if [ -r /home/homedir.dat ]
 then
         HOME="$(/bin/cat /home/homedir.dat)"
+        export HOME
 else
         /bin/echo "Application root configuration file missing at /home/homedir.dat" >&2
         exit 1
 fi
 
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
+then
+        /bin/echo "Error: Resolved HOME directory '${HOME}' is invalid." >&2
+        exit 1
+fi
+
 ip_to_delete="${1}"
 
+config_extractor="${HOME}/utilities/config/ExtractConfigValue.sh"
+config_multi_extractor="${HOME}/utilities/config/ExtractConfigValues.sh"
+style_extractor="${HOME}/utilities/config/ExtractBuildStyleValues.sh"
+
 set +e
-TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
-BUILD_IDENTIFIER="$(${HOME}/utilities/config/ExtractConfigValue.sh 'BUILDIDENTIFIER')"
-REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
-CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
-MULTI_REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'MULTIREGION')"
-PRIMARY_REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'PRIMARYREGION')"
-WEBSITE_URL="$(${HOME}/utilities/config/ExtractConfigValue.sh 'WEBSITEURL')"
-VPC_IP_RANGE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'VPCIPRANGE')"
-DATABASE_DBAAS_INSTALLATION_TYPE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DATABASE_DBAAS_INSTALLATION_TYPE')"
+TOKEN="$("${config_extractor}" 'TOKEN')"
+BUILD_IDENTIFIER="$("${config_extractor}" 'BUILDIDENTIFIER')"
+REGION="$("${config_extractor}" 'REGION')"
+CLOUDHOST="$("${config_extractor}" 'CLOUDHOST')"
+MULTI_REGION="$("${config_extractor}" 'MULTIREGION')"
+PRIMARY_REGION="$("${config_extractor}" 'PRIMARYREGION')"
+VPC_IP_RANGE="$("${config_extractor}" 'VPCIPRANGE')"
+DATABASE_DBAAS_INSTALLATION_TYPE="$("${config_extractor}" 'DATABASEDBaaSINSTALLATIONTYPE')"
+[ -z "${DATABASE_DBAAS_INSTALLATION_TYPE}" ] && DATABASE_DBAAS_INSTALLATION_TYPE="$("${config_extractor}" 'DATABASE_DBAAS_INSTALLATION_TYPE')"
 set -e
 
 if [ -z "${TOKEN}" ] || [ -z "${BUILD_IDENTIFIER}" ] || [ -z "${REGION}" ] || [ -z "${CLOUDHOST}" ] || [ -z "${VPC_IP_RANGE}" ]
@@ -81,13 +95,14 @@ then
 fi
 
 database_engine="mysql"
-if /bin/echo "${DATABASE_DBAAS_INSTALLATION_TYPE}" | /bin/grep -q 'Postgres'
-then
-        database_engine="postgres"
-fi
+case "${DATABASE_DBAAS_INSTALLATION_TYPE}" in
+        *Postgres*|*postgres*)
+                database_engine="postgres"
+                ;;
+esac
 
 set +e
-orchestration_tool="$(${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}')"
+orchestration_tool="$("${style_extractor}" "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}')"
 set -e
 
 if [ -z "${orchestration_tool}" ]
@@ -96,43 +111,47 @@ then
         exit 1
 fi
 
-multi_region_ips=""
+allowed_ips_dir="${HOME}/runtime/dbaas_allowed_ips"
+ip_list_file="${allowed_ips_dir}/ip_list.dat"
 
-if [ ! -d "${HOME}/runtime/dbaas_allowed_ips" ]
+if [ ! -d "${allowed_ips_dir}" ]
 then
-        /bin/mkdir -p "${HOME}/runtime/dbaas_allowed_ips"
+        /bin/mkdir -p "${allowed_ips_dir}"
 fi
+
+multi_region_ips=""
 
 if [ "${MULTI_REGION}" = "1" ] && [ "${PRIMARY_REGION}" != "1" ]
 then
-        multi_region_bucket="$(/bin/echo "${WEBSITE_URL}" | /bin/sed 's/\./-/g')-multi-region"
-
         set +e
-        multi_region_ips="$(${HOME}/services/datastore/operations/ListFromDatastore.sh "multi-region" "dbaas_ips/*" | /usr/bin/awk -F'/' '{print $NF}')"
+        multi_region_ips="$("${HOME}/services/datastore/operations/ListFromDatastore.sh" "multi-region" "dbaas_ips/*" 2>/dev/null | /usr/bin/awk -F'/' '{print $NF}')"
         set -e
 
-        /bin/touch "${HOME}/runtime/dbaas_allowed_ips/ip_list.dat"
+        /usr/bin/touch "${ip_list_file}"
 
         modified="no"
         for ip in ${multi_region_ips}
         do
-                if ! /bin/grep -qxF "${ip}" "${HOME}/runtime/dbaas_allowed_ips/ip_list.dat"
+                [ -z "${ip}" ] && continue
+                if ! /bin/grep -qxF "${ip}" "${ip_list_file}"
                 then
-                        /bin/echo "${ip}" >> "${HOME}/runtime/dbaas_allowed_ips/ip_list.dat"
+                        /bin/echo "${ip}" >> "${ip_list_file}"
                         modified="yes"
                 fi
         done
 
-        for existing_ip in $(/bin/cat "${HOME}/runtime/dbaas_allowed_ips/ip_list.dat")
+        while IFS= read -r existing_ip
         do
-                if ! /bin/echo "${multi_region_ips}" | /bin/grep -qwF "${existing_ip}"
+                [ -z "${existing_ip}" ] && continue
+                if ! printf '%s\n' ${multi_region_ips} | /bin/grep -qxF "${existing_ip}"
                 then
-                        /bin/sed -i "#^${existing_ip}$#d" "${HOME}/runtime/dbaas_allowed_ips/ip_list.dat"
+                        escaped_ip="$(printf '%s' "${existing_ip}" | /bin/sed -e 's/[\\.*^$[\]/]/\\&/g')"
+                        /bin/sed -i "/^${escaped_ip}$/d" "${ip_list_file}"
                         modified="yes"
                 fi
-        done
+        done < "${ip_list_file}"
 
-        if [ "${modified}" = "no" ]
+        if [ "${modified}" = "no" ] && [ -z "${ip_to_delete}" ]
         then
                 /bin/echo "Success: No multi-region IP changes detected for DBaaS firewall."
                 exit 0
@@ -140,8 +159,7 @@ then
 fi
 
 set +e
-dbaas="$(${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped")"
-label="$(${HOME}/utilities/config/ExtractConfigValues.sh "DATABASEDBaaSINSTALLATIONTYPE" "stripped" | /usr/bin/awk '{print $7}')"
+label="$("${config_multi_extractor}" "DATABASEDBaaSINSTALLATIONTYPE" "stripped" | /usr/bin/awk '{print $7}')"
 set -e
 
 if [ -z "${label}" ]
@@ -150,34 +168,46 @@ then
         exit 1
 fi
 
+list_script="${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/list_database.sh"
+if [ ! -x "${list_script}" ]
+then
+        /bin/echo "Error: Database listing script missing or not executable at ${list_script}." >&2
+        exit 1
+fi
+
+trap 'unset LINODE_CLI_TOKEN' EXIT INT TERM
 export LINODE_CLI_TOKEN="${TOKEN}"
 
 set +e
-database_id="$(${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/list_database.sh | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id' | /usr/bin/head -n 1)"
+database_id="$("${list_script}" | /usr/bin/jq -r --arg lbl "${label}" '.[] | select(.label | contains($lbl)) | .id' | /usr/bin/head -n 1)"
 set -e
 
 unset LINODE_CLI_TOKEN
+trap - EXIT INT TERM
 
 if [ -z "${database_id}" ]
 then
-        /bin/echo "Error: Unable to locate Linode DBaaS instance matching label ${label}." >&2
+        /bin/echo "Error: Unable to locate DBaaS instance matching label '${label}'." >&2
         exit 1
 fi
 
 set +e
-webserver_ips="$(${HOME}/services/server/GetServerPublicIPAddresses.sh "ws-${REGION}-${BUILD_IDENTIFIER}")"
-database_ips="$(${HOME}/services/server/GetServerPublicIPAddresses.sh "db-${REGION}-${BUILD_IDENTIFIER}")"
+webserver_ips="$("${HOME}/services/server/GetServerPublicIPAddresses.sh" "ws-${REGION}-${BUILD_IDENTIFIER}")"
+database_ips="$("${HOME}/services/server/GetServerPublicIPAddresses.sh" "db-${REGION}-${BUILD_IDENTIFIER}")"
 set -e
 
-ip_addresses="${webserver_ips} ${database_ips}"
-
-if [ -n "${multi_region_ips}" ]
-then
-        for ip in ${multi_region_ips}
+# Deduplicate fleet + multi-region IPs and filter out any ip_to_delete queued during node teardown
+ip_addresses="$(
+        for ip in ${webserver_ips} ${database_ips} ${multi_region_ips}
         do
-                ip_addresses="${ip_addresses} ${ip}"
-        done
-fi
+                [ -z "${ip}" ] && continue
+                if [ -n "${ip_to_delete}" ] && { [ "${ip}" = "${ip_to_delete}" ] || [ "${ip}" = "${ip_to_delete}/32" ]; }
+                then
+                        continue
+                fi
+                printf '%s\n' "${ip}"
+        done | /usr/bin/sort -u | /usr/bin/tr '\n' ' ' | /bin/sed 's/[[:space:]]*$//'
+)"
 
 adjust_script="${HOME}/services/dbaas/${CLOUDHOST}/${orchestration_tool}/${database_engine}/update_database_firewall.sh"
 
@@ -198,7 +228,8 @@ then
         exit "${exit_code}"
 fi
 
-/bin/echo "${ipaddresses}" > "${HOME}/runtime/dbaas_allowed_ips/ip_list.dat"
+printf '%s\n' ${ip_addresses} > "${ip_list_file}"
 
 /bin/echo "Success: DBaaS firewall allow list updated for database ${database_id}."
 exit 0
+
