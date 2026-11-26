@@ -1,6 +1,56 @@
 #!/bin/sh
+#: Name:        AddRecord.sh
+#: Purpose:     Provisions a new proxied DNS A-record entry within the Cloudflare DNS provider backend.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       AddRecord.sh <website_url> <target_ip>
+#:              AddRecord.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target website Fully Qualified Domain Name (e.g., "://domain.com")
+#:   $2         [Required] Destination node IPv4 address
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/GetZoneID.sh
+#:   - ${HOME}/services/dns/cloudflare/<ORCHESTRATION_TOOL>/add_record.sh
+#:   - External binaries: cat, echo, grep, cut, awk, jq
+#:
+#: Exit Codes:
+#:   0          Cloudflare DNS A-record successfully provisioned and verified
+#:   1          Missing /home/homedir.dat, missing arguments, missing zone ID, or API failure
+###################################################################################
+# License Agreement:
+# This file is part of The Wintersys Agile Deployment Toolkit.
+# The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# The Agile Deployment Toolkit is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
@@ -21,27 +71,24 @@ fi
 website_url="${1}"
 ip="${2}"
 
-# Extract structural configuration contexts securely via modern subshells
+# Extract DNS provider choice
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
 if [ -z "${DNS_CHOICE}" ]
 then
-        /bin/echo "Error: Failed to fetch required context variables (TOKEN)." >&2
+        /bin/echo "Error: Failed to fetch required context variable (DNSCHOICE)." >&2
         exit 1
 fi
 
-# Parse apex zone identifier safely
+# Parse apex zone identifier and resolve Cloudflare zone ID
 zone_name="$(/bin/echo "${website_url}" | /usr/bin/cut -d'.' -f2-)"
-
-# Intercept and capture zone ID configurations cleanly
 zone_id="$("${HOME}/services/dns/GetZoneID.sh" "${zone_name}")"
 
-
-if [ -z "${DNS_CHOICE}" ] 
+if [ -z "${zone_id}" ]
 then
-        /bin/echo "Error: Failed to fetch required context variables (TOKEN)." >&2
+        /bin/echo "Error: Failed to resolve Cloudflare Zone ID for '${zone_name}'." >&2
         exit 1
 fi
 
@@ -65,9 +112,7 @@ then
         orchestration_tool="api"
 fi
 
-
-
-# Assemble raw JSON transaction parameters block defensively to resist string injection threats
+# Assemble JSON payload for Cloudflare DNS A-record creation
 json_payload="$(/bin/cat <<EOF
 {
   "type": "A",
@@ -80,7 +125,7 @@ EOF
 )"
 
 set +e
-response="$(${HOME}/services/dns/cloudflare/${orchestration_tool}/add_record.sh "${zone_id}" "${json_payload}")"
+response="$("${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}/add_record.sh" "${zone_id}" "${json_payload}")"
 exit_code="$?"
 set -e
 
@@ -100,3 +145,4 @@ fi
 
 /bin/echo "Cloudflare DNS A-record successfully provisioned: ${website_url} -> ${ip} [Proxied: True, TTL: 120s]"
 exit 0
+
