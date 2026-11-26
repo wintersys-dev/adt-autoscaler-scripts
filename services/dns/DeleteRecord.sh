@@ -3,7 +3,7 @@
 #: Purpose:     Routes DNS record deletion requests to the active DNS provider backend script.
 #: Author:      Peter Winter
 #: Date:        26/11/2026
-#: Version:     2.0
+#: Version:     1.0
 #:
 #: Usage:       DeleteRecord.sh <record_id> <website_url>
 #:              DeleteRecord.sh [-h|--help]
@@ -73,6 +73,12 @@ website_url="${2}"
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
+
+if [ -z "${DNS_CHOICE}" ]
+then
+        /bin/echo "Error: DNS_CHOICE not set" >&2
+        exit 1
+fi
 
 
 script_path="${HOME}/services/dns/${DNS_CHOICE}/DeleteRecord.sh"
