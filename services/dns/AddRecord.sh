@@ -3,7 +3,7 @@
 #: Purpose:     Routes DNS record creation requests to the active DNS provider backend script.
 #: Author:      Peter Winter
 #: Date:        26/11/2026
-#: Version:     2.0
+#: Version:     1.0
 #:
 #: Usage:       AddRecord.sh <website_url> <ip>
 #:              AddRecord.sh [-h|--help]
@@ -74,6 +74,12 @@ ip="${2}"
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
+
+if [ -z "${DNS_CHOICE}" ]
+then
+        /bin/echo "Error: DNS_CHOICE not set" >&2
+        exit 1
+fi
 
 script_path="${HOME}/services/dns/${DNS_CHOICE}/AddRecord.sh"
 
