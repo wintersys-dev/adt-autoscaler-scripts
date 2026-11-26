@@ -1,17 +1,32 @@
 #!/bin/sh
-######################################################################################
-# Author : Peter Winter
-# Date   : 13/06/2016
-# Description : This will setup the configuration file for the current cloudhost cli tool
-# a template is held in the configfiles subdirectory if needed with placeholders that
-# this script replaces with "live" values. If there is a change to the format that a
-# later version of the current cli tool needs needs then the template in the "configfiles"
-# subdirectory will have to be updated to reflect the needed changes. 
-# I did some experimenting and this was the easiest and cleanest way I could come up
-# with for generating these configuration files. 
-######################################################################################
+#: Name:        InitialiseCloudhostConfig.sh
+#: Purpose:     Generates primary and DNS-scoped CLI configuration files for DigitalOcean, Exoscale, Linode, and Vultr.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       InitialiseCloudhostConfig.sh
+#:              InitialiseCloudhostConfig.sh [-h|--help]
+#:
+#: Parameters:
+#:   None       Reads CLOUDHOST, DNSSECURITYKEY, and provider-specific credentials from configuration.
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat and exported
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/utilities/config/ExtractBuildStyleValues.sh
+#:   - ${HOME}/services/cloudhost/configfiles/<provider>/*
+#:   - External binaries: cat, echo, printf, grep, cut, awk, sed, mkdir, cp, chown, chmod, touch, sleep
+#:
+#: Exit Codes:
+#:   0          Cloudhost CLI configuration files generated and secured cleanly
+#:   1          Missing /home/homedir.dat, missing required credentials/templates, or file write failure
+###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -21,225 +36,275 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://www.gnu.org/licenses/>.
-###################################################################################
-###################################################################################
-set -x
+# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+####################################################################################
 
-export HOME="`/bin/cat /home/homedir.dat`"
+# Exit immediately if any command exits with a non-zero status
+#set -x
+set -e
 
-CLOUDHOST="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST'`"
-DNS_SECURITY_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'DNSSECURITYKEY'`"
-
-if ( [ "${CLOUDHOST}" = "digitalocean" ] )
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
 then
-        TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
-
-        /bin/echo "${0} Configuring Digital Ocean CLI tool" 
-
-        if ( [ ! -d ${HOME}/.config/doctl ] )
-        then
-                /bin/mkdir -p ${HOME}/.config/doctl
-        fi
-
-		if ( [ -f ${HOME}/services/cloudhost/configfiles/digitalocean/digitalocean.tmpl ] )
-		then
-        	/bin/cp ${HOME}/services/cloudhost/configfiles/digitalocean/digitalocean.tmpl ${HOME}/.config/doctl/config.yaml
-		fi
-		
-        if ( [ "${TOKEN}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXTOKENXXXX/${TOKEN}/" ${HOME}/.config/doctl/config.yaml
-        else 
-                /bin/echo "${0} Couldn't find your digital ocean account personal access token in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ ! -d /root/.config/doctl ] )
-        then
-                /bin/mkdir -p /root/.config/doctl
-        fi
-        
-        /bin/cp ${HOME}/.config/doctl/config.yaml /root/.config/doctl/config.yaml
-        /bin/chown root:root ${HOME}/.config/doctl/config.yaml /root/.config/doctl/config.yaml
-        /bin/chmod 400 ${HOME}/.config/doctl/config.yaml /root/.config/doctl/config.yaml
-
-        /bin/cp ${HOME}/.config/doctl/config.yaml /root/.config/doctl/dns-do-config.yaml
-        /bin/chown root:root /root/.config/doctl/dns-do-config.yaml
-        /bin/chmod 400 /root/.config/doctl/dns-do-config.yaml
-
-        /bin/sed -i "s/^access-token.*/access-token: ${DNS_SECURITY_KEY}/" /root/.config/doctl/dns-do-config.yaml
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
 fi
 
-if ( [ "${CLOUDHOST}" = "exoscale" ] )
+# Resolve the server toolkit root directory from /home/homedir.dat
+if [ -r /home/homedir.dat ]
 then
-        CLOUDHOST_ACCOUNT_ID="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOSTACCOUNTID'`"
-        REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
-        ACCESS_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'ACCESSKEY'`"
-        SECRET_KEY="`${HOME}/utilities/config/ExtractConfigValue.sh 'SECRETKEY'`"
-
-        /bin/echo "${0} Configuring Exoscale CLI tool" 
-
-        if ( [ ! -d ${HOME}/.config/exoscale ] )
-        then
-                /bin/mkdir -p ${HOME}/.config/exoscale
-        fi
-
-		if ( [ -f ${HOME}/services/cloudhost/configfiles/exoscale/exoscale.tmpl ] )
-		then
-        	/bin/cp ${HOME}/services/cloudhost/configfiles/exoscale/exoscale.tmpl  ${HOME}/.config/exoscale/exoscale.toml
-		fi
-		
-        if ( [ "${CLOUDHOST_ACCOUNT_ID}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXCLOUDEMAILADDRESSXXXX/${CLOUDHOST_ACCOUNT_ID}/" ${HOME}/.config/exoscale/exoscale.toml
-        else 
-                /bin/echo "${0} Couldn't find your exoscale cloud email address in your template, will have to exit"
-                exit
-        fi
-
-        if ( [ "${REGION}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXREGIONXXXX/${REGION}/" ${HOME}/.config/exoscale/exoscale.toml
-        else 
-                /bin/echo "${0} Couldn't find your region in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ "${ACCESS_KEY}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXACCESSKEYXXXX/${ACCESS_KEY}/" ${HOME}/.config/exoscale/exoscale.toml
-        else 
-                /bin/echo "${0} Couldn't find your access key in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ "${SECRET_KEY}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXSECRETKEYXXXX/${SECRET_KEY}/" ${HOME}/.config/exoscale/exoscale.toml
-        else 
-                /bin/echo "${0} Couldn't find your secret key in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ ! -d /root/.config/exoscale ] )
-        then
-                /bin/mkdir -p /root/.config/exoscale
-        fi
-
-        /bin/cp ${HOME}/.config/exoscale/exoscale.toml /root/.config/exoscale/exoscale.toml
-        /bin/chown root:root ${HOME}/.config/exoscale/exoscale.toml /root/.config/exoscale/exoscale.toml
-        /bin/chmod 400 ${HOME}/.config/exoscale/exoscale.toml /root/.config/exoscale/exoscale.toml
-
-        /bin/cp ${HOME}/.config/exoscale/exoscale.toml /root/.config/exoscale/dns-exoscale.toml
-        /bin/chown root:root /root/.config/exoscale/dns-exoscale.toml
-        /bin/chmod 400 /root/.config/exoscale/dns-exoscale.toml
-
-        DNS_ACCESS_KEY="`/bin/echo ${DNS_SECURITY_KEY} | /usr/bin/awk -F':' '{print $1}'`"
-        DNS_SECRET_KEY="`/bin/echo ${DNS_SECURITY_KEY} | /usr/bin/awk -F':' '{print $2}'`"
-
-        /bin/sed -i 's/key.*/key = "'${DNS_ACCESS_KEY}'"/' /root/.config/exoscale/dns-exoscale.toml
-        /bin/sed -i 's/secret.*/secret = "'${DNS_SECRET_KEY}'"/' /root/.config/exoscale/dns-exoscale.toml
+        HOME="$(/bin/cat /home/homedir.dat)"
+        export HOME
+else
+        /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
+        exit 1
 fi
 
-if ( [ "${CLOUDHOST}" = "linode" ] && [ "`${HOME}/utilities/config/ExtractBuildStyleValues.sh "ORCHESTRATION_TOOL" | /usr/bin/awk -F':' '{print $NF}'`" = "cli" ] )
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
 then
-		CLOUDHOST_ACCOUNT_ID="`${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOSTACCOUNTID'`"
-        TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
-        REGION="`${HOME}/utilities/config/ExtractConfigValue.sh 'REGION'`"
-
-        if ( [ ! -d ${HOME}/.config ] )
-        then
-                /bin/mkdir ${HOME}/.config
-        fi
-
-        /bin/echo "${0} Configuring Linode CLI tool" >> ${HOME}/logs/initialbuild/BUILD_PROCESS_MONITORING.log
-
-		if ( [ -f ${HOME}/services/cloudhost/configfiles/linode/linode-cli.tmpl ] )
-		then
-        	/bin/cp ${HOME}/services/cloudhost/configfiles/linode/linode-cli.tmpl  ${HOME}/.config/linode-cli
-		fi
-		
-        if ( [ "${CLOUDHOST_ACCOUNT_ID}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXLINODEACCOUNTUSERNAMEXXXX/${CLOUDHOST_ACCOUNT_ID}/" ${HOME}/.config/linode-cli
-        else 
-                /bin/echo "${0} Couldn't find your linode account username in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ "${TOKEN}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXTOKENXXXX/${TOKEN}/" ${HOME}/.config/linode-cli
-        else 
-                /bin/echo "${0} Couldn't find your linode account personal access token in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ "${REGION}" != "" ] )
-        then
-                /bin/sed -i "s/XXXXREGIONXXXX/${REGION}/" ${HOME}/.config/linode-cli
-        else 
-                /bin/echo "${0} Couldn't find your region id in your template, will have to exit" 
-                exit
-        fi
-
-        if ( [ ! -d /root/.config ] )
-        then
-                /bin/mkdir /root/.config
-        fi
-
-        /bin/cp  ${HOME}/.config/linode-cli /root/.config/linode-cli
-        /bin/chown root:root /root/.config/linode-cli ${HOME}/.config/linode-cli
-        /bin/chmod 400 /root/.config/linode-cli ${HOME}/.config/linode-cli
-
-        /bin/cp ${HOME}/.config/linode-cli /root/.config/dns-linode-cli
-		/bin/cp ${HOME}/.config/linode-cli ${HOME}/.config/dns-linode-cli
-        /bin/chown root:root /root/.config/dns-linode-cli
-        /bin/chmod 400 /root/.config/dns-linode-cli 
-
-        /bin/sed -i "s/^token.*/token = ${DNS_SECURITY_KEY}/" ${HOME}/.config/dns-linode-cli
-        /bin/sed -i "s/^token.*/token = ${DNS_SECURITY_KEY}/" /root/.config/dns-linode-cli
-
-	if ( [ "`/bin/grep "^CLOUDCLITOOL:*" ${HOME}/runtime/software.dat | /bin/grep CLOUDCLITOOL:linode-cli:snap`" != "" ] )
-	then
-		/snap/bin/linode-cli 2>&1 >/dev/null &
-		count="0"
-		while ( ( [ ! -f /root/snap/linode-cli/current/.config/linode-cli ] || [ ! -f /root/snap/linode-cli/current/.config/dns-linode-cli ] ) && [ "${count}" -lt "5" ] )
-		do
-			/bin/cp ${HOME}/.config/linode-cli /root/snap/linode-cli/current/.config/linode-cli 2>&1 >/dev/null
-			/bin/cp ${HOME}/.config/dns-linode-cli /root/snap/linode-cli/current/.config/dns-linode-cli 2>&1 >/dev/null
-			count="`/usr/bin/expr ${count} + 1`"
-			/bin/sleep 5
-		done
-	fi
+        /bin/echo "Error: Resolved HOME directory '${HOME}' is invalid." >&2
+        exit 1
 fi
 
-if ( [ "${CLOUDHOST}" = "vultr" ] )
+config_extractor="${HOME}/utilities/config/ExtractConfigValue.sh"
+style_extractor="${HOME}/utilities/config/ExtractBuildStyleValues.sh"
+
+if [ ! -x "${config_extractor}" ]
 then
-        TOKEN="`${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN'`"
+        /bin/echo "Error: ExtractConfigValue.sh missing or not executable at ${config_extractor}" >&2
+        exit 1
+fi
 
-        if ( [ "${TOKEN}" != "" ] )
+# Escape sed replacement special characters (&, \, and delimiter |)
+escape_sed_rep()
+{
+        printf '%s' "${1}" | /bin/sed -e 's/[\\&|]/\\&/g'
+}
+
+set +e
+CLOUDHOST="$("${config_extractor}" 'CLOUDHOST')"
+DNS_SECURITY_KEY="$("${config_extractor}" 'DNSSECURITYKEY')"
+set -e
+
+if [ -z "${CLOUDHOST}" ]
+then
+        /bin/echo "Error: CLOUDHOST configuration value is missing." >&2
+        exit 1
+fi
+
+umask 077
+
+# 1. DigitalOcean (doctl)
+if [ "${CLOUDHOST}" = "digitalocean" ]
+then
+        set +e
+        TOKEN="$("${config_extractor}" 'TOKEN')"
+        set -e
+
+        if [ -z "${TOKEN}" ]
         then
-                export VULTR_API_KEY="${TOKEN}"
-                if ( [ ! -d ${HOME}/.config ] )
-                then
-                        /bin/mkdir ${HOME}/.config
-                fi
+                /bin/echo "${0}: Couldn't find your DigitalOcean account personal access token; exiting." >&2
+                exit 1
+        fi
 
-                /usr/bin/touch ${HOME}/.config/VULTRAPIKEY:${VULTR_API_KEY}
-                /bin/echo "api-key: ${VULTR_API_KEY}" > ${HOME}/.vultr-cli.yaml
-                /bin/echo "api-key: ${VULTR_API_KEY}" > /root/.vultr-cli.yaml
-                /bin/chown root:root ${HOME}/.vultr-cli.yaml /root/.vultr-cli.yaml
-                /bin/chmod 400 ${HOME}/.vultr-cli.yaml /root/.vultr-cli.yaml
+        tmpl_file="${HOME}/services/cloudhost/configfiles/digitalocean/digitalocean.tmpl"
+        if [ ! -r "${tmpl_file}" ]
+        then
+                /bin/echo "Error: DigitalOcean CLI template missing at ${tmpl_file}" >&2
+                exit 1
+        fi
 
-                /usr/bin/touch ${HOME}/.config/VULTRDNSAPIKEY:${DNS_SECURITY_KEY}
-                /bin/echo "api-key: ${DNS_SECURITY_KEY}" > ${HOME}/.dns-vultr-cli.yaml
-                /bin/echo "api-key: ${DNS_SECURITY_KEY}" > /root/.dns-vultr-cli.yaml
-                /bin/chown root:root ${HOME}/.vultr-cli.yaml /root/.dns-vultr-cli.yaml
-                /bin/chmod 400 ${HOME}/.vultr-cli.yaml /root/.dns-vultr-cli.yaml
-        else
-                /bin/echo "${0} Couldn't find your vultr API key from your template - will have to exit...." 
-                exit
+        /bin/echo "${0}: Configuring DigitalOcean CLI tool"
+        /bin/mkdir -p "${HOME}/.config/doctl" /root/.config/doctl
+
+        /bin/cp "${tmpl_file}" "${HOME}/.config/doctl/config.yaml"
+        escaped_token="$(escape_sed_rep "${TOKEN}")"
+        /bin/sed -i "s|XXXXTOKENXXXX|${escaped_token}|g" "${HOME}/.config/doctl/config.yaml"
+
+        /bin/cp "${HOME}/.config/doctl/config.yaml" /root/.config/doctl/config.yaml
+        /bin/chown root:root "${HOME}/.config/doctl/config.yaml" /root/.config/doctl/config.yaml
+        /bin/chmod 400 "${HOME}/.config/doctl/config.yaml" /root/.config/doctl/config.yaml
+
+        if [ -n "${DNS_SECURITY_KEY}" ]
+        then
+                /bin/cp "${HOME}/.config/doctl/config.yaml" /root/.config/doctl/dns-do-config.yaml
+                escaped_dns_key="$(escape_sed_rep "${DNS_SECURITY_KEY}")"
+                /bin/sed -i "s|^access-token.*|access-token: ${escaped_dns_key}|" /root/.config/doctl/dns-do-config.yaml
+                /bin/chown root:root /root/.config/doctl/dns-do-config.yaml
+                /bin/chmod 400 /root/.config/doctl/dns-do-config.yaml
         fi
 fi
+
+# 2. Exoscale (exo)
+if [ "${CLOUDHOST}" = "exoscale" ]
+then
+        set +e
+        CLOUDHOST_ACCOUNT_ID="$("${config_extractor}" 'CLOUDHOSTACCOUNTID')"
+        REGION="$("${config_extractor}" 'REGION')"
+        ACCESS_KEY="$("${config_extractor}" 'ACCESSKEY')"
+        SECRET_KEY="$("${config_extractor}" 'SECRETKEY')"
+        set -e
+
+        if [ -z "${CLOUDHOST_ACCOUNT_ID}" ] || [ -z "${REGION}" ] || [ -z "${ACCESS_KEY}" ] || [ -z "${SECRET_KEY}" ]
+        then
+                /bin/echo "${0}: Missing required Exoscale credentials (CLOUDHOSTACCOUNTID, REGION, ACCESSKEY, or SECRETKEY); exiting." >&2
+                exit 1
+        fi
+
+        tmpl_file="${HOME}/services/cloudhost/configfiles/exoscale/exoscale.tmpl"
+        if [ ! -r "${tmpl_file}" ]
+        then
+                /bin/echo "Error: Exoscale CLI template missing at ${tmpl_file}" >&2
+                exit 1
+        fi
+
+        /bin/echo "${0}: Configuring Exoscale CLI tool"
+        /bin/mkdir -p "${HOME}/.config/exoscale" /root/.config/exoscale
+
+        /bin/cp "${tmpl_file}" "${HOME}/.config/exoscale/exoscale.toml"
+
+        escaped_email="$(escape_sed_rep "${CLOUDHOST_ACCOUNT_ID}")"
+        escaped_region="$(escape_sed_rep "${REGION}")"
+        escaped_access="$(escape_sed_rep "${ACCESS_KEY}")"
+        escaped_secret="$(escape_sed_rep "${SECRET_KEY}")"
+
+        /bin/sed -i "s|XXXXCLOUDEMAILADDRESSXXXX|${escaped_email}|g" "${HOME}/.config/exoscale/exoscale.toml"
+        /bin/sed -i "s|XXXXREGIONXXXX|${escaped_region}|g" "${HOME}/.config/exoscale/exoscale.toml"
+        /bin/sed -i "s|XXXXACCESSKEYXXXX|${escaped_access}|g" "${HOME}/.config/exoscale/exoscale.toml"
+        /bin/sed -i "s|XXXXSECRETKEYXXXX|${escaped_secret}|g" "${HOME}/.config/exoscale/exoscale.toml"
+
+        /bin/cp "${HOME}/.config/exoscale/exoscale.toml" /root/.config/exoscale/exoscale.toml
+        /bin/chown root:root "${HOME}/.config/exoscale/exoscale.toml" /root/.config/exoscale/exoscale.toml
+        /bin/chmod 400 "${HOME}/.config/exoscale/exoscale.toml" /root/.config/exoscale/exoscale.toml
+
+        if [ -n "${DNS_SECURITY_KEY}" ]
+        then
+                /bin/cp "${HOME}/.config/exoscale/exoscale.toml" /root/.config/exoscale/dns-exoscale.toml
+                DNS_ACCESS_KEY="${DNS_SECURITY_KEY%%:*}"
+                DNS_SECRET_KEY="${DNS_SECURITY_KEY#*:}"
+                escaped_dns_access="$(escape_sed_rep "${DNS_ACCESS_KEY}")"
+                escaped_dns_secret="$(escape_sed_rep "${DNS_SECRET_KEY}")"
+
+                /bin/sed -i "s|^key.*|key = \"${escaped_dns_access}\"|" /root/.config/exoscale/dns-exoscale.toml
+                /bin/sed -i "s|^secret.*|secret = \"${escaped_dns_secret}\"|" /root/.config/exoscale/dns-exoscale.toml
+                /bin/chown root:root /root/.config/exoscale/dns-exoscale.toml
+                /bin/chmod 400 /root/.config/exoscale/dns-exoscale.toml
+        fi
+fi
+# 3. Linode (linode-cli)
+orch_tool=""
+if [ -x "${style_extractor}" ]
+then
+        set +e
+        orch_tool="$("${style_extractor}" "ORCHESTRATION_TOOL" 2>/dev/null | /usr/bin/awk -F':' '{print $NF}')"
+        set -e
+fi
+
+if [ "${CLOUDHOST}" = "linode" ] && [ "${orch_tool}" = "cli" ]
+then
+        set +e
+        CLOUDHOST_ACCOUNT_ID="$("${config_extractor}" 'CLOUDHOSTACCOUNTID')"
+        TOKEN="$("${config_extractor}" 'TOKEN')"
+        REGION="$("${config_extractor}" 'REGION')"
+        set -e
+
+        if [ -z "${CLOUDHOST_ACCOUNT_ID}" ] || [ -z "${TOKEN}" ] || [ -z "${REGION}" ]
+        then
+                /bin/echo "${0}: Missing required Linode credentials (CLOUDHOSTACCOUNTID, TOKEN, or REGION); exiting." >&2
+                exit 1
+        fi
+
+        tmpl_file="${HOME}/services/cloudhost/configfiles/linode/linode-cli.tmpl"
+        if [ ! -r "${tmpl_file}" ]
+        then
+                /bin/echo "Error: Linode CLI template missing at ${tmpl_file}" >&2
+                exit 1
+        fi
+
+        log_dir="${HOME}/logs/initialbuild"
+        /bin/mkdir -p "${log_dir}" "${HOME}/.config" /root/.config
+        /bin/echo "${0}: Configuring Linode CLI tool" >> "${log_dir}/BUILD_PROCESS_MONITORING.log"
+
+        /bin/cp "${tmpl_file}" "${HOME}/.config/linode-cli"
+
+        escaped_account="$(escape_sed_rep "${CLOUDHOST_ACCOUNT_ID}")"
+        escaped_token="$(escape_sed_rep "${TOKEN}")"
+        escaped_region="$(escape_sed_rep "${REGION}")"
+
+        /bin/sed -i "s|XXXXLINODEACCOUNTUSERNAMEXXXX|${escaped_account}|g" "${HOME}/.config/linode-cli"
+        /bin/sed -i "s|XXXXTOKENXXXX|${escaped_token}|g" "${HOME}/.config/linode-cli"
+        /bin/sed -i "s|XXXXREGIONXXXX|${escaped_region}|g" "${HOME}/.config/linode-cli"
+
+        /bin/cp "${HOME}/.config/linode-cli" /root/.config/linode-cli
+        /bin/chown root:root /root/.config/linode-cli "${HOME}/.config/linode-cli"
+        /bin/chmod 400 /root/.config/linode-cli "${HOME}/.config/linode-cli"
+
+        if [ -n "${DNS_SECURITY_KEY}" ]
+        then
+                /bin/cp "${HOME}/.config/linode-cli" /root/.config/dns-linode-cli
+                /bin/cp "${HOME}/.config/linode-cli" "${HOME}/.config/dns-linode-cli"
+                escaped_dns_key="$(escape_sed_rep "${DNS_SECURITY_KEY}")"
+                /bin/sed -i "s|^token.*|token = ${escaped_dns_key}|" "${HOME}/.config/dns-linode-cli"
+                /bin/sed -i "s|^token.*|token = ${escaped_dns_key}|" /root/.config/dns-linode-cli
+                /bin/chown root:root /root/.config/dns-linode-cli "${HOME}/.config/dns-linode-cli"
+                /bin/chmod 400 /root/.config/dns-linode-cli "${HOME}/.config/dns-linode-cli"
+        fi
+
+        if [ -f "${HOME}/runtime/software.dat" ] && /bin/grep -q '^CLOUDCLITOOL:linode-cli:snap' "${HOME}/runtime/software.dat"
+        then
+                /snap/bin/linode-cli >/dev/null 2>&1 &
+                count=0
+                while [ "${count}" -lt 5 ]
+                do
+                        if [ -d /root/snap/linode-cli/current/.config ]
+                        then
+                                /bin/cp "${HOME}/.config/linode-cli" /root/snap/linode-cli/current/.config/linode-cli
+                                /bin/chmod 400 /root/snap/linode-cli/current/.config/linode-cli
+                                if [ -f "${HOME}/.config/dns-linode-cli" ]
+                                then
+                                        /bin/cp "${HOME}/.config/dns-linode-cli" /root/snap/linode-cli/current/.config/dns-linode-cli
+                                        /bin/chmod 400 /root/snap/linode-cli/current/.config/dns-linode-cli
+                                fi
+                                break
+                        fi
+                        count=$((count + 1))
+                        /bin/sleep 5
+                done
+        fi
+fi
+
+# 4. Vultr (vultr-cli)
+if [ "${CLOUDHOST}" = "vultr" ]
+then
+        set +e
+        TOKEN="$("${config_extractor}" 'TOKEN')"
+        set -e
+
+        if [ -z "${TOKEN}" ]
+        then
+                /bin/echo "${0}: Couldn't find your Vultr API key; exiting." >&2
+                exit 1
+        fi
+
+        /bin/mkdir -p "${HOME}/.config" /root/.config
+
+        /usr/bin/touch "${HOME}/.config/VULTRAPIKEY:${TOKEN}"
+        /bin/chmod 400 "${HOME}/.config/VULTRAPIKEY:${TOKEN}"
+        printf 'api-key: %s\n' "${TOKEN}" > "${HOME}/.vultr-cli.yaml"
+        printf 'api-key: %s\n' "${TOKEN}" > /root/.vultr-cli.yaml
+        /bin/chown root:root "${HOME}/.vultr-cli.yaml" /root/.vultr-cli.yaml
+        /bin/chmod 400 "${HOME}/.vultr-cli.yaml" /root/.vultr-cli.yaml
+
+        if [ -n "${DNS_SECURITY_KEY}" ]
+        then
+                /usr/bin/touch "${HOME}/.config/VULTRDNSAPIKEY:${DNS_SECURITY_KEY}"
+                /bin/chmod 400 "${HOME}/.config/VULTRDNSAPIKEY:${DNS_SECURITY_KEY}"
+                printf 'api-key: %s\n' "${DNS_SECURITY_KEY}" > "${HOME}/.dns-vultr-cli.yaml"
+                printf 'api-key: %s\n' "${DNS_SECURITY_KEY}" > /root/.dns-vultr-cli.yaml
+                /bin/chown root:root "${HOME}/.dns-vultr-cli.yaml" /root/.dns-vultr-cli.yaml
+                /bin/chmod 400 "${HOME}/.dns-vultr-cli.yaml" /root/.dns-vultr-cli.yaml
+        fi
+fi
+
+exit 0
+
