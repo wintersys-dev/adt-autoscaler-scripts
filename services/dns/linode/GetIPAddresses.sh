@@ -1,37 +1,33 @@
 #!/bin/sh
-###################################################################################
-# @file        GetIPAddresses.sh
-# @brief       Retrieves active target IP addresses associated with a given DNS sub-domain.
-# @author      Peter Winter
-# @date        10/11/2026
-# @version     1.0
-#
-# @details     This script parses a target Fully Qualified Domain Name (FQDN) into 
-#              isolated sub-domain and zone apex properties, queries provider catalogs
-#              using the Linode CLI under a designated configuration profile, and isolates
-#              the active destination IP target records mapping explicitly to the specified node.
-#
-# @param       $1  [Required] The target website Fully Qualified Domain Name or URL string.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - LogStatusMessages.sh utility logging centralized system events.
-#              - external dependencies: cat, echo, awk, cut, linode-cli, jq
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Replaces legacy, fragile backtick subshells with secure shell evaluations.
-#              - Eliminates redundant subshell grouping fork performance bottlenecks.
-#              - Scopes and purges sensitive configs (LINODE_CLI_CONFIG) tightly inside execution tracks.
-#              - Protects dynamic JSON queries from code parameter injection tracking bugs.
-#
-# @exit        0  Success: Target DNS records successfully located and targets printed.
-# @exit        1  Failure: Missing context paths, input parameter errors, or binary failures.
+#: Name:        GetIPAddresses.sh
+#: Purpose:     Retrieves active target IP addresses associated with a given Linode DNS sub-domain.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       GetIPAddresses.sh <website_url>
+#:              GetIPAddresses.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target website Fully Qualified Domain Name (e.g., "://domain.com")
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/linode/<ORCHESTRATION_TOOL>/get_domains.sh
+#:   - ${HOME}/services/dns/linode/<ORCHESTRATION_TOOL>/get_record_ids.sh
+#:   - External binaries: cat, echo, grep, cut, awk, jq
+#:
+#: Exit Codes:
+#:   0          Target DNS records successfully located and IP targets printed to stdout
+#:   1          Missing /home/homedir.dat, missing arguments, missing domain/records, or API/CLI failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -43,7 +39,18 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
+#set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
 
 if [ -r /home/homedir.dat ]
 then
@@ -55,8 +62,8 @@ fi
 
 if [ -z "${1}" ]
 then
-        status "Error: One argument is required."
-        status "Usage: $0 <website_url>" 
+        /bin/echo "Error: One argument is required." >&2
+        /bin/echo "Usage: $0 <website_url>" >&2
         exit 1
 fi
 
@@ -98,7 +105,7 @@ then
         exit 1
 fi
 
-domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain == $dom) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
@@ -111,7 +118,7 @@ records_json="$(${HOME}/services/dns/linode/${orchestration_tool}/get_record_ids
 records_exit_code="$?"
 set -e
 
-if [ "${exit_code}" -ne 0 ] || [ -z "${records_json}" ]
+if [ "${records_exit_code}" -ne 0 ] || [ -z "${records_json}" ]
 then
         /bin/echo "Failed to query domain records management catalog or network timeout occurred." >&2
         exit 1
