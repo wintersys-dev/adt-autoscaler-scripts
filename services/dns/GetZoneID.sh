@@ -1,33 +1,31 @@
 #!/bin/sh
-###################################################################################
-# @file        GetZoneID.sh
-# @brief       Routes DNS zone ID retrieval requests to specialized backend scripts.
-# @author      Peter Winter
-# @date        10/11/2026
-# @version     1.0
-#
-# @details     This script evaluates a target zone name to determine the designated
-#              DNS provider context. It maps the active deployment strategy against
-#              centralized hardware and software configurations before handing off
-#              execution to target providers to fetch the matching zone tracking ID.
-#
-# @param       $1  [Required] The target DNS zone name string (e.g., "domain.com").
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - external dependencies: cat, awk, test
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Protects layout evaluation chains from unexpected multi-parameter expansions.
-#
-# @exit        0  Success: Underlying script executed cleanly and returned code 0 or script was skipped.
-# @exit        1  Failure: Missing context paths, configuration syntax bugs, or tool failures.
+#: Name:        GetZoneID.sh
+#: Purpose:     Routes DNS zone ID retrieval requests to the active DNS provider backend script.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       GetZoneID.sh <zone_name>
+#:              GetZoneID.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target DNS zone domain name (e.g., "domain.com")
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/GetZoneID.sh
+#:   - External binaries: cat, echo, grep, cut
+#:
+#: Exit Codes:
+#:   0          DNS zone ID retrieval routed and executed cleanly
+#:   1          Missing /home/homedir.dat, missing arguments, missing DNSCHOICE, or backend failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -37,10 +35,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+# along with The Wintersys Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
