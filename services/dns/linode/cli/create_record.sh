@@ -1,36 +1,32 @@
 #!/bin/sh
+#: Name:        create_record.sh
+#: Purpose:     Creates a new DNS zone or DNS record under a Linode domain via linode-cli.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       create_record.sh <domain_id|zone> <json_payload>
+#:              create_record.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target Linode domain ID, or literal "zone" to create a new master zone
+#:   $2         [Required] Valid JSON payload defining DNS zone or record attributes
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - /usr/local/bin/linode-cli
+#:   - External binaries: cat, echo, grep, cut, jq
+#:
+#: Exit Codes:
+#:   0          Target DNS domain zone or record created cleanly
+#:   1          Missing /home/homedir.dat, missing arguments, missing TOKEN, or CLI failure
 ###################################################################################
-# @file        create_record.sh
-# @brief       Creates a new DNS record under a specific Linode domain via CLI.
-# @author      Peter Winter
-# @date        12/11/2026
-# @version     1.0
-#
-# @details     This script exports the required infrastructure authentication tokens,
-#              validates the presence of target domain identifiers and record creation
-#              payloads, and executes the provider CLI tool with strict status capture
-#              routines to create a DNS record under the target domain.
-#
-# @param       $1  [Required] The unique numerical identifier of the target DNS domain.
-# @param       $2  [Required] A valid JSON payload containing DNS record specification details.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking the active framework layout.
-#              - external dependencies: cat, echo, linode-cli
-#
-# @security    
-#              - Hardens system-owned paths (/bin, /usr/local/bin) to eliminate executable hijack vectors.
-#              - Quotes variable interpolations thoroughly to trap space-injection hazards.
-#              - Ensures the CLI authorization token environment variable is cleared immediately post-run.
-#
-# @exit        0  Success: Target DNS domain record created cleanly.
-# @exit        *  Failure: Missing arguments, missing framework layouts, or bubbling
-#                 exit codes generated directly by the underlying cloud execution client.
-##################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -42,8 +38,17 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
@@ -55,8 +60,8 @@ fi
 
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Domain ID and JSON payload arguments are required."
-        /bin/echo "Usage: $0 <domain_id> <json_payload>"
+        /bin/echo "Error: Domain ID (or 'zone') and JSON payload arguments are required." >&2
+        /bin/echo "Usage: $0 <domain_id|zone> <json_payload>" >&2
         exit 1
 fi
 
@@ -99,9 +104,10 @@ unset LINODE_CLI_TOKEN
 
 if [ "${exit_code}" -ne 0 ]
 then
-        /bin/echo  "Error: linode-cli domains records-create failed with exit code ${exit_code}." >&2
+        /bin/echo "Error: linode-cli domains operation failed with exit code ${exit_code}." >&2
         exit "${exit_code}"
 fi
 
 exit 0
+
  
