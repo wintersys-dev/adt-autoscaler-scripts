@@ -1,38 +1,35 @@
 #!/bin/sh
-###################################################################################
-# @file        DeleteRecordByIP.sh
-# @brief       Deletes DNS record(s) matching a target FQDN and IP address.
-# @author      Peter Winter
-# @date        13/11/2026
-# @version     1.0
-#
-# @details     This script parses a target Fully Qualified Domain Name (FQDN) into
-#              sub-domain and baseline zone properties, resolves the active orchestration
-#              tool (CLI or API), queries provider catalogs to locate the domain zone ID
-#              and all matching DNS record IDs pointing to the specified IP address, and
-#              executes delete_record.sh to purge them cleanly.
-#
-# @param       $1  [Required] The target Fully Qualified Domain Name (e.g., "://domain.com").
-# @param       $2  [Required] The target IP address whose DNS record(s) should be removed.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/buildhome.dat configuration file tracking active framework layout.
-#              - software.dat configuration file defining the active ORCHESTRATION_TOOL.
-#              - LogStatusMessages.sh utility logging centralized system events.
-#              - external dependencies: cat, echo, awk, cut, jq
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Replaces legacy, fragile backtick subshells with secure shell evaluations.
-#              - Protects dynamic JSON queries from code parameter injection tracking bugs.
-#
-# @exit        0  Success: Matching DNS record(s) deleted cleanly (or none found).
-# @exit        1  Failure: Missing context paths, input parameter errors, or API/CLI failures.
+#: Name:        DeleteRecordByIP.sh
+#: Purpose:     Deletes Linode DNS record(s) matching a target FQDN and IP address.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       DeleteRecordByIP.sh <fqdn> <target_ip>
+#:              DeleteRecordByIP.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target Fully Qualified Domain Name (e.g., "://domain.com")
+#:   $2         [Required] Target IPv4/IPv6 address whose DNS record(s) should be removed
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/<ORCHESTRATION_TOOL>/get_domains.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/<ORCHESTRATION_TOOL>/get_record_ids.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/<ORCHESTRATION_TOOL>/delete_record.sh
+#:   - External binaries: cat, echo, grep, cut, awk, jq
+#:
+#: Exit Codes:
+#:   0          Matching DNS record(s) deleted cleanly (or none found)
+#:   1          Missing /home/homedir.dat, missing arguments, missing domain ID, or API/CLI failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -44,8 +41,18 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
 
 if [ -r /home/homedir.dat ]
 then
@@ -57,8 +64,8 @@ fi
 
 if [ -z "${1}" ] || [ -z "${2}" ]
 then
-        /bin/echo "Error: Fully Qualified Domain Name and target IP parameters are required."
-        /bin/echo "Usage: $0 <fqdn> <target_ip>"
+        /bin/echo "Error: Fully Qualified Domain Name and target IP parameters are required." >&2
+        /bin/echo "Usage: $0 <fqdn> <target_ip>" >&2
         exit 1
 fi
 
@@ -116,7 +123,7 @@ then
         exit 1
 fi
 
-domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain == $dom) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
