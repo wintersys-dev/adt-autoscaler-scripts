@@ -1,37 +1,34 @@
 #!/bin/sh
-###################################################################################
-# @file        AddRecord.sh
-# @brief       Provisions a new dynamic A-record entry within the DNS provider matrix.
-# @author      Peter Winter
-# @date        05/11/2026
-# @version     1.0
-#
-# @details     This script parses a target fully qualified domain name (FQDN) into 
-#              isolated sub-domain and baseline zone properties, queries provider catalogs
-#              securely to capture the domain zone ID wrapper, and executes an authorized
-#              transaction payload to inject the tracking destination IP node.
-#
-# @param       $1  [Required] The target Fully Qualified Domain Name (e.g., "www.domain.com").
-# @param       $2  [Required] The target IPv4 address destination tracking node.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - external dependencies: cat, echo, awk, cut, curl, jq
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Replaces legacy, fragile backtick subshells with secure shell evaluations.
-#              - Eliminates redundant subshell grouping fork performance bottlenecks.
-#              - Masks API interactions securely via stream piping using the @- syntax.
-#              - Protects dynamic JSON queries from code parameter injection tracking bugs.
-#
-# @exit        0  Success: Target DNS A-record successfully provisioned and verified.
-# @exit        1  Failure: Missing context paths, input parameter errors, or API communication failures.
+#: Name:        AddRecord.sh
+#: Purpose:     Provisions a new dynamic A-record entry within the Linode DNS provider backend.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       AddRecord.sh <fqdn> <target_ip>
+#:              AddRecord.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target Fully Qualified Domain Name (e.g., "://domain.com")
+#:   $2         [Required] Target IPv4 address destination tracking node
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/linode/<ORCHESTRATION_TOOL>/get_domains.sh
+#:   - ${HOME}/services/dns/linode/<ORCHESTRATION_TOOL>/create_record.sh
+#:   - External binaries: cat, echo, grep, cut, awk, jq
+#:
+#: Exit Codes:
+#:   0          Target DNS A-record successfully provisioned and verified
+#:   1          Missing /home/homedir.dat, missing arguments, missing domain ID, or API failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -43,8 +40,17 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
@@ -100,7 +106,7 @@ then
         exit 1
 fi
 
-domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain == $dom) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
