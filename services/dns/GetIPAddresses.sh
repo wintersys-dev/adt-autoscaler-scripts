@@ -1,34 +1,31 @@
 #!/bin/sh
-###################################################################################
-# @file        GetIPAddresses.sh
-# @brief       Routes DNS IP address retrieval requests using the standalone environment layout.
-# @author      Peter Winter
-# @date        10/11/2026
-# @version     1.0
-#
-# @details     This script evaluates a target website URL to determine the designated
-#              DNS provider context within the standalone workspace. It validates layout 
-#              paths, software maps, and orchestration targets before handing off execution 
-#              to backend modules to fetch matching IP records.
-#
-# @param       $1  [Required] The target website Fully Qualified Domain Name or URL string.
-#
-# @env         HOME                Path to the stand-alone environment framework directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active base home path.
-#              - ExtractConfigValue.sh configuration variable extraction utility.
-#              - external dependencies: cat, awk, test
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Protects layout evaluation chains from unexpected multi-parameter expansions.
-#
-# @exit        0  Success: Underlying script executed cleanly and returned code 0.
-# @exit        1  Failure: Missing context paths, configuration syntax bugs, or tool failures.
+#: Name:        GetIPAddresses.sh
+#: Purpose:     Routes DNS IP address retrieval requests to the active DNS provider backend script.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       GetIPAddresses.sh <website_url>
+#:              GetIPAddresses.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target website Fully Qualified Domain Name (FQDN)
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat and exported
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/GetIPAddresses.sh
+#:   - External binaries: cat, echo, grep, cut
+#:
+#: Exit Codes:
+#:   0          DNS IP address retrieval routed and executed cleanly
+#:   1          Missing /home/homedir.dat, missing arguments, missing DNSCHOICE, or backend failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -40,8 +37,17 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 # Resolve HOME baseline layout securely
 if [ -r /home/homedir.dat ]
