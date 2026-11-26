@@ -83,6 +83,11 @@ then
         exit 1
 fi
 
+if [ ! -d "${HOME}/services/dns/${DNS_CHOICE}/${orchestration_tool}" ] 
+then
+        orchestration_tool="api"
+fi
+
 set +e
 domain_json="$(${HOME}/services/dns/linode/${orchestration_tool}/get_domains.sh)"
 exit_code="$?"
