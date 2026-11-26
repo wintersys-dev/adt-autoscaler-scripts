@@ -1,36 +1,32 @@
 #!/bin/sh
-############################################################################
-# @file        GetServerPrivateIPAddressByPublicIPAddress.sh
-# @brief       Resolves a machine's private VPC IP based on its public NAT IP.
-# @author      Peter Winter
-# @date        13/06/2021
-# @version     1.0
-#
-# @details     This script connects to the Linode v4 VPC IPs endpoint to query 
-#              network address configurations. It searches the dataset for the 
-#              provided public IP address via the 'nat_1_1' attribute and extracts 
-#              its mapped private IPv4 address using jq.
-#
-# @param       $1  [Required] The target public IPv4 address to translate.
-#
-# @env         HOME                Path to the framework root directory (read from file).
-# @env         REGION              The region that the servers are running in.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking the active framework layout.
-#              - external dependencies: curl, jq, cat, mkdir, dirname, date, echo
-#
-# @security    
-#              - Filters curl interactions through piped authorization headers via @- syntax.
-#              - Hardens system-owned paths (/bin, /usr/bin) to eliminate executable hijack vectors.
-#              - Wraps API data extractions safely in localized variables.
-#
-# @exit        0  Success: The private VPC IP was found and printed to stdout.
-# @exit        1  Failure: Missing arguments, invalid token, network timeouts, or 
-#                 no matching private VPC IP exists for the given public IP.
-#############################################################################
+#: Name:        GetServerPrivateIPAddressByPublicIPAddress.sh
+#: Purpose:     Resolves a Linode instance's private VPC IPv4 address from its public 1:1 NAT IPv4 address.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       GetServerPrivateIPAddressByPublicIPAddress.sh <server_public_ip>
+#:              GetServerPrivateIPAddressByPublicIPAddress.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target public IPv4 address of the Linode server instance
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat and exported
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/services/server/linode/<orchestration_tool>/get_vpc_ips.sh
+#:   - External binaries: cat, echo, printf, grep, cut, awk, tr, head, jq
+#:
+#: Exit Codes:
+#:   0          Private VPC IPv4 address resolved and printed to stdout
+#:   1          Missing /home/homedir.dat, invalid IP argument, missing driver/config, or no matching VPC IP
+###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -42,70 +38,112 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
-####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
 
-# Resolve BUILD_HOME baseline layout securely
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
+# Resolve the server toolkit root directory from /home/homedir.dat
 if [ -r /home/homedir.dat ]
 then
         HOME="$(/bin/cat /home/homedir.dat)"
+        export HOME
 else
         /bin/echo "Application framework configuration file missing at /home/homedir.dat" >&2
         exit 1
 fi
 
-# Input validation
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
+then
+        /bin/echo "Error: Resolved HOME directory '${HOME}' is invalid." >&2
+        exit 1
+fi
+
 if [ -z "${1}" ]
 then
-        /bin/echo "Error: Server public ip argument is required." >&2
-        /bin/echo "Usage: $0 <server_public_ip>" >&2
+        /bin/echo "Error: Server public IP address argument is required." >&2
+        /bin/echo "Usage: ${0} <server_public_ip>" >&2
         exit 1
 fi
 
 server_ip="${1}"
 
-set +e
-#TOKEN="$(${HOME}/utilities/config/ExtractConfigValue.sh 'TOKEN')"
-REGION="$(${HOME}/utilities/config/ExtractConfigValue.sh 'REGION')"
-set -e
-
-software_file="${HOME}/runtime/software.dat"
-if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
+if ! printf '%s\n' "${server_ip}" | /usr/bin/grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$'
 then
-    /bin/echo "Error: Cannot read software configuration file at ${software_file}"  >&2
-    exit 1
-fi
-
-orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}" 2>/dev/null | /bin/tr -d ' ')"
-
-if [ -z "${orchestration_tool}" ]
-then
-    /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}"  >&2
-    exit 1
-fi
-
-# Temporary disable set -e to evaluate curl transaction pipeline failures manually
-set +e
-response="$(${HOME}/services/server/linode/${orchestration_tool}/get_vpc_ips.sh "${REGION}")"
-curl_status="$?"
-set -e
-
-if [ "${curl_status}" -eq 0 ] && [ -n "${response}" ]
-then
-        output="$(/bin/echo "${response}" | /usr/bin/jq -r --arg ip "${server_ip}" '.[] | select(.nat_1_1 == $ip).address')"
-
-        if [ -z "${output}" ] || [ "${output}" = "null" ]
-        # Ensure a valid private VPC IP string was found
-        then
-                /bin/echo "Error: No matching private IP address found for public ip ${server_ip}."  >&2
-                exit 1
-        else
-                /bin/echo "${output}"
-        fi
-else
-        /bin/echo "Network request failed. Check your API token or URL."  >&2
+        /bin/echo "Error: Invalid IPv4 address format '${server_ip}'." >&2
         exit 1
 fi
 
+extract_script="${HOME}/utilities/config/ExtractConfigValue.sh"
+if [ ! -x "${extract_script}" ]
+then
+        /bin/echo "Error: ExtractConfigValue.sh missing or not executable at ${extract_script}" >&2
+        exit 1
+fi
+
+set +e
+REGION="$("${extract_script}" 'REGION')"
+set -e
+
+if [ -z "${REGION}" ]
+then
+        /bin/echo "Error: Failed to retrieve REGION configuration value." >&2
+        exit 1
+fi
+
+software_file="${HOME}/runtime/software.dat"
+if [ ! -r "${software_file}" ]
+then
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
+        exit 1
+fi
+
+orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}" 2>/dev/null | /bin/tr -d ' ')"
+if [ -z "${orchestration_tool}" ]
+then
+        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
+        exit 1
+fi
+
+vpc_ips_script="${HOME}/services/server/linode/${orchestration_tool}/get_vpc_ips.sh"
+if [ ! -x "${vpc_ips_script}" ]
+then
+        /bin/echo "Error: VPC IP lookup script missing or not executable at ${vpc_ips_script}" >&2
+        exit 1
+fi
+
+if [ ! -x /usr/bin/jq ]
+then
+        /bin/echo "Error: /usr/bin/jq not found or not executable." >&2
+        exit 1
+fi
+
+set +e
+response="$("${vpc_ips_script}" "${REGION}")"
+vpc_status="$?"
+set -e
+
+if [ "${vpc_status}" -ne 0 ] || [ -z "${response}" ]
+then
+        /bin/echo "Error: Failed to retrieve Linode VPC IP inventory for region '${REGION}'." >&2
+        exit 1
+fi
+
+output="$(printf '%s\n' "${response}" | /usr/bin/jq -r --arg ip "${server_ip}" '.[] | select((.nat_1_1 // "") == $ip) | .address' | /usr/bin/head -n 1)"
+
+if [ -z "${output}" ] || [ "${output}" = "null" ]
+then
+        /bin/echo "Error: No matching private IP address found for public IP ${server_ip}." >&2
+        exit 1
+fi
+
+/bin/echo "${output}"
 exit 0
+
