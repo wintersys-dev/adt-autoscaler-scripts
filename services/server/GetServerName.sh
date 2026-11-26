@@ -1,33 +1,31 @@
-#!/bin/sh 
-###################################################################################
-# @file        GetServerName.sh
-# @brief       Resolves active provider configurations and triggers label discovery by IP.
-# @author      Peter Winter
-# @date        13/07/2021
-# @version     1.0
-#
-# @details     This script acts as the entry orchestrator within the framework for 
-#              server metadata lookup. It verifies active cloud environment states,
-#              determines the downstream orchestration toolchain, validates script 
-#              permissions, and hands off the target IPv4 address to find its 
-#              corresponding host system name.
-#
-# @param       $1  [Required] The targeted public IPv4 address of the server instance.
-#
-# @env         None explicitly sourced from top-level environment registers.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking the active application root path.
-#
-# @security    
-#              - Relies on system-owned executable paths (/bin, /usr/bin) to circumvent malicious search path injection.
-#
-# @exit        0  Success: Target handoff complete and server name resolved successfully.
-# @exit        1  Failure: Missing arguments, unreadable environment configurations, 
-#                 or an error encountered executing downstream provider scripts.
+#!/bin/sh
+#: Name:        GetServerName.sh
+#: Purpose:     Routes server hostname/label lookup by public IPv4 address to the active cloud provider driver.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       GetServerName.sh <server_ip>
+#:              GetServerName.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Public IPv4 address of the target server instance
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat and exported
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/server/<cloudhost>/GetServerName.sh
+#:   - External binaries: cat, echo, printf, grep, cut
+#:
+#: Exit Codes:
+#:   0          Server hostname/label resolved and printed cleanly
+#:   1          Missing /home/homedir.dat, invalid IP argument, missing driver, or provider lookup failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -38,59 +36,83 @@
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
-#########################################################################################
+####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
 
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
+# Resolve the server toolkit root directory from /home/homedir.dat
 if [ -r /home/homedir.dat ]
 then
         HOME="$(/bin/cat /home/homedir.dat)"
+        export HOME
 else
         /bin/echo "Application root configuration file missing at /home/homedir.dat" >&2
         exit 1
 fi
 
-
-# 1. Check for the required argument safely
-if [ -z "$1" ]
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
 then
-    /bin/echo "Error: Server IP address argument is required." >&2
-    /bin/echo "Usage: $0 <server_ip>" >&2
-    exit 1
+        /bin/echo "Error: Resolved HOME directory '${HOME}' is invalid." >&2
+        exit 1
 fi
 
-server_ip="$1"
+if [ -z "${1}" ]
+then
+        /bin/echo "Error: Server IP address argument is required." >&2
+        /bin/echo "Usage: ${0} <server_ip>" >&2
+        exit 1
+fi
+
+server_ip="${1}"
+
+if ! printf '%s\n' "${server_ip}" | /usr/bin/grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+then
+        /bin/echo "Error: Invalid IPv4 address format '${server_ip}'." >&2
+        exit 1
+fi
+
+extract_script="${HOME}/utilities/config/ExtractConfigValue.sh"
+if [ ! -x "${extract_script}" ]
+then
+        /bin/echo "Error: ExtractConfigValue.sh missing or not executable at ${extract_script}" >&2
+        exit 1
+fi
 
 set +e
-CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
+CLOUDHOST="$("${extract_script}" 'CLOUDHOST')"
 set -e
+
+if [ -z "${CLOUDHOST}" ]
+then
+        /bin/echo "Error: Failed to retrieve CLOUDHOST configuration value." >&2
+        exit 1
+fi
 
 script_path="${HOME}/services/server/${CLOUDHOST}/GetServerName.sh"
 
 if [ ! -f "${script_path}" ]
 then
-    /bin/echo "Error: Script not found at ${script_path}" >&2
-    exit 1
+        /bin/echo "Error: Script not found at ${script_path}" >&2
+        exit 1
 fi
 
 if [ ! -x "${script_path}" ]
 then
-    /bin/echo "Error: Script at ${script_path} is not executable." >&2
-    exit 1
+        /bin/echo "Error: Script at ${script_path} is not executable." >&2
+        exit 1
 fi
 
-set +e
-"${script_path}" "${server_ip}"
-exit_code=$?
-set -e
+exec "${script_path}" "${server_ip}"
 
-if [ ${exit_code} -ne 0 ]
-then
-    /bin/echo "Error: GetServerName.sh failed with exit code $exit_code" >&2
-    exit $exit_code
-fi
-
-exit 0
 
 
 
