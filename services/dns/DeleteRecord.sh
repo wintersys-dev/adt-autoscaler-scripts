@@ -1,34 +1,33 @@
 #!/bin/sh
-###################################################################################
-# @file        DeleteRecord.sh
-# @brief       Routes DNS record deletion requests to specialized backend scripts.
-# @author      Peter Winter
-# @date        10/11/2026
-# @version     1.0
-#
-# @details     This script evaluates a specific record ID, a target website URL,
-#              and authority constraints to determine the designated provider context.
-#              It maps the active deployment strategy against centralized hardware and
-#              software configurations before handing off execution to target providers.
-#
-# @param       $1  [Required] The unique platform identifier of the target DNS record.
-# @param       $2  [Required] The target website Fully Qualified Domain Name or URL string.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - external dependencies: cat, awk, test
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Protects layout evaluation chains from unexpected multi-parameter expansions.
-#
-# @exit        0  Success: Underlying script executed cleanly and returned code 0.
-# @exit        1  Failure: Missing context paths, configuration syntax bugs, or tool failures.
+#: Name:        DeleteRecord.sh
+#: Purpose:     Routes DNS record deletion requests to the active DNS provider backend script.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       DeleteRecord.sh <record_id> <website_url>
+#:              DeleteRecord.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Unique platform identifier of the target DNS record
+#:   $2         [Required] Target website Fully Qualified Domain Name (FQDN)
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/services/dns/<DNSCHOICE>/DeleteRecord.sh
+#:   - External binaries: cat, echo, grep, cut
+#:
+#: Exit Codes:
+#:   0          DNS record deletion routed and executed cleanly
+#:   1          Missing /home/homedir.dat, missing arguments, missing DNSCHOICE/software.dat, or backend failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -40,8 +39,18 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
 
 if [ -r /home/homedir.dat ]
 then
