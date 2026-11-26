@@ -53,7 +53,7 @@ API_URL="https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?type=
 set +e
 if /bin/echo "${DNS_SECURITY_KEY}" | /bin/grep -q ':::'
 then
-        api_token="$(/bin/echo "${DNS_SECURITY_KEY}" | /usr/bin/awk -F':::' '{print $2}')"
+        api_token="${DNS_SECURITY_KEY#*:::}"
         RESPONSE="$(/bin/echo "Authorization: Bearer ${api_token}" | /usr/bin/curl -H @- -sS -w "\nHTTP_STATUS:%{http_code}" -X GET "${API_URL}" -H "Content-Type: application/json" 2>&1)"
 else
         RESPONSE="$(/bin/echo "X-Auth-Key: ${DNS_SECURITY_KEY}" | /usr/bin/curl -H @- -sS -w "\nHTTP_STATUS:%{http_code}" -X GET "${API_URL}" -H "X-Auth-Email: ${DNS_USERNAME}" -H "Content-Type: application/json" 2>&1)"
