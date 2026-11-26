@@ -1,36 +1,32 @@
 #!/bin/sh
+#: Name:        delete_record.sh
+#: Purpose:     Deletes a specific DNS record from a Linode domain via linode-cli.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       delete_record.sh <domain_id> <record_id>
+#:              delete_record.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Unique numerical identifier of the target Linode DNS domain
+#:   $2         [Required] Unique numerical identifier of the target Linode DNS record
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - /usr/local/bin/linode-cli
+#:   - External binaries: cat, echo, grep, cut
+#:
+#: Exit Codes:
+#:   0          Target DNS domain record deleted cleanly
+#:   *          Missing /home/homedir.dat, missing arguments, missing TOKEN, or bubbled CLI exit code
 ###################################################################################
-# @file        delete_record.sh
-# @brief       Deletes a specific DNS record from a Linode domain via CLI.
-# @author      Peter Winter
-# @date        12/11/2026
-# @version     1.0
-#
-# @details     This script exports the required infrastructure authentication tokens,
-#              validates the presence of target domain and record identifiers, and
-#              executes the provider CLI tool with strict status capture routines to
-#              delete the specified DNS record.
-#
-# @param       $1  [Required] The unique numerical identifier of the target DNS domain.
-# @param       $2  [Required] The unique numerical identifier of the target DNS record.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking the active framework layout.
-#              - external dependencies: cat, echo, linode-cli
-#
-# @security    
-#              - Hardens system-owned paths (/bin, /usr/local/bin) to eliminate executable hijack vectors.
-#              - Quotes variable interpolations thoroughly to trap space-injection hazards.
-#              - Ensures the CLI authorization token environment variable is cleared immediately post-run.
-#
-# @exit        0  Success: Target DNS domain record deleted cleanly.
-# @exit        *  Failure: Missing arguments, missing framework layouts, or bubbling
-#                 exit codes generated directly by the underlying cloud execution client.
-##################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -42,8 +38,17 @@
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
@@ -89,3 +94,4 @@ then
 fi
 
 exit 0
+
