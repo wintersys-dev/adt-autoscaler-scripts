@@ -1,33 +1,31 @@
-#!/bin/sh 
-###################################################################################
-# @file        GetServerPrivateIPAddressesMain.sh
-# @brief       Resolves active runtime paths and triggers provider-specific private IP lookup.
-# @author      Peter Winter
-# @date        13/07/2021
-# @version     1.0
-#
-# @details     This script acts as a high-level orchestrator within the framework.
-#              It parses core runtime configuration metadata to determine the active
-#              cloud host and deployment orchestration toolchain, validates script path
-#              permissions, and forwards the server name parameter to the downstream
-#              provider subsystem to isolate private network addresses.
-#
-# @param       $1  [Required] The unique name or type label of the target machine.
-#
-# @env         None explicitly sourced from top-level environment registers.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking the active application root path.
-#
-# @security    
-#              - Relies on system-owned executable paths (/bin, /usr/bin) to circumvent malicious search path injection.
-#
-# @exit        0  Success: Target handoff complete and server private IP resolved successfully.
-# @exit        1  Failure: Missing positional parameters, unreadable environment configurations,
-#                 or a downstream script processing exception encountered.
+#!/bin/sh
+#: Name:        GetServerPrivateIPAddressesMain.sh
+#: Purpose:     Routes private IPv4 address discovery by server type/label to the active cloud provider driver.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       GetServerPrivateIPAddressesMain.sh <server_type>
+#:              GetServerPrivateIPAddressesMain.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Server type prefix or unique machine label (e.g., ws-lon1-prod)
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat and exported
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/server/<cloudhost>/GetServerPrivateIPAddresses.sh
+#:   - External binaries: cat, echo, grep, cut
+#:
+#: Exit Codes:
+#:   0          Private IPv4 address(es) resolved and printed cleanly
+#:   1          Missing /home/homedir.dat, missing argument, missing driver, or provider lookup failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -38,58 +36,77 @@
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
 # along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
-#########################################################################################
+####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
 
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
+
+# Resolve the server toolkit root directory from /home/homedir.dat
 if [ -r /home/homedir.dat ]
 then
         HOME="$(/bin/cat /home/homedir.dat)"
+        export HOME
 else
         /bin/echo "Application root configuration file missing at /home/homedir.dat" >&2
         exit 1
 fi
 
-# 1. Check for the required argument safely
-if [ -z "$1" ]
+if [ -z "${HOME}" ] || [ ! -d "${HOME}" ]
 then
-    /bin/echo "Error: Server type argument is required." >&2
-    /bin/echo "Usage: $0 <server_type>" >&2
-    exit 1
+        /bin/echo "Error: Resolved HOME directory '${HOME}' is invalid." >&2
+        exit 1
 fi
 
-server_type="$1"
+if [ -z "${1}" ]
+then
+        /bin/echo "Error: Server type argument is required." >&2
+        /bin/echo "Usage: ${0} <server_type>" >&2
+        exit 1
+fi
+
+server_type="${1}"
+
+extract_script="${HOME}/utilities/config/ExtractConfigValue.sh"
+if [ ! -x "${extract_script}" ]
+then
+        /bin/echo "Error: ExtractConfigValue.sh missing or not executable at ${extract_script}" >&2
+        exit 1
+fi
 
 set +e
-CLOUDHOST="$(${HOME}/utilities/config/ExtractConfigValue.sh 'CLOUDHOST')"
+CLOUDHOST="$("${extract_script}" 'CLOUDHOST')"
 set -e
+
+if [ -z "${CLOUDHOST}" ]
+then
+        /bin/echo "Error: Failed to retrieve CLOUDHOST configuration value." >&2
+        exit 1
+fi
 
 script_path="${HOME}/services/server/${CLOUDHOST}/GetServerPrivateIPAddresses.sh"
 
 if [ ! -f "${script_path}" ]
 then
-    /bin/echo "Error: Script not found at ${script_path}" >&2
-    exit 1
+        /bin/echo "Error: Script not found at ${script_path}" >&2
+        exit 1
 fi
 
 if [ ! -x "${script_path}" ]
 then
-    /bin/echo "Error: Script at ${script_path} is not executable." >&2
-    exit 1
+        /bin/echo "Error: Script at ${script_path} is not executable." >&2
+        exit 1
 fi
 
-set +e
-"${script_path}" "${server_type}"
-exit_code=$?
-set -e
+exec "${script_path}" "${server_type}"
 
-if [ ${exit_code} -ne 0 ]
-then
-    /bin/echo "Error: GetServerPrivateIPAddresses.sh failed with exit code $exit_code" >&2
-    exit $exit_code
-fi
-
-exit 0
 
 
 
