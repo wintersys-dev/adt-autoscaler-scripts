@@ -1,36 +1,34 @@
 #!/bin/sh
-###################################################################################
-# @file        GetRecordID.sh
-# @brief       Resolves the unique DNS record identifier matching an FQDN and IP address.
-# @author      Peter Winter
-# @date        13/11/2026
-# @version     1.0
-#
-# @details     This script parses a target Fully Qualified Domain Name (FQDN) into
-#              its zone apex domain root and sub-domain fields, resolves the active
-#              orchestration tool (CLI or API), queries provider catalogs to capture
-#              the parent zone ID, and filters zone record entries to output the
-#              record ID matching both the sub-domain and target IP address.
-#
-# @param       $1  [Required] The target Fully Qualified Domain Name (e.g., "://domain.com").
-# @param       $2  [Required] The target IP address to match against DNS records.
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - software.dat configuration file defining the active ORCHESTRATION_TOOL.
-#              - external dependencies: cat, echo, awk, cut, jq
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Protects dynamic JSON queries from parameter injection via jq --arg.
-#
-# @exit        0  Success: Matching DNS record ID successfully resolved and printed.
-# @exit        1  Failure: Missing context paths, input parameter errors, or lookup failures.
+#: Name:        GetRecordID.sh
+#: Purpose:     Resolves the unique Linode DNS record identifier matching an FQDN and IP address.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     2.0
+#:
+#: Usage:       GetRecordID.sh <fqdn> <target_ip>
+#:              GetRecordID.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Target Fully Qualified Domain Name (e.g., "://domain.com")
+#:   $2         [Required] Target IPv4/IPv6 address to match against DNS records
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/<ORCHESTRATION_TOOL>/get_domains.sh
+#:   - ${HOME}/services/dns/<DNSCHOICE>/<ORCHESTRATION_TOOL>/get_record_ids.sh
+#:   - External binaries: cat, echo, grep, cut, awk, jq
+#:
+#: Exit Codes:
+#:   0          Matching DNS record ID successfully resolved and printed to stdout
+#:   1          Missing /home/homedir.dat, missing arguments, missing domain/record ID, or API/CLI failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -40,10 +38,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+# along with The Wintersys Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
@@ -74,18 +81,12 @@ then
         exit 1
 fi
 
-software_file="${HOME}/runtime/software.dat"
-if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
-then
-        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
-        exit 1
-fi
 
 orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
 
 if [ -z "${orchestration_tool}" ]
 then
-        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}"
+        /bin/echo "Error: ORCHESTRATION_TOOL not found in ${software_file}" >&2
         exit 1
 fi
 
@@ -113,7 +114,7 @@ then
         exit 1
 fi
 
-domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain == $dom) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
