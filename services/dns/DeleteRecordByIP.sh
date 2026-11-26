@@ -65,6 +65,12 @@ set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
+if [ -z "${DNS_CHOICE}" ]
+then
+        /bin/echo "Error: DNS_CHOICE not set" >&2
+        exit 1
+fi
+
 script_path="${HOME}/services/dns/${DNS_CHOICE}/DeleteRecordByIP.sh"
 
 if [ ! -f "${script_path}" ]
