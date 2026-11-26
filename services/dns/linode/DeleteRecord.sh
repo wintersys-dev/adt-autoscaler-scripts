@@ -1,35 +1,34 @@
 #!/bin/sh
-###################################################################################
-# @file        DeleteRecord.sh
-# @brief       Deletes an active record entry from a specified domain zone matrix.
-# @author      Peter Winter
-# @date        05/11/2026
-# @version     1.0
-#
-# @details     This script parses a target Fully Qualified Domain Name (FQDN) to extract
-#              its zone apex domain root, queries provider catalogs securely to capture
-#              the target domain zone ID, and issues a secure authorized DELETE request
-#              to expunge the specified DNS record ID.
-#
-# @param       $1  [Required] The unique platform identifier ID of the target DNS record.
-# @param       $2  [Required] The Fully Qualified Domain Name context (e.g., "www.domain.com").
-#
-# @env         HOME          Path to the toolkit core framework layout directory.
-#
-# @dependencies
-#              - /home/homedir.dat configuration file tracking active framework layout.
-#              - external dependencies: cat, echo, cut, curl, jq
-#
-# @security    
-#              - Hardens executable locations (/bin, /usr/bin) to negate path hijacking.
-#              - Masks API interactions securely via stream piping using the @- syntax.
-#              - Protects dynamic JSON queries from parameter injection tracking vulnerabilities.
-#
-# @exit        0  Success: Target DNS record successfully deleted and verified.
-# @exit        1  Failure: Missing context paths, input parameter errors, or API communication failures.
+#: Name:        DeleteRecord.sh
+#: Purpose:     Deletes an active DNS record entry from a specified Linode domain zone.
+#: Author:      Peter Winter
+#: Date:        26/11/2026
+#: Version:     1.0
+#:
+#: Usage:       DeleteRecord.sh <record_id> <fqdn>
+#:              DeleteRecord.sh [-h|--help]
+#:
+#: Parameters:
+#:   $1         [Required] Unique platform identifier ID of the target DNS record
+#:   $2         [Required] Fully Qualified Domain Name context (e.g., "://domain.com")
+#:
+#: Environment:
+#:   HOME       Resolved automatically from /home/homedir.dat
+#:
+#: Dependencies:
+#:   - /home/homedir.dat
+#:   - ${HOME}/runtime/software.dat
+#:   - ${HOME}/utilities/config/ExtractConfigValue.sh
+#:   - ${HOME}/services/dns/linode/<ORCHESTRATION_TOOL>/get_domains.sh
+#:   - ${HOME}/services/dns/linode/<ORCHESTRATION_TOOL>/delete_record.sh
+#:   - External binaries: cat, echo, grep, cut, awk, jq
+#:
+#: Exit Codes:
+#:   0          Target DNS record successfully deleted and verified
+#:   1          Missing /home/homedir.dat, missing arguments, missing domain ID, or API failure
 ###################################################################################
 # License Agreement:
-# This file is part of The Agile Deployment Toolkit.
+# This file is part of The Wintersys Agile Deployment Toolkit.
 # The Agile Deployment Toolkit is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -39,10 +38,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with The Agile Deployment Toolkit.  If not, see <http://gnu.org>.
+# along with The Wintersys Agile Deployment Toolkit.  If not, see <http://gnu.org>.
 ####################################################################################
+
+# Exit immediately if any command exits with a non-zero status
 #set -x
 set -e
+
+# Render self-extracting help documentation when -h or --help is supplied
+if [ "${1}" = "-h" ] || [ "${1}" = "--help" ]
+then
+        /usr/bin/grep '^#:' "$0" | /usr/bin/cut -c 4-
+        exit 0
+fi
 
 if [ -r /home/homedir.dat ]
 then
@@ -66,20 +74,6 @@ domain_url="$(/bin/echo "${2}" | /usr/bin/cut -d'.' -f2-)"
 set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
-
-software_file="${HOME}/runtime/software.dat"
-if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
-then
-        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
-        exit 1
-fi
-
-software_file="${HOME}/runtime/software.dat"
-if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
-then
-        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
-        exit 1
-fi
 
 orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
 
@@ -107,7 +101,7 @@ then
         exit 1
 fi
 
-domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] | select(.domain | contains($dom)) | .id // empty' 2>/dev/null)
+domain_id=$(/bin/echo "${domain_json}" | /usr/bin/jq -r --arg dom "${domain_url}" '.[] |select(.domain == $dom) | .id // empty' 2>/dev/null)
 
 if [ -z "${domain_id}" ]
 then
