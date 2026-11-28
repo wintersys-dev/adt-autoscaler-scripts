@@ -75,6 +75,13 @@ set +e
 DNS_CHOICE="$(${HOME}/utilities/config/ExtractConfigValue.sh 'DNSCHOICE')"
 set -e
 
+software_file="${HOME}/runtime/software.dat"
+if [ ! -f "${software_file}" ] || [ ! -r "${software_file}" ]
+then
+        /bin/echo "Error: Cannot read software configuration file at ${software_file}" >&2
+        exit 1
+fi
+
 orchestration_tool="$(/usr/bin/awk -F':' '/^ORCHESTRATION_TOOL:/ {print $NF}' "${software_file}")"
 
 if [ -z "${orchestration_tool}" ]
